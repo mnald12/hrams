@@ -1,0 +1,96 @@
+.employee {
+  width: 100%;
+  height: auto;
+  padding: 16px 6px;
+}
+
+.employee .table-container {
+  width: 100%;
+  padding: 20px;
+  box-shadow: 0 0 1px 0 black;
+  border-radius: 4px;
+}
+
+.table-container h3 {
+  color: forestgreen;
+  margin-left: 12px;
+  font-size: 22px;
+}
+
+.table-header {
+  width: 100%;
+  height: 46px;
+  display: flex;
+  position: relative;
+}
+
+.table-header input {
+  width: 220px;
+  padding: 12px;
+  position: absolute;
+  left: 10px;
+  border: none;
+  outline: none;
+  border-radius: 4px;
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px,
+    rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+}
+
+.table-header button {
+  padding: 14px;
+  position: absolute;
+  right: 10px;
+  border: none;
+  outline: none;
+  border-radius: 4px;
+  background: royalblue;
+  box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;
+  color: aliceblue;
+}
+
+.employee table {
+  width: 100%;
+  height: auto;
+  text-align: left;
+}
+
+.employee table thead tr {
+  padding: 12px;
+  box-shadow: rgba(0, 0, 0, 0.45) 0px 10px 10px -10px;
+}
+.employee table thead th {
+  padding: 12px;
+}
+
+.employee table tbody tr {
+  box-shadow: rgba(0, 0, 0, 0.45) 0px 8px 10px -10px;
+}
+.employee table td {
+  padding: 12px;
+}
+
+.employee table tbody .table-actions {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+}
+
+.employee table tbody td button {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: none;
+  outline: none;
+  border-radius: 3px;
+  background: aliceblue;
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px,
+    rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+}
+
+.employee table tbody td button:hover {
+  background-color: rgba(17, 235, 17, 0.445);
+}

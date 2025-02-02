@@ -1,0 +1,94 @@
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+*::-webkit-scrollbar {
+  width: 5px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: #3e3e3e;
+  border-radius: 10px;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  position: relative;
+}
+
+.container {
+  height: 100vh;
+  display: flex;
+  gap: 8px;
+}
+
+.page {
+  width: 100%;
+  height: 100vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  border-top: 10px solid white;
+  padding-bottom: 10px;
+  padding-right: 10px;
+}
+
+.page-content {
+  width: 100%;
+  height: auto;
+}
+
+button {
+  cursor: pointer;
+}
+
+.color-red {
+  color: red;
+}
+
+.color-green {
+  color: green;
+}
+
+.color-blue {
+  color: blue;
+}
+
+.bg-red {
+  background: rgb(233, 202, 202);
+  background: linear-gradient(
+    77deg,
+    rgba(233, 202, 202, 1) 0%,
+    rgba(231, 106, 106, 0.6924894957983193) 69%
+  );
+}
+
+.bg-orange {
+  background: rgb(236, 202, 128);
+  background: linear-gradient(
+    77deg,
+    rgba(236, 202, 128, 1) 0%,
+    rgba(231, 196, 106, 0.6924894957983193) 69%
+  );
+}
+
+.bg-dark-red {
+  background: rgb(230, 43, 69);
+  background: linear-gradient(
+    77deg,
+    rgba(230, 43, 69, 0.7905287114845938) 53%,
+    rgba(230, 68, 90, 0.7905287114845938) 78%
+  );
+}

@@ -1,0 +1,66 @@
+.home {
+  width: 100%;
+  height: 100vh;
+  background: linear-gradient(to top left, lightskyblue, midnightblue);
+  background-size: 100% 300px;
+  background-repeat: no-repeat;
+  overflow-y: auto;
+}
+
+.home .home-header {
+  width: 100%;
+  height: auto;
+  min-height: 100px;
+}
+.navbar {
+  width: 100%;
+  height: 60px;
+  background: white;
+  display: flex;
+  align-items: center;
+  position: sticky;
+  top: 0;
+}
+.navbar .brand {
+  font-size: 30px;
+  position: absolute;
+  left: 20px;
+}
+
+.home .home-content {
+  width: auto;
+  max-width: 1000px;
+  height: auto;
+  padding: 12px;
+  margin: 0 auto;
+}
+
+.home .home-content h4 {
+  font-size: 22px;
+  color: aliceblue;
+  margin-left: 10px;
+}
+
+.home .home-content .subjects {
+  width: 100%;
+  height: auto;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  padding: 10px;
+  flex-wrap: wrap;
+}
+
+.home .home-content .subjects button {
+  border: none;
+  outline: none;
+  width: 23%;
+  height: 100%;
+  min-height: 200px;
+  font-size: 18px;
+  border-radius: 5px;
+  background: aliceblue;
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px,
+    rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+  display: block;
+}
