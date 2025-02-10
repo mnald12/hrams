@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import Loader from "../components/Loader";
 import "../css/attendance.css";
+import Calendar from "react-calendar/dist/cjs/Calendar.js";
+import "react-calendar/dist/Calendar.css";
+import { Padding } from "@mui/icons-material";
 
 const data = [
   {
@@ -93,6 +96,12 @@ const datas = [
 
 const Attendances = () => {
   const [isLoading, setIsLoading] = useState(true);
+  const [value, setCal] = useState(new Date());
+
+  const onChange = (v) => {
+    setCal(v);
+    console.log(v);
+  };
 
   useEffect(() => {
     setTimeout(() => {
@@ -105,8 +114,8 @@ const Attendances = () => {
   } else {
     return (
       <div className="employee">
-        <div className="attendance">
-          <div className="attendance-left">
+        <div className="d-flex-3-1">
+          <div className="d-left">
             <div className="table-container">
               <h3>Today's attendance</h3>
               <table>
@@ -143,17 +152,17 @@ const Attendances = () => {
               </table>
             </div>
           </div>
-          <div className="attendance-right">
+          <div className="d-right">
             <div className="table-container">
               <div className="table-header">
                 <h3>All attendance</h3>
-                <input type="text" placeholder="Search here..." />
               </div>
-              <div className="atts">
-                {datas.map((d) => (
-                  <button>{d.date}</button>
-                ))}
-              </div>
+              <Calendar
+                calendarType="gregory"
+                style={{ Padding: "20px !important" }}
+                onChange={onChange}
+                value={value}
+              />
             </div>
           </div>
         </div>

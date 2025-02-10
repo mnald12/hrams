@@ -6,6 +6,7 @@ import { AiOutlineLeft, AiOutlineRight } from "react-icons/ai";
 import { TbFileCertificate, TbAdjustmentsStar } from "react-icons/tb";
 import { RiFolderChartFill } from "react-icons/ri";
 import { IoIosPeople } from "react-icons/io";
+import { MdListAlt } from "react-icons/md";
 import { fold, unFold } from "../methods/navMethods";
 import { useContext } from "react";
 import { DataContext } from "../App";
@@ -64,6 +65,15 @@ const Sidebar = () => {
               onClick={() => setNavActive("Attendance")}
             >
               <TbFileCertificate className="icn" /> <span>Attendance</span>
+            </Link>
+            <Link
+              className={
+                location.pathname === "/leave" ? "side-btn active" : "side-btn"
+              }
+              to="/leave"
+              onClick={() => setNavActive("Leave Management")}
+            >
+              <MdListAlt className="icn" /> <span>Leave Management</span>
             </Link>
             <Link
               className={

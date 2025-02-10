@@ -7,6 +7,7 @@ import Scanlog from "./pages/Scanlog";
 import Attendances from "./pages/Attendances";
 import { createContext, useState } from "react";
 import Scanner from "./pages/Scanner";
+import Leave from "./pages/Leave";
 
 const DataContext = createContext(null);
 
@@ -22,6 +23,7 @@ function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/employee" element={<Employee />} />
             <Route path="/attendance" element={<Attendances />} />
+            <Route path="/leave" element={<Leave />} />
             <Route path="/performance" element={<Perfomance />} />
             <Route path="/scanlog" element={<Scanlog />} />
             <Route path="/scanner" element={<Scanner />} />

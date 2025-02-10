@@ -11,6 +11,7 @@
   background: linear-gradient(to bottom right, midnightblue, royalblue);
   border-radius: 6px;
   padding: 10px;
+  box-shadow: 0 0 3px 0 black;
 }
 
 .nav-brand {

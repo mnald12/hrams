@@ -27,6 +27,9 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   position: relative;
+  background-image: url(./bgd.jpg);
+  background-position: center;
+  background-size: cover;
 }
 
 .container {
@@ -91,4 +94,27 @@ button {
     rgba(230, 43, 69, 0.7905287114845938) 53%,
     rgba(230, 68, 90, 0.7905287114845938) 78%
   );
+}
+
+.react-calendar {
+  padding: 12px !important;
+  border-radius: 4px !important;
+}
+
+.d-flex-3-1 {
+  width: 100%;
+  height: auto;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.d-flex-3-1 .d-left {
+  width: 70%;
+  height: auto;
+}
+
+.d-flex-3-1 .d-right {
+  width: 29%;
+  height: auto;
 }
