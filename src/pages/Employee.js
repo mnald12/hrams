@@ -8,134 +8,35 @@ import { MdOutlinePersonOff } from "react-icons/md";
 import { TiGroupOutline } from "react-icons/ti";
 import { IoPersonRemoveOutline } from "react-icons/io5";
 import { BsPersonX } from "react-icons/bs";
-
-const employees = [
-  {
-    firstName: "Jason",
-    lastName: "Macaroni",
-    Age: 22,
-    Address: "San juan makatol city",
-    late: "90 hours",
-    absent: 5,
-    leave: 52,
-  },
-  {
-    firstName: "Jason",
-    lastName: "Macaroni",
-    Age: 22,
-    Address: "San juan makatol city",
-    late: "90 hours",
-    absent: 5,
-    leave: 52,
-  },
-  {
-    firstName: "Jason",
-    lastName: "Macaroni",
-    Age: 22,
-    Address: "San juan makatol city",
-    late: "90 hours",
-    absent: 5,
-    leave: 52,
-  },
-  {
-    firstName: "Jason",
-    lastName: "Macaroni",
-    Age: 22,
-    Address: "San juan makatol city",
-    late: "90 hours",
-    absent: 5,
-    leave: 52,
-  },
-  {
-    firstName: "Jason",
-    lastName: "Macaroni",
-    Age: 22,
-    Address: "San juan makatol city",
-    late: "90 hours",
-    absent: 5,
-    leave: 52,
-  },
-  {
-    firstName: "Jason",
-    lastName: "Macaroni",
-    Age: 22,
-    Address: "San juan makatol city",
-    late: "90 hours",
-    absent: 5,
-    leave: 52,
-  },
-  {
-    firstName: "Jason",
-    lastName: "Macaroni",
-    Age: 22,
-    Address: "San juan makatol city",
-    late: "90 hours",
-    absent: 5,
-    leave: 52,
-  },
-  {
-    firstName: "Jason",
-    lastName: "Macaroni",
-    Age: 22,
-    Address: "San juan makatol city",
-    late: "90 hours",
-    absent: 5,
-    leave: 52,
-  },
-  {
-    firstName: "Jason",
-    lastName: "Macaroni",
-    Age: 22,
-    Address: "San juan makatol city",
-    late: "90 hours",
-    absent: 5,
-    leave: 52,
-  },
-  {
-    firstName: "Jason",
-    lastName: "Macaroni",
-    Age: 22,
-    Address: "San juan makatol city",
-    late: "90 hours",
-    absent: 5,
-    leave: 52,
-  },
-  {
-    firstName: "Jason",
-    lastName: "Macaroni",
-    Age: 22,
-    Address: "San juan makatol city",
-    late: "90 hours",
-    absent: 5,
-    leave: 52,
-  },
-  {
-    firstName: "Jason",
-    lastName: "Macaroni",
-    Age: 22,
-    Address: "San juan makatol city",
-    late: "90 hours",
-    absent: 5,
-    leave: 52,
-  },
-  {
-    firstName: "Jason",
-    lastName: "Macaroni",
-    Age: 22,
-    Address: "San juan makatol city",
-    late: "90 hours",
-    absent: 5,
-    leave: 52,
-  },
-];
-
+import { collection, onSnapshot } from "firebase/firestore";
+import { db } from "../firebase/db";
 const Employee = () => {
   const [isLoading, setIsLoading] = useState(true);
+  const [employee, setEmployee] = useState([]);
 
   useEffect(() => {
+    const collectionRef = collection(db, "employee");
+
+    // Real-time listener
+    const unsubscribe = onSnapshot(
+      collectionRef,
+      (querySnapshot) => {
+        const items = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setEmployee(items);
+      },
+      (error) => {
+        console.error("Error fetching real-time updates: ", error);
+      }
+    );
+
     setTimeout(() => {
       setIsLoading(false);
     }, 1000);
+
+    return () => unsubscribe();
   }, []);
 
   if (isLoading) {
@@ -147,8 +48,15 @@ const Employee = () => {
           <div className="d-left">
             <div className="table-container">
               <div className="table-header">
-                <input type="text" placeholder="Search here..." />
-                <button>Add Employee</button>
+                <input type="text" placeholder="Search by employee..." />
+                <button
+                  onClick={() =>
+                    (document.getElementById("add-employee").style.display =
+                      "flex")
+                  }
+                >
+                  Add Employee
+                </button>
               </div>
               <table>
                 <thead>
@@ -162,13 +70,13 @@ const Employee = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {employees.map((e) => (
-                    <tr>
+                  {employee.map((e) => (
+                    <tr key={e.id}>
                       <td>{e.lastName}</td>
                       <td>{e.firstName}</td>
-                      <td>{e.late}</td>
-                      <td>{e.absent} days</td>
-                      <td>{e.leave} days</td>
+                      <td>{e.late.length}</td>
+                      <td>{e.absent.length} days</td>
+                      <td>{e.leave.length} days</td>
                       <td className="table-actions">
                         <button title="view">
                           <FaEye color="green" />

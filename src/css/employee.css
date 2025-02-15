@@ -48,28 +48,28 @@
   color: aliceblue;
 }
 
-.employee table {
+table {
   width: 100%;
   height: auto;
   text-align: left;
 }
 
-.employee table thead tr {
+table thead tr {
   padding: 12px;
   box-shadow: rgba(0, 0, 0, 0.45) 0px 10px 10px -10px;
 }
-.employee table thead th {
+table thead th {
   padding: 12px;
 }
 
-.employee table tbody tr {
+table tbody tr {
   box-shadow: rgba(0, 0, 0, 0.45) 0px 8px 10px -10px;
 }
-.employee table td {
+table td {
   padding: 12px;
 }
 
-.employee table tbody .table-actions {
+table tbody .table-actions {
   width: 100%;
   display: flex;
   align-items: center;
@@ -77,7 +77,7 @@
   text-align: left;
 }
 
-.employee table tbody td button {
+table tbody td button {
   width: 30px;
   height: 30px;
   display: flex;
@@ -91,7 +91,7 @@
     rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
 }
 
-.employee table tbody td button:hover {
+table tbody td button:hover {
   background-color: rgba(17, 235, 17, 0.445);
 }
 
@@ -171,4 +171,79 @@
   position: absolute;
   top: 5px;
   left: 6px;
+}
+
+.form-container {
+  width: 100%;
+  height: auto;
+  display: flex;
+  align-items: flex-start;
+  padding: 20px;
+  gap: 30px;
+}
+
+.form-container .form-left {
+  width: auto;
+  height: auto;
+}
+
+.form-container .form-right {
+  width: 100%;
+  height: auto;
+}
+
+.form-left .preview {
+  width: 200px;
+  height: 180px;
+  box-shadow: 0 0 3px 0 black;
+  padding: 20px;
+  border-radius: 6px;
+  margin-bottom: 12px;
+}
+
+.form-left input {
+  width: 200px;
+  height: auto;
+  padding: 12px;
+  border: none;
+  outline: none;
+  box-shadow: 0 0 3px 0 black;
+  margin-top: 12px;
+  margin-bottom: 7px;
+  border-radius: 4px;
+}
+
+.inps {
+  width: 100%;
+  height: auto;
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.inp-grp {
+  width: 31%;
+  height: auto;
+}
+
+.form-container h4 {
+  color: midnightblue;
+}
+
+.inp-grp input,
+.inp-grp select {
+  width: 100%;
+  border: none;
+  outline: none;
+  height: auto;
+  padding: 10px;
+  box-shadow: 0 0 3px 0 black;
+  margin-top: 8px;
+  background: transparent;
+  border-radius: 4px;
+}
+
+.w-2 {
+  width: 64%;
 }
