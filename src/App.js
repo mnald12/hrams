@@ -8,6 +8,8 @@ import Attendances from "./pages/Attendances";
 import { createContext, useState } from "react";
 import Scanner from "./pages/Scanner";
 import Leave from "./pages/Leave";
+import Addemployee from "./pages/Addemployee";
+import Viewemployee from "./pages/Viewemployee";
 
 const DataContext = createContext(null);
 
@@ -26,6 +28,8 @@ function App() {
             <Route path="/leave" element={<Leave />} />
             <Route path="/performance" element={<Perfomance />} />
             <Route path="/scanlog" element={<Scanlog />} />
+            <Route path="/employee/add" element={<Addemployee />} />
+            <Route path="/employee/view/:id" element={<Viewemployee />} />
             <Route path="/scanner" element={<Scanner />} />
           </Route>
         </Routes>

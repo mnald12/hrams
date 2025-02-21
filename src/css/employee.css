@@ -36,8 +36,9 @@
     rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
 }
 
-.table-header button {
-  padding: 14px;
+.table-header button,
+.add-btn {
+  padding: 12px 14px;
   position: absolute;
   right: 10px;
   border: none;
@@ -46,6 +47,8 @@
   background: royalblue;
   box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;
   color: aliceblue;
+  text-decoration: none;
+  font-size: 16px !important;
 }
 
 table {
@@ -69,6 +72,14 @@ table td {
   padding: 12px;
 }
 
+table td img {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  margin: 1px auto;
+  transform: translateY(3px);
+}
+
 table tbody .table-actions {
   width: 100%;
   display: flex;
@@ -77,7 +88,8 @@ table tbody .table-actions {
   text-align: left;
 }
 
-table tbody td button {
+table tbody td button,
+table tbody td .add-btn-icn {
   width: 30px;
   height: 30px;
   display: flex;
@@ -178,7 +190,6 @@ table tbody td button:hover {
   height: auto;
   display: flex;
   align-items: flex-start;
-  padding: 20px;
   gap: 30px;
 }
 
@@ -196,9 +207,20 @@ table tbody td button:hover {
   width: 200px;
   height: 180px;
   box-shadow: 0 0 3px 0 black;
-  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 6px;
   margin-bottom: 12px;
+}
+
+.form-left .preview img {
+  width: 100%;
+  height: 100%;
+}
+
+.form-left p {
+  font-size: smaller;
 }
 
 .form-left input {
@@ -227,12 +249,20 @@ table tbody td button:hover {
   height: auto;
 }
 
-.form-container h4 {
+.inp-grp-4 {
+  width: 23.2%;
+  height: auto;
+}
+
+.form-container h4,
+.form-container-bottom h4 {
   color: midnightblue;
 }
 
 .inp-grp input,
-.inp-grp select {
+.inp-grp select,
+.inp-grp-4 input,
+.inp-grp-4 select {
   width: 100%;
   border: none;
   outline: none;
@@ -244,6 +274,72 @@ table tbody td button:hover {
   border-radius: 4px;
 }
 
+.inp-grp input:disabled,
+.inp-grp-4 input:disabled {
+  background-color: aliceblue;
+}
+
 .w-2 {
   width: 64%;
+}
+
+.form-container .form-right h2 {
+  font-size: 22px;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid black;
+}
+
+.form-container-bottom h2 {
+  font-size: 22px;
+  margin-bottom: 5px;
+  margin-top: 16px;
+}
+
+.add-row-btn {
+  width: 100%;
+  text-align: right;
+}
+
+.divider {
+  width: 100%;
+  border-bottom: 1px solid black;
+  margin-top: 5px;
+  margin-bottom: 12px;
+}
+
+.add-row-btn button {
+  border: none;
+  outline: none;
+  height: auto;
+  padding: 10px 16px;
+  box-shadow: 0 0 3px 0 black;
+  margin-top: 8px;
+  background: limegreen;
+  border-radius: 4px;
+  color: aliceblue;
+  margin-top: 20px;
+  margin-left: 16px;
+}
+
+.add-row-btn .arbtn {
+  background: rgb(71, 114, 243);
+}
+
+.form-container-bottom .inps {
+  width: 100%;
+  height: auto;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin: 16px auto;
+  padding: 20px;
+  box-shadow: 0 0 3px 0 black;
+  border-radius: 5px;
+}
+
+.address {
+  width: 64.5% !important;
 }

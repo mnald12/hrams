@@ -1,5 +1,5 @@
 import "../css/sidebar.css";
-import pdlogo from "../pdlogo.jpg";
+import pdlogo from "../pdlogo.png";
 import { Link, useLocation } from "react-router-dom";
 import { BiSolidDashboard } from "react-icons/bi";
 import { AiOutlineLeft, AiOutlineRight } from "react-icons/ai";

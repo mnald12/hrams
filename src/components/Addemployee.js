@@ -132,6 +132,13 @@ const Addemployee = () => {
                   />
                 </div>
                 <div className="inp-grp">
+                  <h4>Points Balance :</h4>
+                  <input
+                    type="text"
+                    onChange={(e) => setPosition(e.target.value)}
+                  />
+                </div>
+                <div className="inp-grp">
                   <h4>Employed :</h4>
                   <input
                     type="date"

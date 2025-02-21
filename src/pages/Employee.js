@@ -1,7 +1,6 @@
 import "../css/employee.css";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import Loader from "../components/Loader";
-import { MdDeleteForever } from "react-icons/md";
 import { FaEye } from "react-icons/fa";
 import { FaEdit } from "react-icons/fa";
 import { MdOutlinePersonOff } from "react-icons/md";
@@ -10,14 +9,17 @@ import { IoPersonRemoveOutline } from "react-icons/io5";
 import { BsPersonX } from "react-icons/bs";
 import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase/db";
+import { Link } from "react-router-dom";
+import { DataContext } from "../App";
 const Employee = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [employee, setEmployee] = useState([]);
 
+  const { setNavActive } = useContext(DataContext);
+
   useEffect(() => {
     const collectionRef = collection(db, "employee");
 
-    // Real-time listener
     const unsubscribe = onSnapshot(
       collectionRef,
       (querySnapshot) => {
@@ -49,18 +51,18 @@ const Employee = () => {
             <div className="table-container">
               <div className="table-header">
                 <input type="text" placeholder="Search by employee..." />
-                <button
-                  onClick={() =>
-                    (document.getElementById("add-employee").style.display =
-                      "flex")
-                  }
+                <Link
+                  className="add-btn"
+                  to="/employee/add"
+                  onClick={() => setNavActive("Add Employee")}
                 >
                   Add Employee
-                </button>
+                </Link>
               </div>
               <table>
                 <thead>
                   <tr>
+                    <th>Img</th>
                     <th width="20%">Last Name</th>
                     <th width="20%">First Name</th>
                     <th width="15%">Late</th>
@@ -72,20 +74,25 @@ const Employee = () => {
                 <tbody>
                   {employee.map((e) => (
                     <tr key={e.id}>
+                      <td>
+                        <img src={e.avatar} alt="avatar" />
+                      </td>
                       <td>{e.lastName}</td>
                       <td>{e.firstName}</td>
                       <td>{e.late.length}</td>
                       <td>{e.absent.length} days</td>
                       <td>{e.leave.length} days</td>
                       <td className="table-actions">
-                        <button title="view">
+                        <Link
+                          title="view"
+                          className="add-btn-icn"
+                          to={`/employee/view/${e.id}`}
+                          onClick={() => setNavActive("View Employee")}
+                        >
                           <FaEye color="green" />
-                        </button>
+                        </Link>
                         <button title="edit">
                           <FaEdit color="orange" />
-                        </button>
-                        <button title="delete">
-                          <MdDeleteForever color="red" />
                         </button>
                       </td>
                     </tr>

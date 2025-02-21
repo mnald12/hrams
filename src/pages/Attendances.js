@@ -3,7 +3,6 @@ import Loader from "../components/Loader";
 import "../css/attendance.css";
 import Calendar from "react-calendar/dist/cjs/Calendar.js";
 import "react-calendar/dist/Calendar.css";
-import { Padding } from "@mui/icons-material";
 
 const data = [
   {
@@ -61,36 +60,6 @@ const data = [
     timeInPM: "12:40",
     timeOutAM: "11:50",
     timeOutPM: "4:56",
-  },
-];
-
-const datas = [
-  {
-    date: "01-02-2025",
-  },
-  {
-    date: "01-02-2025",
-  },
-  {
-    date: "01-02-2025",
-  },
-  {
-    date: "01-02-2025",
-  },
-  {
-    date: "01-02-2025",
-  },
-  {
-    date: "01-02-2025",
-  },
-  {
-    date: "01-02-2025",
-  },
-  {
-    date: "01-02-2025",
-  },
-  {
-    date: "01-02-2025",
   },
 ];
 
