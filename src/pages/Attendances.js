@@ -3,6 +3,8 @@ import Loader from "../components/Loader";
 import "../css/attendance.css";
 import Calendar from "react-calendar/dist/cjs/Calendar.js";
 import "react-calendar/dist/Calendar.css";
+import { collection, onSnapshot } from "firebase/firestore";
+import { db } from "../firebase/db";
 
 const data = [
   {
@@ -66,6 +68,7 @@ const data = [
 const Attendances = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [value, setCal] = useState(new Date());
+  const [attendance, setAttendance] = useState([]);
 
   const onChange = (v) => {
     setCal(v);
@@ -73,9 +76,27 @@ const Attendances = () => {
   };
 
   useEffect(() => {
+    const collectionRef = collection(db, "attendance");
+
+    const unsubscribe = onSnapshot(
+      collectionRef,
+      (querySnapshot) => {
+        const items = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setAttendance(items);
+      },
+      (error) => {
+        console.error("Error fetching real-time updates: ", error);
+      }
+    );
+
     setTimeout(() => {
       setIsLoading(false);
     }, 1000);
+
+    return () => unsubscribe();
   }, []);
 
   if (isLoading) {
@@ -87,34 +108,57 @@ const Attendances = () => {
           <div className="d-left">
             <div className="table-container">
               <h3>Today's attendance</h3>
-              <table>
+              <table style={{ marginTop: "-10px" }}>
                 <thead>
+                  <tr
+                    style={{
+                      boxShadow: "none",
+                      transform: "translateY(20px)",
+                    }}
+                  >
+                    <th width="25%"></th>
+                    <th width="15%"></th>
+                    <th width="15%">
+                      <i style={{ color: "blue" }}>(AM)</i>
+                    </th>
+                    <th width="15%">
+                      <i style={{ color: "blue" }}>(AM)</i>
+                    </th>
+                    <th width="15%">
+                      <i style={{ color: "orange" }}>(PM)</i>
+                    </th>
+                    <th width="15%">
+                      <i style={{ color: "orange" }}>(PM)</i>
+                    </th>
+                  </tr>
                   <tr>
                     <th width="25%">Name</th>
                     <th width="15%">Date</th>
-                    <th width="15%">
-                      Time in <i style={{ color: "blue" }}>(AM)</i>
-                    </th>
-                    <th width="15%">
-                      Time out <i style={{ color: "blue" }}>(AM)</i>
-                    </th>
-                    <th width="15%">
-                      Time in <i style={{ color: "orange" }}>(PM)</i>
-                    </th>
-                    <th width="15%">
-                      Time out <i style={{ color: "orange" }}>(PM)</i>
-                    </th>
+                    <th width="15%">Time in</th>
+                    <th width="15%">Time out</th>
+                    <th width="15%">Time in</th>
+                    <th width="15%">Time out</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {data.map((e) => (
+                  {attendance.map((e) => (
                     <tr>
-                      <td>{e.name}</td>
+                      <td>
+                        {e.firstName} {e.lastName}
+                      </td>
                       <td>{e.date}</td>
-                      <td>{e.timeInAM} AM</td>
-                      <td>{e.timeOutAM} AM</td>
-                      <td>{e.timeInPM} PM</td>
-                      <td>{e.timeOutPM} PM</td>
+                      <td>
+                        {e.timeInAM.hour} : {e.timeInAM.minute} AM
+                      </td>
+                      <td>
+                        {e.timeOutAM.hour} : {e.timeOutAM.minute} AM
+                      </td>
+                      <td>
+                        {e.timeInPM.hour} : {e.timeInPM.minute} PM
+                      </td>
+                      <td>
+                        {e.timeOutPM.hour} : {e.timeOutPM.minute} PM
+                      </td>
                     </tr>
                   ))}
                 </tbody>

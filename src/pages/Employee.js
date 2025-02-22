@@ -11,11 +11,20 @@ import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase/db";
 import { Link } from "react-router-dom";
 import { DataContext } from "../App";
+import { FiSearch } from "react-icons/fi";
 const Employee = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [employee, setEmployee] = useState([]);
+  const [search, setSearch] = useState("");
 
   const { setNavActive } = useContext(DataContext);
+
+  const filteredEmployees = employee.filter(
+    (emp) =>
+      emp.rfid.includes(search) ||
+      emp.firstName.toLowerCase().includes(search.toLowerCase()) ||
+      emp.lastName.toLowerCase().includes(search.toLowerCase())
+  );
 
   useEffect(() => {
     const collectionRef = collection(db, "employee");
@@ -50,7 +59,15 @@ const Employee = () => {
           <div className="d-left">
             <div className="table-container">
               <div className="table-header">
-                <input type="text" placeholder="Search by employee..." />
+                <div className="search-container">
+                  <FiSearch className="search-icon" size={20} />
+                  <input
+                    className="search-input"
+                    placeholder="Search by Employee or RFID"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                  />
+                </div>
                 <Link
                   className="add-btn"
                   to="/employee/add"
@@ -63,25 +80,21 @@ const Employee = () => {
                 <thead>
                   <tr>
                     <th>Img</th>
-                    <th width="20%">Last Name</th>
-                    <th width="20%">First Name</th>
-                    <th width="15%">Late</th>
-                    <th width="15%">Absent</th>
-                    <th width="15%">Leave</th>
-                    <th width="15%">Action</th>
+                    <th>Last Name</th>
+                    <th>First Name</th>
+                    <th>RFID</th>
+                    <th>Action</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {employee.map((e) => (
+                  {filteredEmployees.map((e) => (
                     <tr key={e.id}>
                       <td>
                         <img src={e.avatar} alt="avatar" />
                       </td>
                       <td>{e.lastName}</td>
                       <td>{e.firstName}</td>
-                      <td>{e.late.length}</td>
-                      <td>{e.absent.length} days</td>
-                      <td>{e.leave.length} days</td>
+                      <td>{e.rfid}</td>
                       <td className="table-actions">
                         <Link
                           title="view"

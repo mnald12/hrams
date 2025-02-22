@@ -4,6 +4,8 @@ import { FiSearch } from "react-icons/fi";
 import "../css/dashboard.css";
 import "../css/scanlog.css";
 import Loader from "../components/Loader";
+import { collection, onSnapshot } from "firebase/firestore";
+import { db } from "../firebase/db";
 const Scanlog = () => {
   const [isLoading, setIsLoading] = useState(true);
 
@@ -11,41 +13,30 @@ const Scanlog = () => {
   const [search, setSearch] = useState("");
 
   useEffect(() => {
-    // Sample scan logs
-    const sampleLogs = [
-      {
-        employee: "John Doe",
-        rfid: "1234567890",
-        time: "08:00 AM",
-        date: "02/12/2025",
+    const collectionRef = collection(db, "scanlog");
+
+    const unsubscribe = onSnapshot(
+      collectionRef,
+      (querySnapshot) => {
+        const items = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setLogs(items);
       },
-      {
-        employee: "Jane Smith",
-        rfid: "0987654321",
-        time: "08:15 AM",
-        date: "02/12/2025",
-      },
-      {
-        employee: "Alice Brown",
-        rfid: "1122334455",
-        time: "08:30 AM",
-        date: "02/12/2025",
-      },
-      {
-        employee: "Bob White",
-        rfid: "5566778899",
-        time: "09:00 AM",
-        date: "02/12/2025",
-      },
-    ];
-    setLogs(sampleLogs);
+      (error) => {
+        console.error("Error fetching real-time updates: ", error);
+      }
+    );
+
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+
+    return () => unsubscribe();
   }, []);
 
-  const filteredLogs = logs.filter(
-    (log) =>
-      log.employee.toLowerCase().includes(search.toLowerCase()) ||
-      log.rfid.includes(search)
-  );
+  const filteredLogs = logs.filter((log) => log.rfid.includes(search));
 
   useEffect(() => {
     setTimeout(() => {
@@ -67,7 +58,7 @@ const Scanlog = () => {
               />
               <input
                 className="search-input pl-8 border rounded px-2 py-1"
-                placeholder="Search by Employee or RFID"
+                placeholder="Search by RFID"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
@@ -77,18 +68,14 @@ const Scanlog = () => {
             <table>
               <thead>
                 <tr className="bg-gray-200">
-                  <th>Employee</th>
                   <th>RFID</th>
-                  <th>Date</th>
-                  <th>Time</th>
+                  <th>Date / Time</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredLogs.map((log, index) => (
                   <tr key={index} className="hover:bg-gray-100">
-                    <td>{log.employee}</td>
                     <td>{log.rfid}</td>
-                    <td>{log.date}</td>
                     <td>{log.time}</td>
                   </tr>
                 ))}

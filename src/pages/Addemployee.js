@@ -25,12 +25,12 @@ const Addemployee = () => {
     {
       from: "",
       to: "",
-      slb: "",
-      vlb: "",
-      sle: "",
-      vle: "",
-      sls: "",
-      vls: "",
+      slb: 0,
+      vlb: 0,
+      sle: 0,
+      vle: 0,
+      sls: 0,
+      vls: 0,
     },
   ]);
 
@@ -44,6 +44,7 @@ const Addemployee = () => {
     uploadBytes(imageRef, img).then((snapshot) => {
       getDownloadURL(snapshot.ref).then(async (url) => {
         const add = insertOne("employee", {
+          attendance: [],
           rfid,
           firstName: fname,
           lastName: lname,
@@ -55,12 +56,23 @@ const Addemployee = () => {
           address,
           position,
           employed,
+          isOnLeave: false,
           late: [],
           absent: [],
           leave: [],
           files: [],
           avatar: url,
           points: inputsValues,
+          thisYearPoints: {
+            from: "",
+            to: "",
+            slb: 0,
+            vlb: 0,
+            sle: 0,
+            vle: 0,
+            sls: 0,
+            vls: 0,
+          },
         });
 
         if (add) {
@@ -68,12 +80,12 @@ const Addemployee = () => {
             {
               from: "",
               to: "",
-              slb: "",
-              vlb: "",
-              sle: "",
-              vle: "",
-              sls: "",
-              vls: "",
+              slb: 0,
+              vlb: 0,
+              sle: 0,
+              vle: 0,
+              sls: 0,
+              vls: 0,
             },
           ]);
           setRfid("");
@@ -100,12 +112,12 @@ const Addemployee = () => {
       {
         from: "",
         to: "",
-        slb: "",
-        vlb: "",
-        sle: "",
-        vle: "",
-        sls: "",
-        vls: "",
+        slb: 0,
+        vlb: 0,
+        sle: 0,
+        vle: 0,
+        sls: 0,
+        vls: 0,
       },
     ]);
   };
@@ -211,7 +223,7 @@ const Addemployee = () => {
             <div className="inp-grp-4">
               <h4>SL Balance:</h4>
               <input
-                type="text"
+                type="number"
                 value={input.slb}
                 onChange={(e) =>
                   handleInputChange(index, "slb", e.target.value)
@@ -221,7 +233,7 @@ const Addemployee = () => {
             <div className="inp-grp-4">
               <h4>VL Balance:</h4>
               <input
-                type="text"
+                type="number"
                 value={input.vlb}
                 onChange={(e) =>
                   handleInputChange(index, "vlb", e.target.value)
@@ -231,7 +243,7 @@ const Addemployee = () => {
             <div className="inp-grp-4">
               <h4>SL Earned:</h4>
               <input
-                type="text"
+                type="number"
                 value={input.sle}
                 onChange={(e) =>
                   handleInputChange(index, "sle", e.target.value)
@@ -241,7 +253,7 @@ const Addemployee = () => {
             <div className="inp-grp-4">
               <h4>VL Earned:</h4>
               <input
-                type="text"
+                type="number"
                 value={input.vle}
                 onChange={(e) =>
                   handleInputChange(index, "vle", e.target.value)
@@ -251,7 +263,7 @@ const Addemployee = () => {
             <div className="inp-grp-4">
               <h4>SL Spent:</h4>
               <input
-                type="text"
+                type="number"
                 value={input.sls}
                 onChange={(e) =>
                   handleInputChange(index, "sls", e.target.value)
@@ -261,7 +273,7 @@ const Addemployee = () => {
             <div className="inp-grp-4">
               <h4>VL Spent:</h4>
               <input
-                type="text"
+                type="number"
                 value={input.vls}
                 onChange={(e) =>
                   handleInputChange(index, "vls", e.target.value)

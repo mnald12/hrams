@@ -24,16 +24,29 @@
   position: relative;
 }
 
-.table-header input {
-  width: 220px;
-  padding: 12px;
+.table-header .search-container {
+  width: 50%;
   position: absolute;
-  left: 10px;
+  left: 0;
+}
+
+.table-header .search-icon {
+  transform: translate(30px -50%);
+  color: gray;
+}
+
+.table-header .search-input {
+  padding-left: 32px;
+  width: 260px;
+  border-radius: 8px;
+  height: 36px;
+  background: white !important;
   border: none;
   outline: none;
   border-radius: 4px;
   box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px,
     rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+  margin-left: 12px;
 }
 
 .table-header button,
