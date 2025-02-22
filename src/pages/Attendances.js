@@ -6,65 +6,6 @@ import "react-calendar/dist/Calendar.css";
 import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase/db";
 
-const data = [
-  {
-    name: "Jhon espiritu",
-    date: "02/03/2025",
-    timeInAM: "6:40",
-    timeInPM: "12:40",
-    timeOutAM: "11:50",
-    timeOutPM: "4:56",
-  },
-  {
-    name: "Jhon espiritu",
-    date: "02/03/2025",
-    timeInAM: "6:40",
-    timeInPM: "12:40",
-    timeOutAM: "11:50",
-    timeOutPM: "4:56",
-  },
-  {
-    name: "Jhon espiritu",
-    date: "02/03/2025",
-    timeInAM: "6:40",
-    timeInPM: "12:40",
-    timeOutAM: "11:50",
-    timeOutPM: "4:56",
-  },
-  {
-    name: "Jhon espiritu",
-    date: "02/03/2025",
-    timeInAM: "6:40",
-    timeInPM: "12:40",
-    timeOutAM: "11:50",
-    timeOutPM: "4:56",
-  },
-  {
-    name: "Jhon espiritu",
-    date: "02/03/2025",
-    timeInAM: "6:40",
-    timeInPM: "12:40",
-    timeOutAM: "11:50",
-    timeOutPM: "4:56",
-  },
-  {
-    name: "Jhon espiritu",
-    date: "02/03/2025",
-    timeInAM: "6:40",
-    timeInPM: "12:40",
-    timeOutAM: "11:50",
-    timeOutPM: "4:56",
-  },
-  {
-    name: "Jhon espiritu",
-    date: "02/03/2025",
-    timeInAM: "6:40",
-    timeInPM: "12:40",
-    timeOutAM: "11:50",
-    timeOutPM: "4:56",
-  },
-];
-
 const Attendances = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [value, setCal] = useState(new Date());
