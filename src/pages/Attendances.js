@@ -1,20 +1,21 @@
 import { useEffect, useState } from "react";
 import Loader from "../components/Loader";
 import "../css/attendance.css";
-import Calendar from "react-calendar/dist/cjs/Calendar.js";
 import "react-calendar/dist/Calendar.css";
 import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase/db";
+import { FiSearch } from "react-icons/fi";
 
 const Attendances = () => {
   const [isLoading, setIsLoading] = useState(true);
-  const [value, setCal] = useState(new Date());
   const [attendance, setAttendance] = useState([]);
+  const [search, setSearch] = useState("");
 
-  const onChange = (v) => {
-    setCal(v);
-    console.log(v);
-  };
+  const filteredEmployees = attendance.filter(
+    (emp) =>
+      emp.firstName.toLowerCase().includes(search.toLowerCase()) ||
+      emp.lastName.toLowerCase().includes(search.toLowerCase())
+  );
 
   useEffect(() => {
     const collectionRef = collection(db, "attendance");
@@ -45,80 +46,91 @@ const Attendances = () => {
   } else {
     return (
       <div className="employee">
-        <div className="d-flex-3-1">
-          <div className="d-left">
-            <div className="table-container">
-              <h3>Today's attendance</h3>
-              <table style={{ marginTop: "-10px" }}>
-                <thead>
-                  <tr
-                    style={{
-                      boxShadow: "none",
-                      transform: "translateY(20px)",
-                    }}
-                  >
-                    <th width="25%"></th>
-                    <th width="15%"></th>
-                    <th width="15%">
-                      <i style={{ color: "blue" }}>(AM)</i>
-                    </th>
-                    <th width="15%">
-                      <i style={{ color: "blue" }}>(AM)</i>
-                    </th>
-                    <th width="15%">
-                      <i style={{ color: "orange" }}>(PM)</i>
-                    </th>
-                    <th width="15%">
-                      <i style={{ color: "orange" }}>(PM)</i>
-                    </th>
-                  </tr>
-                  <tr>
-                    <th width="25%">Name</th>
-                    <th width="15%">Date</th>
-                    <th width="15%">Time in</th>
-                    <th width="15%">Time out</th>
-                    <th width="15%">Time in</th>
-                    <th width="15%">Time out</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {attendance.map((e) => (
-                    <tr>
+        <div className="table-container">
+          <div className="table-header">
+            <div className="search-container">
+              <FiSearch className="search-icon" size={20} />
+              <input
+                className="search-input"
+                placeholder="Search by Employee"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </div>
+          </div>
+          <table style={{ marginTop: "-30px" }}>
+            <thead>
+              <tr
+                style={{
+                  boxShadow: "none",
+                  transform: "translateY(20px)",
+                }}
+              >
+                <th width="25%"></th>
+                <th width="15%"></th>
+                <th width="15%">
+                  <i style={{ color: "blue" }}>(AM)</i>
+                </th>
+                <th width="15%">
+                  <i style={{ color: "blue" }}>(AM)</i>
+                </th>
+                <th width="15%">
+                  <i style={{ color: "orange" }}>(PM)</i>
+                </th>
+                <th width="15%">
+                  <i style={{ color: "orange" }}>(PM)</i>
+                </th>
+              </tr>
+              <tr>
+                <th width="25%">Name</th>
+                <th width="15%">Date</th>
+                <th width="15%">Time in</th>
+                <th width="15%">Time out</th>
+                <th width="15%">Time in</th>
+                <th width="15%">Time out</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredEmployees
+                .sort((a, b) => {
+                  // Extract the latest scan time (fallback to other times if missing)
+                  const getLastScanTime = (e) => {
+                    return (
+                      (e.timeOutPM?.hour ?? 0) * 60 +
+                        (e.timeOutPM?.minute ?? 0) ||
+                      (e.timeInPM?.hour ?? 0) * 60 +
+                        (e.timeInPM?.minute ?? 0) ||
+                      (e.timeOutAM?.hour ?? 0) * 60 +
+                        (e.timeOutAM?.minute ?? 0) ||
+                      (e.timeInAM?.hour ?? 0) * 60 + (e.timeInAM?.minute ?? 0)
+                    );
+                  };
+
+                  return getLastScanTime(b) - getLastScanTime(a); // Sort descending
+                })
+                .map((e, i) => {
+                  const formatTime = ({ hour, minute, period }) => {
+                    if (hour === 0) return ""; // Hide if hour is 0
+                    return `${hour >= 13 ? hour - 12 : hour}:${minute
+                      .toString()
+                      .padStart(2, "0")} ${period}`;
+                  };
+
+                  return (
+                    <tr key={i}>
                       <td>
                         {e.firstName} {e.lastName}
                       </td>
                       <td>{e.date}</td>
-                      <td>
-                        {e.timeInAM.hour} : {e.timeInAM.minute} AM
-                      </td>
-                      <td>
-                        {e.timeOutAM.hour} : {e.timeOutAM.minute} AM
-                      </td>
-                      <td>
-                        {e.timeInPM.hour} : {e.timeInPM.minute} PM
-                      </td>
-                      <td>
-                        {e.timeOutPM.hour} : {e.timeOutPM.minute} PM
-                      </td>
+                      <td>{formatTime({ ...e.timeInAM, period: "AM" })}</td>
+                      <td>{formatTime({ ...e.timeOutAM, period: "AM" })}</td>
+                      <td>{formatTime({ ...e.timeInPM, period: "PM" })}</td>
+                      <td>{formatTime({ ...e.timeOutPM, period: "PM" })}</td>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <div className="d-right">
-            <div className="table-container">
-              <div className="table-header">
-                <h3>All attendance</h3>
-              </div>
-              <Calendar
-                calendarType="gregory"
-                style={{ Padding: "20px !important" }}
-                onChange={onChange}
-                value={value}
-              />
-            </div>
-          </div>
+                  );
+                })}
+            </tbody>
+          </table>
         </div>
       </div>
     );

@@ -122,7 +122,7 @@ const Employee = () => {
                 </div>
                 <div className="card-right">
                   <p className="color-blue">Total Employee</p>
-                  <h3 style={{ fontSize: "30px" }}>104</h3>
+                  <h3 style={{ fontSize: "30px" }}>{employee.length}</h3>
                 </div>
               </div>
               <div className="card-4">

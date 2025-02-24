@@ -1,0 +1,107 @@
+/* Container */
+.leave-container {
+  padding: 16px;
+  font-family: Arial, sans-serif;
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.leaves {
+  width: 100%;
+}
+
+/* Title */
+.leave-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 16px;
+}
+
+/* Leave Balance Summary */
+.leave-balance {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.leave-card {
+  background: white;
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.leave-card h2 {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.leave-card p {
+  color: #666;
+}
+
+/* Leave Request Form */
+.leave-form {
+  width: 30%;
+  min-width: 300px;
+  background: white;
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 0 1px 0 black;
+  margin-bottom: 24px;
+}
+
+.leave-form h2 {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: forestgreen;
+}
+
+.leave-input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+/* Submit Button */
+.leave-button {
+  background-color: #007bff;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.leave-button:hover {
+  background-color: #0056b3;
+}
+
+/* Leave History Table */
+.leave-history {
+  width: 100%;
+  background: white;
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 0 1px 0 black;
+  margin-bottom: 20px;
+}
+
+.leave-history h2 {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: forestgreen;
+}
+
+.pending {
+  color: #e0a800;
+  font-weight: bold;
+}

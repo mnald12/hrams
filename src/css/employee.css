@@ -51,17 +51,23 @@
 
 .table-header button,
 .add-btn {
-  padding: 12px 14px;
+  padding: 12px 20px !important;
   position: absolute;
   right: 10px;
   border: none;
   outline: none;
+  background-color: #007bff;
+  padding: 10px;
+  border: none;
   border-radius: 4px;
-  background: royalblue;
-  box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;
-  color: aliceblue;
+  cursor: pointer;
+  color: white;
   text-decoration: none;
   font-size: 16px !important;
+}
+
+.add-btn:hover {
+  background-color: #0056b3;
 }
 
 table {
@@ -116,7 +122,8 @@ table tbody td .add-btn-icn {
     rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
 }
 
-table tbody td button:hover {
+table tbody td button:hover,
+table tbody td .add-btn-icn:hover {
   background-color: rgba(17, 235, 17, 0.445);
 }
 
@@ -218,7 +225,7 @@ table tbody td button:hover {
 
 .form-left .preview {
   width: 200px;
-  height: 180px;
+  height: auto;
   box-shadow: 0 0 3px 0 black;
   display: flex;
   align-items: center;
@@ -324,19 +331,28 @@ table tbody td button:hover {
 .add-row-btn button {
   border: none;
   outline: none;
-  height: auto;
+  background-color: limegreen;
   padding: 10px 16px;
-  box-shadow: 0 0 3px 0 black;
-  margin-top: 8px;
-  background: limegreen;
+  border: none;
   border-radius: 4px;
-  color: aliceblue;
+  cursor: pointer;
+  color: white;
+  text-decoration: none;
+  font-size: 16px !important;
   margin-top: 20px;
   margin-left: 16px;
 }
 
+.add-row-btn button:hover {
+  background-color: rgb(40, 173, 40);
+}
+
 .add-row-btn .arbtn {
-  background: rgb(71, 114, 243);
+  background: #007bff;
+}
+
+.add-row-btn .arbtn:hover {
+  background-color: #0056b3;
 }
 
 .form-container-bottom .inps {
@@ -355,4 +371,16 @@ table tbody td button:hover {
 
 .address {
   width: 64.5% !important;
+}
+
+.tablediv {
+  width: 100% !important;
+}
+
+.tablediv table {
+  width: 100% !important;
+}
+
+.tablediv table tbody {
+  width: 100%;
 }

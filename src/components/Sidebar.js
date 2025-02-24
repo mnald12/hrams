@@ -3,10 +3,11 @@ import pdlogo from "../pdlogo.png";
 import { Link, useLocation } from "react-router-dom";
 import { BiSolidDashboard } from "react-icons/bi";
 import { AiOutlineLeft, AiOutlineRight } from "react-icons/ai";
-import { TbFileCertificate, TbAdjustmentsStar } from "react-icons/tb";
+import { TbFileCertificate } from "react-icons/tb";
 import { RiFolderChartFill } from "react-icons/ri";
 import { IoIosPeople } from "react-icons/io";
 import { MdListAlt } from "react-icons/md";
+import { MdEventNote } from "react-icons/md";
 import { fold, unFold } from "../methods/navMethods";
 import { useContext } from "react";
 import { DataContext } from "../App";
@@ -62,9 +63,21 @@ const Sidebar = () => {
                   : "side-btn"
               }
               to="/attendance"
-              onClick={() => setNavActive("Attendance")}
+              onClick={() => setNavActive("Today's Attendance")}
             >
-              <TbFileCertificate className="icn" /> <span>Attendance</span>
+              <TbFileCertificate className="icn" />{" "}
+              <span>Today's Attendance</span>
+            </Link>
+            <Link
+              className={
+                location.pathname === "/allattendance"
+                  ? "side-btn active"
+                  : "side-btn"
+              }
+              to="/allattendance"
+              onClick={() => setNavActive("All Attendance")}
+            >
+              <TbFileCertificate className="icn" /> <span>All Attendance</span>
             </Link>
             <Link
               className={
@@ -88,14 +101,12 @@ const Sidebar = () => {
             </Link>
             <Link
               className={
-                location.pathname === "/scanlog"
-                  ? "side-btn active"
-                  : "side-btn"
+                location.pathname === "/events" ? "side-btn active" : "side-btn"
               }
-              to="/scanlog"
-              onClick={() => setNavActive("Scan Log")}
+              to="/events"
+              onClick={() => setNavActive("Events")}
             >
-              <TbAdjustmentsStar className="icn" /> <span>Scan Log</span>
+              <MdEventNote className="icn" /> <span>Events</span>
             </Link>
           </div>
         </div>

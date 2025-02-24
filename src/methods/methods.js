@@ -36,10 +36,11 @@ const isNewUser = async (id) => {
 
 const insertOne = async (table, data) => {
   try {
-    await addDoc(collection(db, table), data);
-    return true;
+    const docRef = await addDoc(collection(db, table), data);
+    return docRef.id;
   } catch (e) {
-    return false;
+    console.error("Error adding document: ", e);
+    return null;
   }
 };
 
@@ -52,27 +53,6 @@ const getOne = async (table, id) => {
     return e;
   }
 };
-
-// const getOneWithRFID = async (table, rfid) => {
-//   try {
-//     const employeesRef = collection(db, table);
-//     const q = query(employeesRef, where("rfid", "==", rfid));
-//     const querySnapshot = await getDocs(q);
-
-//     if (!querySnapshot.empty) {
-//       const doc = querySnapshot.docs[0];
-//       return {
-//         data: { id: doc.id, ...doc.data() },
-//         isExist: true,
-//       };
-//     }
-
-//     return { isExist: false };
-//   } catch (error) {
-//     console.error("Error fetching employee data:", error);
-//     throw error;
-//   }
-// };
 
 const getOneWithRFID = (table, rfid, callback) => {
   const employeesRef = collection(db, table);
@@ -89,7 +69,7 @@ const getOneWithRFID = (table, rfid, callback) => {
     })
     .catch((error) => {
       console.error("Error fetching employee data:", error);
-      callback(null, error); // Pass error to callback if needed
+      callback(null, error);
     });
 };
 
@@ -118,29 +98,25 @@ const update = async (table, id, toBeUpdated) => {
   }
 };
 
-const updateTimeInOut = async (mode, docId, val) => {
+const updateTimeInOut = async (employeeID, val) => {
   try {
-    const docRef = doc(db, "attendance", docId);
+    const attref = collection(db, "attendance");
+    const q = query(attref, where("employeeID", "==", employeeID));
 
-    if (mode === "TIAM") {
-      await updateDoc(docRef, {
-        timeInAm: val,
-      });
-    } else if (mode === "TIPM") {
-      await updateDoc(docRef, {
-        timeInPm: val,
-      });
-    } else if (mode === "TOAM") {
-      await updateDoc(docRef, {
-        timeOutAm: val,
-      });
-    } else if (mode === "TOPM") {
-      await updateDoc(docRef, {
-        timeOutPm: val,
-      });
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) {
+      console.log("No employee found with this id.");
+      return;
     }
+
+    querySnapshot.forEach(async (document) => {
+      const docRef = doc(db, "attendance", document.id);
+      await updateDoc(docRef, val);
+      console.log(`Updated employee ${employeeID}`);
+    });
   } catch (error) {
-    console.error("Error updating attendace:", error);
+    console.error("Error updating employee:", error);
   }
 };
 

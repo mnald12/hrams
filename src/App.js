@@ -10,6 +10,8 @@ import Scanner from "./pages/Scanner";
 import Leave from "./pages/Leave";
 import Addemployee from "./pages/Addemployee";
 import Viewemployee from "./pages/Viewemployee";
+import Event from "./pages/Event";
+import Allattendances from "./pages/Allattendance";
 
 const DataContext = createContext(null);
 
@@ -25,9 +27,11 @@ function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/employee" element={<Employee />} />
             <Route path="/attendance" element={<Attendances />} />
+            <Route path="/allattendance" element={<Allattendances />} />
             <Route path="/leave" element={<Leave />} />
             <Route path="/performance" element={<Perfomance />} />
             <Route path="/scanlog" element={<Scanlog />} />
+            <Route path="/events" element={<Event />} />
             <Route path="/employee/add" element={<Addemployee />} />
             <Route path="/employee/view/:id" element={<Viewemployee />} />
             <Route path="/scanner" element={<Scanner />} />

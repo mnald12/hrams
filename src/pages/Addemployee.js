@@ -140,7 +140,7 @@ const Addemployee = () => {
     <div className="employee">
       <div className="form-container">
         <div className="form-left">
-          <div className="preview">
+          <div className="preview" style={{ minHeight: "180px" }}>
             <img id="img" alt="avatar" style={{ display: "none" }} />
           </div>
           <h4>Employee Image:</h4>

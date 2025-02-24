@@ -3,14 +3,13 @@ import Sidebar from "./Sidebar";
 import Header from "./Header";
 import Profile from "./Profile";
 import Settings from "./Settings";
-import Addemployee from "./Addemployee";
 
 const Layout = () => {
   const location = useLocation();
 
   return (
     <>
-      {location.pathname === "/scanner" ? (
+      {location.pathname === "/scanner" || location.pathname === "/scanlog" ? (
         <Outlet />
       ) : (
         <>
@@ -23,7 +22,6 @@ const Layout = () => {
           </div>
           <Profile />
           <Settings />
-          <Addemployee />
         </>
       )}
     </>

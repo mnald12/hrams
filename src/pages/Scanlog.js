@@ -65,8 +65,8 @@ const Scanlog = () => {
             </div>
           </div>
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            <table>
-              <thead>
+            <table className="log-table">
+              <thead className="log-table-sticky">
                 <tr className="bg-gray-200">
                   <th>RFID</th>
                   <th>Date / Time</th>

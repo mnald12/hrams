@@ -1,19 +1,25 @@
 .scanlog {
   width: 100%;
-  height: auto;
-  padding: 16px 2px;
+  height: 100vh;
+  padding: 50px;
 }
 .scan-log-container {
-  width: 100%;
-  padding: 20px 16px;
+  height: calc(100vh - 100px);
+  border-top: 20px solid #f9f9f9;
+  padding: 0 16px;
   box-shadow: 0 0 1px 0 black;
   border-radius: 4px;
+  overflow-y: scroll;
+  background-color: #f9f9f9;
 }
 
 .scan-log-header {
   display: flex;
   justify-content: space-between;
   margin-bottom: 16px;
+  position: sticky;
+  top: 0;
+  background-color: #f9f9f9;
 }
 
 .search-container {
@@ -57,6 +63,7 @@
   width: 100%;
   border-collapse: collapse;
   border: 1px solid #ddd;
+  transform: translateY(-10px);
 }
 
 .scan-log-table th,
@@ -72,5 +79,11 @@
 }
 
 .scan-log-table tr:hover {
+  background-color: #f9f9f9;
+}
+
+.log-table-sticky {
+  position: sticky;
+  top: 55px;
   background-color: #f9f9f9;
 }

@@ -8,10 +8,9 @@ import {
 import pdlogo from "../pdlogo.png";
 import { useState, useEffect, useRef } from "react";
 
-// Configurable time session ranges
 const timeRanges = {
   timeInAM: { start: 8, end: 12 },
-  timeOutAM: { start: 12, end: 1 },
+  timeOutAM: { start: 12, end: 13 },
   timeInPM: { start: 13, end: 17 },
   timeOutPM: { start: 17, end: 24 },
 };
@@ -31,7 +30,7 @@ const Scanner = () => {
       hour: "2-digit",
       minute: "2-digit",
       second: "2-digit",
-      hour12: true, // 12-hour format with AM/PM
+      hour12: true,
     }).format(new Date(date));
   };
 
@@ -57,85 +56,98 @@ const Scanner = () => {
       return;
     }
 
-    insertOne("attendance", {
-      rfid: scannedCode,
-      lastName: employee.lastName,
-      firstName: employee.firstName,
-      data: scanDate,
-      timeInAM: {
-        hour: 0,
-        minute: 0,
-      },
-      timeInPM: {
-        hour: 0,
-        minute: 0,
-      },
-      timeOutAM: {
-        hour: 0,
-        minute: 0,
-      },
-      timeOutPM: {
-        hour: 0,
-        minute: 0,
-      },
-    });
+    const addDocument = () => {
+      insertOne("attendance", {
+        rfid: scannedCode,
+        employeeID: employee.id,
+        lastName: employee.lastName,
+        firstName: employee.firstName,
+        date: scanDate.toISOString().split("T")[0],
+        timeInAM: {
+          hour: 0,
+          minute: 0,
+        },
+        timeInPM: {
+          hour: 0,
+          minute: 0,
+        },
+        timeOutAM: {
+          hour: 0,
+          minute: 0,
+        },
+        timeOutPM: {
+          hour: 0,
+          minute: 0,
+        },
+      });
 
-    if (hour >= timeRanges.timeInAM.start && hour < timeRanges.timeInAM.end) {
-      console.log("Morning time-in recorded.");
-      updateTimeInOut("TIAM", employee.id, {
-        hour: hour,
-        minute: minute,
-      });
-      if (hour >= 8 && hour < 10) {
-        addToLate("employee", employee.id, {
-          lateMode: "AM",
-          timeInHour: hour,
-          timeInMinute: minute,
-          lateTime: {
-            hour: hour >= 1 ? hour - 8 : 0,
+      if (hour >= timeRanges.timeInAM.start && hour < timeRanges.timeInAM.end) {
+        console.log("Morning time-in recorded.");
+        updateTimeInOut(employee.id, {
+          timeInAM: {
+            hour: hour,
+            minute: minute,
+          },
+        });
+        if (hour >= 8 && hour < 10) {
+          addToLate("employee", employee.id, {
+            lateMode: "AM",
+            timeInHour: hour,
+            timeInMinute: minute,
+            lateTime: {
+              hour: hour >= 1 ? hour - 8 : 0,
+              minute: minute,
+            },
+          });
+        }
+      } else if (
+        hour >= timeRanges.timeOutAM.start &&
+        hour < timeRanges.timeOutAM.end
+      ) {
+        console.log("Morning time-out recorded.");
+        updateTimeInOut(employee.id, {
+          timeOutAM: {
+            hour: hour,
+            minute: minute,
+          },
+        });
+      } else if (
+        hour >= timeRanges.timeInPM.start &&
+        hour < timeRanges.timeInPM.end
+      ) {
+        console.log("Afternoon time-in recorded.");
+        updateTimeInOut(employee.id, {
+          timeInPM: {
+            hour: hour,
+            minute: minute,
+          },
+        });
+        if (hour >= 1 && hour < 3) {
+          addToLate("employee", employee.id, {
+            lateMode: "PM",
+            timeInHour: hour,
+            timeInMinute: minute,
+            lateTime: {
+              hour: hour >= 1 ? hour - 8 : 0,
+              minute: minute,
+            },
+          });
+        }
+      } else if (
+        hour >= timeRanges.timeOutPM.start &&
+        hour < timeRanges.timeOutPM.end
+      ) {
+        console.log("Afternoon time-out recorded.");
+        updateTimeInOut(employee.id, {
+          timeOutPM: {
+            hour: hour,
             minute: minute,
           },
         });
       }
-    } else if (
-      hour >= timeRanges.timeOutAM.start &&
-      hour < timeRanges.timeOutAM.end
-    ) {
-      console.log("Morning time-out recorded.");
-      updateTimeInOut("TOAM", employee.id, {
-        hour: hour,
-        minute: minute,
-      });
-    } else if (
-      hour >= timeRanges.timeInPM.start &&
-      hour < timeRanges.timeInPM.end
-    ) {
-      console.log("Afternoon time-in recorded.");
-      updateTimeInOut("TIPM", employee.id, {
-        hour: hour,
-        minute: minute,
-      });
-      if (hour >= 1 && hour < 3) {
-        addToLate("employee", employee.id, {
-          lateMode: "PM",
-          timeInHour: hour,
-          timeInMinute: minute,
-          lateTime: {
-            hour: hour >= 1 ? hour - 8 : 0,
-            minute: minute,
-          },
-        });
-      }
-    } else if (
-      hour >= timeRanges.timeOutPM.start &&
-      hour < timeRanges.timeOutPM.end
-    ) {
-      console.log("Afternoon time-out recorded.");
-      updateTimeInOut("TOPM", employee.id, {
-        hour: hour,
-        minute: minute,
-      });
-    }
+    };
+
+    addDocument();
   };
 
   const focusInput = () => {
