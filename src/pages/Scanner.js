@@ -1,9 +1,12 @@
+import Scannermodal from "../components/Scannermodal";
 import "../css/scanner.css";
 import {
   insertOne,
   getOneWithRFID,
   addToLate,
   updateTimeInOut,
+  checkEmployeeInAttendance,
+  checkSession,
 } from "../methods/methods";
 import pdlogo from "../pdlogo.png";
 import { useState, useEffect, useRef } from "react";
@@ -19,6 +22,8 @@ const Scanner = () => {
   const [lastScan, setLastScan] = useState(null);
   const [currentTime, setCurrentTime] = useState(new Date());
   const inputRef = useRef(null);
+  const [isShowModal, setIsShowModal] = useState(false);
+  const [modalType, setModalType] = useState(0);
 
   const formatDate = (date) => {
     return new Intl.DateTimeFormat("en-US", {
@@ -34,120 +39,172 @@ const Scanner = () => {
     }).format(new Date(date));
   };
 
-  const checkAttendance = (scannedCode, scanDate, employee) => {
+  const checkAttendance = async (scannedCode, scanDate, employee) => {
     const hour = scanDate.getHours();
     const minute = scanDate.getMinutes();
 
-    // Check if the employee is already in attendance
     if (employee.isOnLeave) {
-      alert("Employee is on leave!");
+      setModalType(3);
+      setIsShowModal(true);
       return;
     }
 
-    // Check if the employee is considered as absent
-    if (employee.isOnLeave) {
-      alert("Employee is on leave!");
-      return;
-    }
+    if (hour >= timeRanges.timeInAM.start && hour < timeRanges.timeInAM.end) {
+      const isScanned = await checkSession(employee.id, "TIME_IN_AM");
 
-    // Check if the employee is on leave today
-    if (employee.isOnLeave) {
-      alert("Employee is on leave!");
-      return;
-    }
+      if (isScanned) {
+        setModalType(2);
+        setIsShowModal(true);
+        return;
+      }
 
-    const addDocument = () => {
-      insertOne("attendance", {
-        rfid: scannedCode,
-        employeeID: employee.id,
-        lastName: employee.lastName,
-        firstName: employee.firstName,
-        date: scanDate.toISOString().split("T")[0],
-        timeInAM: {
-          hour: 0,
-          minute: 0,
-        },
-        timeInPM: {
-          hour: 0,
-          minute: 0,
-        },
-        timeOutAM: {
-          hour: 0,
-          minute: 0,
-        },
-        timeOutPM: {
-          hour: 0,
-          minute: 0,
-        },
-      });
+      const isInAttendance = await checkEmployeeInAttendance(employee.id);
 
-      if (hour >= timeRanges.timeInAM.start && hour < timeRanges.timeInAM.end) {
-        console.log("Morning time-in recorded.");
-        updateTimeInOut(employee.id, {
+      if (!isInAttendance) {
+        insertOne("attendance", {
+          rfid: scannedCode,
+          employeeID: employee.id,
+          lastName: employee.lastName,
+          firstName: employee.firstName,
+          date: scanDate.toISOString().split("T")[0],
           timeInAM: {
             hour: hour,
             minute: minute,
           },
-        });
-        if (hour >= 8 && hour < 10) {
-          addToLate("employee", employee.id, {
-            lateMode: "AM",
-            timeInHour: hour,
-            timeInMinute: minute,
-            lateTime: {
-              hour: hour >= 1 ? hour - 8 : 0,
-              minute: minute,
-            },
-          });
-        }
-      } else if (
-        hour >= timeRanges.timeOutAM.start &&
-        hour < timeRanges.timeOutAM.end
-      ) {
-        console.log("Morning time-out recorded.");
-        updateTimeInOut(employee.id, {
-          timeOutAM: {
-            hour: hour,
-            minute: minute,
-          },
-        });
-      } else if (
-        hour >= timeRanges.timeInPM.start &&
-        hour < timeRanges.timeInPM.end
-      ) {
-        console.log("Afternoon time-in recorded.");
-        updateTimeInOut(employee.id, {
           timeInPM: {
-            hour: hour,
-            minute: minute,
+            hour: 0,
+            minute: 0,
+          },
+          timeOutAM: {
+            hour: 0,
+            minute: 0,
+          },
+          timeOutPM: {
+            hour: 0,
+            minute: 0,
+          },
+          sessions: {
+            timeInAmDone: true,
+            timeInPmDone: false,
+            timeOutAmDone: false,
+            timeOutPmDone: false,
           },
         });
-        if (hour >= 1 && hour < 3) {
-          addToLate("employee", employee.id, {
-            lateMode: "PM",
-            timeInHour: hour,
-            timeInMinute: minute,
-            lateTime: {
-              hour: hour >= 1 ? hour - 8 : 0,
-              minute: minute,
-            },
-          });
-        }
-      } else if (
-        hour >= timeRanges.timeOutPM.start &&
-        hour < timeRanges.timeOutPM.end
-      ) {
-        console.log("Afternoon time-out recorded.");
-        updateTimeInOut(employee.id, {
-          timeOutPM: {
-            hour: hour,
+      }
+
+      if (hour >= 8 && hour <= 10) {
+        addToLate("employee", employee.id, {
+          date: scanDate,
+          lateMode: "AM",
+          timeInHour: hour,
+          timeInMinute: minute,
+          lateTime: {
+            hour: hour >= 1 ? hour - 8 : 0,
             minute: minute,
           },
         });
       }
-    };
+    } else if (
+      hour >= timeRanges.timeOutAM.start &&
+      hour < timeRanges.timeOutAM.end
+    ) {
+      const isScanned = await checkSession(employee.id, "TIME_OUT_AM");
 
-    addDocument();
+      if (isScanned) {
+        setModalType(2);
+        setIsShowModal(true);
+        return;
+      }
+
+      updateTimeInOut(employee.id, {
+        timeOutAM: {
+          hour: hour,
+          minute: minute,
+        },
+        sessions: {
+          timeOutAmDone: true,
+        },
+      });
+    } else if (
+      hour >= timeRanges.timeInPM.start &&
+      hour < timeRanges.timeInPM.end
+    ) {
+      const isScanned = await checkSession(employee.id, "TIME_IN_PM");
+
+      if (isScanned) {
+        setModalType(2);
+        setIsShowModal(true);
+        return;
+      }
+
+      const isInAttendance = await checkEmployeeInAttendance(employee.id);
+
+      if (!isInAttendance) {
+        insertOne("attendance", {
+          rfid: scannedCode,
+          employeeID: employee.id,
+          lastName: employee.lastName,
+          firstName: employee.firstName,
+          date: scanDate.toISOString().split("T")[0],
+          timeInAM: {
+            hour: 0,
+            minute: 0,
+          },
+          timeInPM: {
+            hour: hour,
+            minute: minute,
+          },
+          timeOutAM: {
+            hour: 0,
+            minute: 0,
+          },
+          timeOutPM: {
+            hour: 0,
+            minute: 0,
+          },
+          sessions: {
+            timeInAmDone: false,
+            timeInPmDone: true,
+            timeOutAmDone: false,
+            timeOutPmDone: false,
+          },
+        });
+      }
+
+      if (hour >= 13 && hour <= 15) {
+        addToLate("employee", employee.id, {
+          date: scanDate,
+          lateMode: "PM",
+          timeInHour: hour,
+          timeInMinute: minute,
+          lateTime: {
+            hour: hour > 13 ? hour - 13 : 0,
+            minute: minute,
+          },
+        });
+      }
+    } else if (
+      hour >= timeRanges.timeOutPM.start &&
+      hour < timeRanges.timeOutPM.end
+    ) {
+      const isScanned = await checkSession(employee.id, "TIME_OUT_PM");
+
+      if (isScanned) {
+        setModalType(2);
+        setIsShowModal(true);
+        return;
+      }
+
+      updateTimeInOut(employee.id, {
+        timeOutPM: {
+          hour: hour,
+          minute: minute,
+        },
+        sessions: {
+          timeOutPmDone: true,
+        },
+      });
+    }
   };
 
   const focusInput = () => {
@@ -172,7 +229,6 @@ const Scanner = () => {
     const scanDate = new Date();
     insertOne("scanlog", {
       rfid: scannedCode,
-      date: scanDate,
       time: formatDate(scanDate).toLocaleString(),
     });
 
@@ -185,12 +241,17 @@ const Scanner = () => {
       if (isExist) {
         checkAttendance(scannedCode, scanDate, data);
       } else {
-        console.log("RFID NOT FOUND!");
+        setModalType(0);
+        setIsShowModal(true);
         return;
       }
     });
 
     event.target.value = "";
+  };
+
+  const closeModal = () => {
+    setIsShowModal(false);
   };
 
   return (
@@ -220,6 +281,17 @@ const Scanner = () => {
           </div>
         )}
       </div>
+      {isShowModal ? (
+        <>
+          <div className="modal-scanner" id="modal-scanner">
+            <div className="scanner-not-exist">
+              <Scannermodal type={modalType} handleClose={closeModal} />
+            </div>
+          </div>
+        </>
+      ) : (
+        <></>
+      )}
     </div>
   );
 };

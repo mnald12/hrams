@@ -89,6 +89,53 @@ const getAll = async (table) => {
   }
 };
 
+const checkEmployeeInAttendance = async (employeeId) => {
+  const employeesRef = collection(db, "attendance");
+
+  const collectionSnapshot = await getDocs(employeesRef);
+  if (collectionSnapshot.empty) {
+    return false;
+  }
+
+  const q = query(employeesRef, where("employeeID", "==", employeeId));
+  const querySnapshot = await getDocs(q);
+
+  return !querySnapshot.empty;
+};
+
+const checkSession = async (employeeId, session) => {
+  const attendanceRef = collection(db, "attendance");
+
+  // Check if the 'attendance' collection has any documents
+  const collectionSnapshot = await getDocs(attendanceRef);
+  if (collectionSnapshot.empty) {
+    return false; // Return false if 'attendance' collection does not exist or is empty
+  }
+
+  const q = query(attendanceRef, where("employeeID", "==", employeeId));
+  const querySnapshot = await getDocs(q);
+
+  if (!querySnapshot.empty) {
+    const docData = querySnapshot.docs[0].data();
+    const sessions = docData.sessions || {};
+
+    switch (session) {
+      case "TIME_IN_AM":
+        return sessions.timeInAmDone || false;
+      case "TIME_IN_PM":
+        return sessions.timeInPmDone || false;
+      case "TIME_OUT_AM":
+        return sessions.timeOutAmDone || false;
+      case "TIME_OUT_PM":
+        return sessions.timeOutPmDone || false;
+      default:
+        throw new Error("Invalid session type.");
+    }
+  }
+
+  return false; // Return false if employee is not found in attendance
+};
+
 const update = async (table, id, toBeUpdated) => {
   try {
     const docRef = doc(db, table, id);
@@ -160,4 +207,6 @@ export {
   deleteTable,
   getOneWithRFID,
   updateTimeInOut,
+  checkEmployeeInAttendance,
+  checkSession,
 };
