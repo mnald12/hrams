@@ -41,7 +41,7 @@ p {
 
 .hidden-input {
   position: absolute;
-  opacity: 1;
+  opacity: 0;
   pointer-events: none;
 }
 
