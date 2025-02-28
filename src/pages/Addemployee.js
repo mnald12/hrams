@@ -43,8 +43,7 @@ const Addemployee = () => {
     );
     uploadBytes(imageRef, img).then((snapshot) => {
       getDownloadURL(snapshot.ref).then(async (url) => {
-        const add = insertOne("employee", {
-          attendance: [],
+        const add = await insertOne("employee", {
           rfid,
           firstName: fname,
           lastName: lname,
@@ -154,9 +153,6 @@ const Addemployee = () => {
               document.getElementById("img").style.display = "block";
             }}
           />
-          {/* <h4 style={{ marginTop: "10px" }}>PDS:</h4>
-          <input type="file" />
-          <p>Upload employee PDS files</p> */}
         </div>
 
         <div className="form-right">

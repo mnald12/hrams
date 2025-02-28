@@ -6,9 +6,22 @@ import "../css/scanlog.css";
 import Loader from "../components/Loader";
 import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase/db";
+
+const parseDateString = (dateString) => {
+  try {
+    // Remove the day of the week (e.g., "Tuesday, ")
+    let cleanedDate = dateString.replace(/^\w+, /, "");
+
+    // Convert to a valid date object
+    return new Date(cleanedDate);
+  } catch (error) {
+    console.error("Error parsing date:", error);
+    return new Date(0); // Return epoch time if invalid
+  }
+};
+
 const Scanlog = () => {
   const [isLoading, setIsLoading] = useState(true);
-
   const [logs, setLogs] = useState([]);
   const [search, setSearch] = useState("");
 
@@ -18,31 +31,31 @@ const Scanlog = () => {
     const unsubscribe = onSnapshot(
       collectionRef,
       (querySnapshot) => {
-        const items = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
+        const items = querySnapshot.docs.map((doc) => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            ...data,
+            time: parseDateString(data.time), // Convert string to Date object
+          };
+        });
+
+        // Sort logs by time (most recent first)
+        items.sort((a, b) => b.time - a.time);
+
         setLogs(items);
+        setIsLoading(false);
       },
       (error) => {
         console.error("Error fetching real-time updates: ", error);
       }
     );
 
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
-
     return () => unsubscribe();
   }, []);
 
+  // Filter logs based on RFID search input
   const filteredLogs = logs.filter((log) => log.rfid.includes(search));
-
-  useEffect(() => {
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
-  }, []);
 
   if (isLoading) {
     return <Loader />;
@@ -76,7 +89,8 @@ const Scanlog = () => {
                 {filteredLogs.map((log, index) => (
                   <tr key={index} className="hover:bg-gray-100">
                     <td>{log.rfid}</td>
-                    <td>{log.time}</td>
+                    <td>{log.time.toLocaleString()}</td>{" "}
+                    {/* Display formatted date */}
                   </tr>
                 ))}
               </tbody>

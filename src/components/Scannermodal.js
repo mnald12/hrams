@@ -4,7 +4,10 @@ import {
   FaTimesCircle,
   FaUserCheck,
   FaCalendarTimes,
+  FaCheckCircle,
+  FaClock,
 } from "react-icons/fa";
+import { useEffect } from "react";
 
 const Scannermodal = ({ type, handleClose }) => {
   const messages = [
@@ -32,7 +35,25 @@ const Scannermodal = ({ type, handleClose }) => {
       message:
         "You are currently on leave. Please check with HR if this is incorrect.",
     },
+    {
+      icon: <FaCheckCircle className="icon green" />,
+      title: "Scan Successful",
+      message: "Your attendance has been recorded successfully.",
+    },
+    {
+      icon: <FaClock className="icon purple" />,
+      title: "Missed Time-In",
+      message:
+        "You did not scan during the time-in session but scanned during time-out. Please inform HR for corrections.",
+    },
   ];
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      handleClose();
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [handleClose]);
 
   return (
     <div className="modal-overlay">
@@ -41,9 +62,6 @@ const Scannermodal = ({ type, handleClose }) => {
           {messages[type].icon}
           <h2 className="modal-title">{messages[type].title}</h2>
           <p className="modal-message">{messages[type].message}</p>
-          <button className="modal-button" onClick={handleClose}>
-            OK
-          </button>
         </div>
       </div>
     </div>

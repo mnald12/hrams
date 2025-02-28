@@ -105,3 +105,8 @@
   color: #e0a800;
   font-weight: bold;
 }
+
+.leave-form h4 {
+  padding-top: 8px;
+  padding-bottom: 6px;
+}

@@ -5,53 +5,22 @@ import { BiTrash } from "react-icons/bi";
 import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase/db";
 import { FaCheck } from "react-icons/fa";
+import { approveLeave, insertOne, rejectLeave } from "../methods/methods";
 
 const Leave = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [employee, setEmployee] = useState([]);
-  const [leaveRequests, setLeaveRequests] = useState([
-    {
-      id: 1,
-      employee: "John Doe",
-      type: "Sick Leave",
-      date: "2025-02-20",
-      duration: "1 day",
-      status: "Pending",
-    },
-    {
-      id: 2,
-      employee: "Jane Smith",
-      type: "Vacation Leave",
-      date: "2025-02-22",
-      duration: "3 days",
-      status: "Pending",
-    },
-  ]);
-
-  const [approvedRequests, setapprovedRequests] = useState([
-    {
-      id: 1,
-      employee: "James Dang",
-      type: "Sick Leave",
-      date: "2025-02-20",
-      duration: "1 day",
-      status: "Approved",
-    },
-    {
-      id: 2,
-      employee: "Josheeep meeee",
-      type: "Vacation Leave",
-      date: "2025-02-22",
-      duration: "5 days",
-      status: "Approved",
-    },
-  ]);
+  const [leaveRequests, setLeaveRequests] = useState([]);
+  const [onLeave, setOnLeave] = useState([]);
 
   const [newLeave, setNewLeave] = useState({
-    employee: "",
+    employeeID: "",
+    lastName: "",
+    firstName: "",
     type: "",
-    date: "",
-    duration: "",
+    from: "",
+    to: "",
+    status: "Pending",
   });
 
   useEffect(() => {
@@ -78,36 +47,61 @@ const Leave = () => {
     return () => unsubscribe();
   }, []);
 
-  const handleApprove = (id) => {
-    setLeaveRequests(
-      leaveRequests.map((request) =>
-        request.id === id ? { ...request, status: "Approved" } : request
-      )
+  useEffect(() => {
+    const collectionRef = collection(db, "leave");
+
+    const unsubscribe = onSnapshot(
+      collectionRef,
+      (querySnapshot) => {
+        const items = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        const pendingRequests = items.filter(
+          (item) => item.status === "Pending"
+        );
+        const approvedRequests = items.filter(
+          (item) => item.status === "Approved"
+        );
+        setLeaveRequests(pendingRequests);
+        setOnLeave(approvedRequests);
+      },
+      (error) => {
+        console.error("Error fetching real-time updates: ", error);
+      }
     );
+
+    return () => unsubscribe();
+  }, []);
+
+  const handleApprove = async (id) => {
+    await approveLeave(id);
   };
 
-  const handleReject = (id) => {
-    setLeaveRequests(
-      leaveRequests.map((request) =>
-        request.id === id ? { ...request, status: "Rejected" } : request
-      )
-    );
+  const handleReject = async (id) => {
+    await rejectLeave(id);
   };
 
-  const handleAddLeave = () => {
-    if (
-      newLeave.employee &&
-      newLeave.type &&
-      newLeave.date &&
-      newLeave.duration
-    ) {
-      const newEntry = {
-        id: leaveRequests.length + 1,
-        ...newLeave,
+  const handleAddLeave = async () => {
+    const isInsert = await insertOne("leave", {
+      employeeID: newLeave.id,
+      firstName: newLeave.firstName,
+      lastName: newLeave.lastName,
+      type: newLeave.type,
+      from: newLeave.from,
+      to: newLeave.to,
+      status: newLeave.status,
+    });
+    if (isInsert) {
+      setNewLeave({
+        id: "",
+        lastName: "",
+        firstName: "",
+        type: "",
+        from: "",
+        to: "",
         status: "Pending",
-      };
-      setLeaveRequests([...leaveRequests, newEntry]);
-      setNewLeave({ employee: "", type: "", date: "", duration: "" });
+      });
     }
   };
 
@@ -123,24 +117,26 @@ const Leave = () => {
           <table>
             <thead>
               <tr>
+                <th>No.</th>
                 <th>Employee</th>
                 <th>Leave Type</th>
-                <th>Date</th>
-                <th>Duration</th>
+                <th>From</th>
+                <th>To</th>
                 <th>Status</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {leaveRequests.map((request) => (
+              {leaveRequests.map((request, no) => (
                 <tr key={request.id}>
-                  <td>{request.employee}</td>
-                  <td>{request.type}</td>
-                  <td>{request.date}</td>
-                  <td>{request.duration}</td>
-                  <td className={request.status.toLowerCase()}>
-                    {request.status}
+                  <td>{no + 1}.</td>
+                  <td>
+                    {request.firstName} {request.lastName}
                   </td>
+                  <td>{request.type}</td>
+                  <td>{request.from}</td>
+                  <td>{request.to}</td>
+                  <td>{request.status}</td>
                   <td style={{ display: "flex", gap: "10px" }}>
                     {request.status === "Pending" && (
                       <>
@@ -167,27 +163,29 @@ const Leave = () => {
           </table>
         </div>
         <div className="leave-history">
-          <h2 style={{ marginLeft: "12px" }}>On Leave</h2>
+          <h2 style={{ marginLeft: "12px" }}>Approved Leave</h2>
           <table>
             <thead>
               <tr>
+                <th>No.</th>
                 <th>Employee</th>
                 <th>Leave Type</th>
-                <th>Date</th>
-                <th>Duration</th>
+                <th>From</th>
+                <th>To</th>
                 <th>Status</th>
               </tr>
             </thead>
             <tbody>
-              {approvedRequests.map((request) => (
-                <tr key={request.id}>
-                  <td>{request.employee}</td>
-                  <td>{request.type}</td>
-                  <td>{request.date}</td>
-                  <td>{request.duration}</td>
-                  <td className={request.status.toLowerCase()}>
-                    {request.status}
+              {onLeave.map((onLeave, no) => (
+                <tr key={no}>
+                  <td>{no + 1}.</td>
+                  <td>
+                    {onLeave.firstName} {onLeave.lastName}
                   </td>
+                  <td>{onLeave.type}</td>
+                  <td>{onLeave.from}</td>
+                  <td>{onLeave.to}</td>
+                  <td>{onLeave.status}</td>
                 </tr>
               ))}
             </tbody>
@@ -197,40 +195,53 @@ const Leave = () => {
       <div className="leave-form">
         <h2>Add Leave Request</h2>
         <select
-          value={newLeave.type}
-          onChange={(e) => setNewLeave({ ...newLeave, type: e.target.value })}
+          value={newLeave.id}
+          onChange={(e) => {
+            const selectedEmployee = employee.find(
+              (emp) => emp.id === e.target.value
+            );
+            setNewLeave({
+              ...newLeave,
+              id: selectedEmployee?.id || "",
+              lastName: selectedEmployee?.lastName || "",
+              firstName: selectedEmployee?.firstName || "",
+            });
+          }}
           className="leave-input"
         >
           <option value="">Select Employee</option>
           {employee.map((e) => (
-            <option>
-              {e.firstName} {e.lastName}
+            <option key={e.id} value={e.id}>
+              {e.lastName}, {e.firstName}
             </option>
           ))}
         </select>
+
         <select
           value={newLeave.type}
           onChange={(e) => setNewLeave({ ...newLeave, type: e.target.value })}
           className="leave-input"
         >
-          <option value="">Select Leave Type</option>
-          <option value="Vacation Leave">Vacation Leave</option>
+          <option value="0" selected>
+            Select Leave Type
+          </option>
+          <option value="Vacation Leave" selected>
+            Vacation Leave
+          </option>
           <option value="Sick Leave">Sick Leave</option>
-          <option value="Emergency Leave">Emergency Leave</option>
         </select>
+        <h4>From :</h4>
         <input
           type="date"
-          value={newLeave.date}
-          onChange={(e) => setNewLeave({ ...newLeave, date: e.target.value })}
+          value={newLeave.from}
+          onChange={(e) => setNewLeave({ ...newLeave, from: e.target.value })}
           className="leave-input"
         />
+        <h4>To :</h4>
         <input
-          type="text"
-          placeholder="Duration (e.g., 2 days)"
-          value={newLeave.duration}
-          onChange={(e) =>
-            setNewLeave({ ...newLeave, duration: e.target.value })
-          }
+          type="date"
+          value={newLeave.to}
+          onChange={(e) => setNewLeave({ ...newLeave, to: e.target.value })}
           className="leave-input"
         />
         <button className="leave-button" onClick={handleAddLeave}>

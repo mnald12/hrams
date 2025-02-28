@@ -1,0 +1,39 @@
+.body-content {
+  display: flex;
+  align-items: flex-start;
+}
+
+.body-content .bc-left {
+  width: auto;
+  height: auto;
+  padding: 20px;
+}
+
+.body-content .bc-left img {
+  width: 220px;
+  height: auto;
+  border-radius: 8px;
+}
+
+.body-content .bc-right {
+  width: 100%;
+  height: auto;
+  padding: 20px;
+}
+
+.profile-detail {
+  width: 25%;
+  height: auto;
+  box-shadow: rgba(33, 35, 38, 0.1) 0px 10px 10px -10px;
+  margin-bottom: 12px;
+}
+
+.profile-detail h5 {
+  color: blue;
+}
+
+.profile-detail h3 {
+  border: none !important;
+  font-size: 21px !important;
+  color: black !important;
+}

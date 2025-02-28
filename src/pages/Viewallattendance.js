@@ -2,15 +2,16 @@ import { useEffect, useState } from "react";
 import Loader from "../components/Loader";
 import "../css/attendance.css";
 import "react-calendar/dist/Calendar.css";
-import { collection, onSnapshot } from "firebase/firestore";
-import { db } from "../firebase/db";
 import { FiSearch } from "react-icons/fi";
 import nopic from "../mopic.jpg";
+import { useParams } from "react-router-dom";
+import { getAttendance } from "../methods/methods";
 
-const Attendances = () => {
+const ViewAlllAttendances = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [attendance, setAttendance] = useState([]);
   const [search, setSearch] = useState("");
+  const params = useParams();
 
   const filteredEmployees = attendance.filter(
     (emp) =>
@@ -19,28 +20,21 @@ const Attendances = () => {
   );
 
   useEffect(() => {
-    const collectionRef = collection(db, "attendance");
-
-    const unsubscribe = onSnapshot(
-      collectionRef,
-      (querySnapshot) => {
-        const items = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setAttendance(items);
-      },
-      (error) => {
-        console.error("Error fetching real-time updates: ", error);
+    const getAtt = async () => {
+      try {
+        const att = await getAttendance(params.id);
+        setAttendance(att);
+      } catch (error) {
+        console.error("Error fetching employee attendance:", error);
       }
-    );
+    };
+
+    getAtt();
 
     setTimeout(() => {
       setIsLoading(false);
     }, 1000);
-
-    return () => unsubscribe();
-  }, []);
+  }, [params.id]);
 
   if (isLoading) {
     return <Loader />;
@@ -146,4 +140,4 @@ const Attendances = () => {
   }
 };
 
-export default Attendances;
+export default ViewAlllAttendances;

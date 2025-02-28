@@ -12,10 +12,10 @@ import pdlogo from "../pdlogo.png";
 import { useState, useEffect, useRef } from "react";
 
 const timeRanges = {
-  timeInAM: { start: 8, end: 12 },
-  timeOutAM: { start: 12, end: 13 },
-  timeInPM: { start: 13, end: 17 },
-  timeOutPM: { start: 17, end: 24 },
+  timeInAM: { start: 5, end: 11 },
+  timeOutAM: { start: 11, end: 12 },
+  timeInPM: { start: 12, end: 15 },
+  timeOutPM: { start: 16, end: 19 },
 };
 
 const Scanner = () => {
@@ -64,6 +64,7 @@ const Scanner = () => {
         insertOne("attendance", {
           rfid: scannedCode,
           employeeID: employee.id,
+          avatar: employee.avatar,
           lastName: employee.lastName,
           firstName: employee.firstName,
           date: scanDate.toISOString().split("T")[0],
@@ -104,6 +105,9 @@ const Scanner = () => {
           },
         });
       }
+
+      setModalType(4);
+      setIsShowModal(true);
     } else if (
       hour >= timeRanges.timeOutAM.start &&
       hour < timeRanges.timeOutAM.end
@@ -112,6 +116,14 @@ const Scanner = () => {
 
       if (isScanned) {
         setModalType(2);
+        setIsShowModal(true);
+        return;
+      }
+
+      const isInAttendance = await checkEmployeeInAttendance(employee.id);
+
+      if (!isInAttendance) {
+        setModalType(5);
         setIsShowModal(true);
         return;
       }
@@ -125,9 +137,12 @@ const Scanner = () => {
           timeOutAmDone: true,
         },
       });
+
+      setModalType(4);
+      setIsShowModal(true);
     } else if (
       hour >= timeRanges.timeInPM.start &&
-      hour < timeRanges.timeInPM.end
+      hour <= timeRanges.timeInPM.end
     ) {
       const isScanned = await checkSession(employee.id, "TIME_IN_PM");
 
@@ -143,6 +158,7 @@ const Scanner = () => {
         insertOne("attendance", {
           rfid: scannedCode,
           employeeID: employee.id,
+          avatar: employee.avatar,
           lastName: employee.lastName,
           firstName: employee.firstName,
           date: scanDate.toISOString().split("T")[0],
@@ -171,6 +187,16 @@ const Scanner = () => {
         });
       }
 
+      updateTimeInOut(employee.id, {
+        timeInPM: {
+          hour: hour,
+          minute: minute,
+        },
+        sessions: {
+          timeInPmDone: true,
+        },
+      });
+
       if (hour >= 13 && hour <= 15) {
         addToLate("employee", employee.id, {
           date: scanDate,
@@ -183,6 +209,9 @@ const Scanner = () => {
           },
         });
       }
+
+      setModalType(4);
+      setIsShowModal(true);
     } else if (
       hour >= timeRanges.timeOutPM.start &&
       hour < timeRanges.timeOutPM.end
@@ -191,6 +220,14 @@ const Scanner = () => {
 
       if (isScanned) {
         setModalType(2);
+        setIsShowModal(true);
+        return;
+      }
+
+      const isInAttendance = await checkEmployeeInAttendance(employee.id);
+
+      if (!isInAttendance) {
+        setModalType(5);
         setIsShowModal(true);
         return;
       }
@@ -204,6 +241,9 @@ const Scanner = () => {
           timeOutPmDone: true,
         },
       });
+
+      setModalType(4);
+      setIsShowModal(true);
     }
   };
 
@@ -223,6 +263,7 @@ const Scanner = () => {
   }, []);
 
   const handleScan = (event) => {
+    setIsShowModal(false);
     const scannedCode = event.target.value.trim();
     if (!scannedCode) return;
 
@@ -230,6 +271,7 @@ const Scanner = () => {
     insertOne("scanlog", {
       rfid: scannedCode,
       time: formatDate(scanDate).toLocaleString(),
+      date: scanDate,
     });
 
     setLastScan({

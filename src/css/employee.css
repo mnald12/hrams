@@ -384,3 +384,19 @@ table tbody td .add-btn-icn:hover {
 .tablediv table tbody {
   width: 100%;
 }
+
+.h6a {
+  position: absolute;
+  right: 0;
+  top: 10px;
+  font-size: 15px;
+  color: red;
+}
+
+.h6b {
+  position: absolute;
+  right: 0;
+  top: 30px;
+  font-size: 14px;
+  color: red;
+}

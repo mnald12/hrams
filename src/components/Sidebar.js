@@ -4,7 +4,6 @@ import { Link, useLocation } from "react-router-dom";
 import { BiSolidDashboard } from "react-icons/bi";
 import { AiOutlineLeft, AiOutlineRight } from "react-icons/ai";
 import { TbFileCertificate } from "react-icons/tb";
-import { RiFolderChartFill } from "react-icons/ri";
 import { IoIosPeople } from "react-icons/io";
 import { MdListAlt } from "react-icons/md";
 import { MdEventNote } from "react-icons/md";
@@ -87,17 +86,6 @@ const Sidebar = () => {
               onClick={() => setNavActive("Leave Management")}
             >
               <MdListAlt className="icn" /> <span>Leave Management</span>
-            </Link>
-            <Link
-              className={
-                location.pathname === "/performance"
-                  ? "side-btn active"
-                  : "side-btn"
-              }
-              to="/performance"
-              onClick={() => setNavActive("Perfomance")}
-            >
-              <RiFolderChartFill className="icn" /> <span>Perfomance</span>
             </Link>
             <Link
               className={

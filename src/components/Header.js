@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import "../css/header.css";
-
 import Menu from "./Menu";
+
 import { DataContext } from "../App";
 const Header = () => {
   const { navActive } = useContext(DataContext);

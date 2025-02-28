@@ -3,7 +3,6 @@ import { useState, useEffect, useContext } from "react";
 import Loader from "../components/Loader";
 import { FaEye } from "react-icons/fa";
 import { FaEdit } from "react-icons/fa";
-import { MdOutlinePersonOff } from "react-icons/md";
 import { TiGroupOutline } from "react-icons/ti";
 import { IoPersonRemoveOutline } from "react-icons/io5";
 import { BsPersonX } from "react-icons/bs";
@@ -12,10 +11,15 @@ import { db } from "../firebase/db";
 import { Link } from "react-router-dom";
 import { DataContext } from "../App";
 import { FiSearch } from "react-icons/fi";
+import avapic from "../mopic.jpg";
+import { getMostLateEmployee, getMostLeaveEmployee } from "../methods/methods";
+
 const Employee = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [employee, setEmployee] = useState([]);
   const [search, setSearch] = useState("");
+  const [mostLate, setMostLate] = useState("");
+  const [mostLeave, setMostLeave] = useState("");
 
   const { setNavActive } = useContext(DataContext);
 
@@ -31,12 +35,17 @@ const Employee = () => {
 
     const unsubscribe = onSnapshot(
       collectionRef,
-      (querySnapshot) => {
+      async (querySnapshot) => {
         const items = querySnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }));
         setEmployee(items);
+        const ml = getMostLateEmployee(items);
+        setMostLate(ml);
+        const mlv = await getMostLeaveEmployee();
+        setMostLeave(mlv);
+        console.log(mlv);
       },
       (error) => {
         console.error("Error fetching real-time updates: ", error);
@@ -79,6 +88,7 @@ const Employee = () => {
               <table>
                 <thead>
                   <tr>
+                    <th width="5%">No.</th>
                     <th>Img</th>
                     <th>Last Name</th>
                     <th>First Name</th>
@@ -87,10 +97,11 @@ const Employee = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredEmployees.map((e) => (
+                  {filteredEmployees.map((e, i) => (
                     <tr key={e.id}>
+                      <td>{i + 1}.</td>
                       <td>
-                        <img src={e.avatar} alt="avatar" />
+                        <img src={e.avatar || avapic} alt="avatar" />
                       </td>
                       <td>{e.lastName}</td>
                       <td>{e.firstName}</td>
@@ -127,20 +138,14 @@ const Employee = () => {
               </div>
               <div className="card-4">
                 <div className="card-left">
-                  <MdOutlinePersonOff className="card-icns" color="red" />
-                </div>
-                <div className="card-right">
-                  <p className="color-red">Most Absent</p>
-                  <h3>Jhon</h3>
-                </div>
-              </div>
-              <div className="card-4">
-                <div className="card-left">
                   <IoPersonRemoveOutline className="card-icns" color="orange" />
                 </div>
                 <div className="card-right">
                   <p className="color-red">Most Late</p>
-                  <h3>Carmen</h3>
+                  <h3>{mostLate.name}</h3>
+                  <h6 className="h6b">
+                    {mostLate.hour} Hrs {mostLate.minutes} Mins
+                  </h6>
                 </div>
               </div>
               <div className="card-4">
@@ -149,7 +154,10 @@ const Employee = () => {
                 </div>
                 <div className="card-right">
                   <p className="color-red">Most Leave</p>
-                  <h3>Jerome</h3>
+                  <h3>
+                    {mostLeave.firstName} {mostLeave.lastName[0]}.
+                  </h3>
+                  <h6 className="h6b">{mostLeave.leaveDays} Days</h6>
                 </div>
               </div>
             </div>

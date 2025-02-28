@@ -1,18 +1,20 @@
 import { useEffect, useState } from "react";
 import Loader from "../components/Loader";
 import "../css/employee.css";
-import { getOne } from "../methods/methods";
+import { getEmployeeAttendance, getOne } from "../methods/methods";
 import { useParams } from "react-router-dom";
 import { FiSearch } from "react-icons/fi";
+import nopic from "../mopic.jpg";
 
 const Viewemployee = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [employee, setEmployee] = useState({ attendance: [] });
   const params = useParams();
   const [search, setSearch] = useState("");
+  const [attendance, setAttendance] = useState([]);
 
-  const filteredEmployees = employee.attendance.filter((emp) =>
-    emp.date.toLowerCase().includes(search.toLowerCase())
+  const filteredEmployees = attendance.filter((emp) =>
+    emp.date.includes(search)
   );
 
   useEffect(() => {
@@ -20,13 +22,23 @@ const Viewemployee = () => {
       try {
         const data = await getOne("employee", params.id);
         setEmployee(data);
-        console.log(data);
       } catch (error) {
         console.error("Error fetching employee:", error);
       }
     };
 
+    const getAtt = async () => {
+      try {
+        const att = await getEmployeeAttendance(params.id);
+        setAttendance(att);
+      } catch (error) {
+        console.error("Error fetching employee attendance:", error);
+      }
+    };
+
     fetchEmployee();
+    getAtt();
+
     setTimeout(() => {
       setIsLoading(false);
     }, 1000);
@@ -39,7 +51,7 @@ const Viewemployee = () => {
       <div className="form-container">
         <div className="form-left">
           <div className="preview">
-            <img id="img" src={employee.avatar} alt="avatar" />
+            <img id="img" src={employee.avatar || nopic} alt="avatar" />
           </div>
         </div>
 
