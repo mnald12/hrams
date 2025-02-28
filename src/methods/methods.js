@@ -181,8 +181,10 @@ const update = async (table, id, toBeUpdated) => {
   try {
     const userRef = doc(db, table, id);
     await updateDoc(userRef, toBeUpdated);
+    return true;
   } catch (error) {
     console.error("Error updating user data: ", error);
+    return false;
   }
 };
 
@@ -365,18 +367,19 @@ const updateEmployeesOnLeave = async () => {
       ...doc.data(),
     }));
 
+    let onLeaveCount = 0;
+
     for (const emp of employees) {
       const shouldBeOnLeave = employeesOnLeave.includes(emp.id);
-
       if (emp.isOnLeave !== shouldBeOnLeave) {
         await updateDoc(doc(db, "employee", emp.id), {
           isOnLeave: shouldBeOnLeave,
         });
-        console.log(
-          `Updated ${emp.firstName} ${emp.lastName}: isOnLeave = ${shouldBeOnLeave}`
-        );
+        onLeaveCount++;
       }
     }
+
+    return onLeaveCount;
   } catch (error) {
     console.error("Error updating leave status:", error);
   }

@@ -71,7 +71,9 @@
   padding-bottom: 5px;
 }
 
-.header-content button {
+.header-content button,
+.header-content .menu-btn {
+  text-decoration: none;
   width: 100%;
   height: auto;
   border: none;
@@ -89,10 +91,11 @@
   transition: 0.6s ease;
 }
 
-.header-content button:hover {
+.header-content button:hover,
+.header-content .menu-btn:hover {
   background: aliceblue;
 }
 
-.header-content button:hover .icn {
+.header-content button:hover .icn .header-content .menu-btn .icn {
   transform: scale(1.1);
 }

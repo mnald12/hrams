@@ -21,12 +21,19 @@ import {
 } from "./methods/methods";
 import LoginPage from "./pages/Loginpage";
 import ViewAlllAttendances from "./pages/Viewallattendance";
+import EditEmployee from "./pages/Editemployee";
+import Viewprofile from "./pages/Viewprofile";
 
 const DataContext = createContext(null);
 
 function App() {
   const [navActive, setNavActive] = useState("Dashboard");
   const [isMobile, setIsMobile] = useState(false);
+  const [type, setType] = useState(0);
+  const [isActionModal, setIsActionModal] = useState(false);
+  const [todaysLate, setTodaysLate] = useState(0);
+  const [todaysAbsent, setTodaysAbsent] = useState(0);
+  const [todaysLeave, setTodaysLeave] = useState(0);
 
   useEffect(() => {
     const checkScreenSize = () => {
@@ -39,7 +46,12 @@ function App() {
   }, []);
 
   useEffect(() => {
-    updateEmployeesOnLeave();
+    const fetchs = async () => {
+      const olc = await updateEmployeesOnLeave();
+      setTodaysLeave(olc);
+    };
+
+    fetchs();
   }, []);
 
   useEffect(() => {
@@ -48,7 +60,7 @@ function App() {
       const hours = now.getHours();
       const minutes = now.getMinutes();
 
-      if (hours === 18 && minutes === 0) {
+      if (hours === 20 && minutes === 49) {
         console.log("It's 6 PM! Running function...");
         processAttendance();
         clearInterval(interval);
@@ -74,8 +86,9 @@ function App() {
       let totalLeaves = 0;
 
       const newAttendance = attendance.map((i) => {
-        const timeInAM = i.value?.timeInAM || null;
-        const timeInPM = i.value?.timeInPM || null;
+        console.log(i);
+        const timeInAM = i.value?.timeInAM ?? null;
+        const timeInPM = i.value?.timeInPM ?? null;
         let isLate = false;
 
         if (
@@ -91,20 +104,20 @@ function App() {
         }
 
         return {
-          avatar: i.value?.avatar || "",
-          firsName: i.firsName,
-          lastName: i.lastName,
-          date: i.value?.date || new Date().toISOString().split("T")[0],
-          employeeID: i.value?.employeeID || "",
+          avatar: i.value?.avatar ?? "",
+          firstName: i.value?.firstName ?? "",
+          lastName: i.value?.lastName ?? "",
+          date: i.value?.date ?? new Date().toISOString().split("T")[0],
+          employeeID: i.value?.employeeID ?? "",
           timeInAM,
           timeInPM,
-          timeOutAM: i.value?.timeOutAM || null,
-          timeOutPM: i.value?.timeOutPM || null,
+          timeOutAM: i.value?.timeOutAM ?? null,
+          timeOutPM: i.value?.timeOutPM ?? null,
           isLate,
         };
       });
 
-      insertOne("allattendance", {
+      const isInserted = await insertOne("allattendance", {
         attendance: newAttendance,
         date: new Date().toISOString().split("T")[0],
         totalLates,
@@ -112,7 +125,9 @@ function App() {
         totalLeaves,
       });
 
-      await clearTable("attendance");
+      if (isInserted) {
+        await clearTable("attendance");
+      }
     } catch (error) {
       console.error("Error processing attendance:", error);
     }
@@ -123,7 +138,22 @@ function App() {
   }
 
   return (
-    <DataContext.Provider value={{ navActive, setNavActive }}>
+    <DataContext.Provider
+      value={{
+        navActive,
+        setNavActive,
+        type,
+        setType,
+        isActionModal,
+        setIsActionModal,
+        todaysLate,
+        setTodaysLate,
+        todaysAbsent,
+        setTodaysAbsent,
+        todaysLeave,
+        setTodaysLeave,
+      }}
+    >
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Layout />}>
@@ -138,10 +168,13 @@ function App() {
             <Route path="/events" element={<Event />} />
             <Route path="/employee/add" element={<Addemployee />} />
             <Route path="/employee/view/:id" element={<Viewemployee />} />
+            <Route path="/employee/edit/:id" element={<EditEmployee />} />
             <Route
               path="/allattendance/view/:id"
               element={<ViewAlllAttendances />}
             />
+            <Route path="/employee/profile/:id" element={<EditEmployee />} />
+            <Route path="/profile/view" element={<Viewprofile />} />
             <Route path="/scanner" element={<Scanner />} />
             <Route path="/login" element={<LoginPage />} />
           </Route>

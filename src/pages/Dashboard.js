@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import "../css/dashboard.css";
 import Loader from "../components/Loader";
 import { MdOutlinePersonOff } from "react-icons/md";
@@ -6,13 +6,26 @@ import { TiGroupOutline } from "react-icons/ti";
 import { IoPersonRemoveOutline } from "react-icons/io5";
 import { BsPersonX } from "react-icons/bs";
 import Lines from "../components/Lines";
-import Pies from "../components/Pie";
 import Line2 from "../components/Line2";
-import Pie2 from "../components/Pie2";
+import { getAll } from "../methods/methods";
+import { DataContext } from "../App";
+import EventDashboard from "../components/Events";
 const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
-
+  const [totalEmployee, setTotalEmployee] = useState(0);
+  const { todaysLate, todaysAbsent, todaysLeave } = useContext(DataContext);
+  const [events, setEvents] = useState([]);
   useEffect(() => {
+    const fetch = async () => {
+      const te = await getAll("employee");
+      console.log(te);
+      setTotalEmployee(te.length);
+      const evs = await getAll("events");
+      setEvents(evs);
+    };
+
+    fetch();
+
     setTimeout(() => {
       setIsLoading(false);
     }, 1000);
@@ -31,7 +44,7 @@ const Dashboard = () => {
             </div>
             <div className="card-right">
               <p>Today's Absent</p>
-              <h3>24</h3>
+              <h3>{todaysAbsent}</h3>
             </div>
           </div>
           <div className="card-4">
@@ -40,7 +53,7 @@ const Dashboard = () => {
             </div>
             <div className="card-right">
               <p>Today's Late</p>
-              <h3>18</h3>
+              <h3>{todaysLate}</h3>
             </div>
           </div>
           <div className="card-4">
@@ -49,7 +62,7 @@ const Dashboard = () => {
             </div>
             <div className="card-right">
               <p>On Leave</p>
-              <h3>14</h3>
+              <h3>{todaysLeave}</h3>
             </div>
           </div>
           <div className="card-4">
@@ -58,51 +71,24 @@ const Dashboard = () => {
             </div>
             <div className="card-right">
               <p>Total Employee</p>
-              <h3>104</h3>
+              <h3>{totalEmployee}</h3>
             </div>
           </div>
         </div>
-        <div className="weekly">
-          <h3 style={{ paddingBottom: "10px" }}>Weekly Status Report</h3>
-          <p className="late">
-            Late : <b>100</b>
-          </p>
-          <p className="absent">
-            Absent : <b>40</b>
-          </p>
-          <p className="leave">
-            Leave : <b>32</b>
-          </p>
-        </div>
+
         <div className="chart">
           <div className="chart-left">
-            <Lines />
+            <h3>Weekly & Monthly Status Report</h3>
+            <div className="lines">
+              <Lines />
+            </div>
+            <div className="lines">
+              <Line2 />
+            </div>
           </div>
           <div className="chart-right">
-            <Pies />
-          </div>
-        </div>
-        <br />
-        <div className="weekly">
-          <h3 style={{ paddingBottom: "10px" }}>
-            Monthly Status Report (2025)
-          </h3>
-          <p className="late">
-            Late : <b>1200</b>
-          </p>
-          <p className="absent">
-            Absent : <b>800</b>
-          </p>
-          <p className="leave">
-            Leave : <b>300</b>
-          </p>
-        </div>
-        <div className="chart">
-          <div className="chart-left">
-            <Line2 />
-          </div>
-          <div className="chart-right">
-            <Pie2 />
+            <h3>Events</h3>
+            <EventDashboard events={events} />
           </div>
         </div>
       </div>

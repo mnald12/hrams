@@ -115,9 +115,14 @@ const Employee = () => {
                         >
                           <FaEye color="green" />
                         </Link>
-                        <button title="edit">
+                        <Link
+                          title="view"
+                          className="add-btn-icn"
+                          to={`/employee/edit/${e.id}`}
+                          onClick={() => setNavActive("Edit Employee")}
+                        >
                           <FaEdit color="orange" />
-                        </button>
+                        </Link>
                       </td>
                     </tr>
                   ))}

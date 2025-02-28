@@ -1,3 +1,4 @@
+import { DataContext } from "../App";
 import Scannermodal from "../components/Scannermodal";
 import "../css/scanner.css";
 import {
@@ -9,7 +10,7 @@ import {
   checkSession,
 } from "../methods/methods";
 import pdlogo from "../pdlogo.png";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useContext } from "react";
 
 const timeRanges = {
   timeInAM: { start: 5, end: 11 },
@@ -24,6 +25,7 @@ const Scanner = () => {
   const inputRef = useRef(null);
   const [isShowModal, setIsShowModal] = useState(false);
   const [modalType, setModalType] = useState(0);
+  const { setTodaysLate } = useContext(DataContext);
 
   const formatDate = (date) => {
     return new Intl.DateTimeFormat("en-US", {
@@ -104,6 +106,7 @@ const Scanner = () => {
             minute: minute,
           },
         });
+        setTodaysLate((prevCount) => prevCount + 1);
       }
 
       setModalType(4);
@@ -208,6 +211,7 @@ const Scanner = () => {
             minute: minute,
           },
         });
+        setTodaysLate((prevCount) => prevCount + 1);
       }
 
       setModalType(4);
@@ -268,6 +272,7 @@ const Scanner = () => {
     if (!scannedCode) return;
 
     const scanDate = new Date();
+
     insertOne("scanlog", {
       rfid: scannedCode,
       time: formatDate(scanDate).toLocaleString(),
@@ -290,10 +295,6 @@ const Scanner = () => {
     });
 
     event.target.value = "";
-  };
-
-  const closeModal = () => {
-    setIsShowModal(false);
   };
 
   return (
@@ -327,7 +328,10 @@ const Scanner = () => {
         <>
           <div className="modal-scanner" id="modal-scanner">
             <div className="scanner-not-exist">
-              <Scannermodal type={modalType} handleClose={closeModal} />
+              <Scannermodal
+                type={modalType}
+                handleClose={() => setIsShowModal(false)}
+              />
             </div>
           </div>
         </>

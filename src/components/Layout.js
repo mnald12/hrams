@@ -3,14 +3,17 @@ import Sidebar from "./Sidebar";
 import Header from "./Header";
 import Profile from "./Profile";
 import Settings from "./Settings";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { db } from "../firebase/db";
 import LoginPage from "../pages/Loginpage";
 import { doc, onSnapshot } from "firebase/firestore";
+import ActionModal from "./Actionmodal";
+import { DataContext } from "../App";
 
 const Layout = () => {
   const location = useLocation();
   const [isLogin, setIsLogin] = useState(false);
+  const { type, isActionModal, setIsActionModal } = useContext(DataContext);
 
   useEffect(() => {
     const docRef = doc(db, "profile", "admin");
@@ -52,6 +55,14 @@ const Layout = () => {
         <div className="page">
           <Header className="header-z" />
           <Outlet />
+          {isActionModal ? (
+            <ActionModal
+              type={type}
+              handleClose={() => setIsActionModal(false)}
+            />
+          ) : (
+            <></>
+          )}
         </div>
       </div>
       <Profile />

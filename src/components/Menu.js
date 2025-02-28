@@ -5,12 +5,15 @@ import { ddClose, ddOpen } from "../methods/navMethods";
 import { GrClose } from "react-icons/gr";
 import { BiUserCircle } from "react-icons/bi";
 import { update } from "../methods/methods";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase/db";
+import { Link } from "react-router-dom";
+import { DataContext } from "../App";
 
 const Menu = () => {
   const [profile, setProfile] = useState({});
+  const { setNavActive } = useContext(DataContext);
 
   useEffect(() => {
     const docRef = doc(db, "profile", "admin");
@@ -52,13 +55,17 @@ const Menu = () => {
       <div className="header-content" id="header-content">
         <h3>Menu</h3>
         <div>
-          <button
-            onClick={() =>
-              (document.getElementById("profile").style.display = "flex")
-            }
+          <Link
+            title="view"
+            className="menu-btn"
+            to={`/profile/view`}
+            onClick={() => {
+              setNavActive("View Employee");
+              ddClose();
+            }}
           >
             <BiUserCircle className="icn" /> Profile
-          </button>
+          </Link>
           <button
             onClick={() => {
               update("profile", "admin", { isLogin: false });
