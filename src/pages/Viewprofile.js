@@ -73,6 +73,11 @@ const Viewprofile = () => {
           </div>
         </div>
       </div>
+      <div className="add-row-btn">
+        <button style={{ marginLeft: "20px !important", background: "orange" }}>
+          Edit profile
+        </button>
+      </div>
     </div>
   );
 };

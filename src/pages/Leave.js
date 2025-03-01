@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Loader from "../components/Loader";
 import "../css/leave.css"; // Import CSS file
 import { BiTrash } from "react-icons/bi";
@@ -6,12 +6,15 @@ import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase/db";
 import { FaCheck } from "react-icons/fa";
 import { approveLeave, insertOne, rejectLeave } from "../methods/methods";
+import { DataContext } from "../App";
 
 const Leave = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [employee, setEmployee] = useState([]);
   const [leaveRequests, setLeaveRequests] = useState([]);
   const [onLeave, setOnLeave] = useState([]);
+
+  const { setType, setIsActionModal } = useContext(DataContext);
 
   const [newLeave, setNewLeave] = useState({
     employeeID: "",
@@ -75,14 +78,39 @@ const Leave = () => {
   }, []);
 
   const handleApprove = async (id) => {
-    await approveLeave(id);
+    const isApproved = await approveLeave(id);
+    if (isApproved) {
+      setType(8);
+      setIsActionModal(true);
+    } else {
+      setType(9);
+      setIsActionModal(true);
+    }
   };
 
   const handleReject = async (id) => {
-    await rejectLeave(id);
+    const isRejected = await rejectLeave(id);
+    if (isRejected) {
+      setType(10);
+      setIsActionModal(true);
+    } else {
+      setType(11);
+      setIsActionModal(true);
+    }
   };
 
   const handleAddLeave = async () => {
+    if (
+      !newLeave.employeeID ||
+      !newLeave.from ||
+      !newLeave.to ||
+      !newLeave.type
+    ) {
+      setType(12);
+      setIsActionModal(true);
+      return;
+    }
+
     const isInsert = await insertOne("leave", {
       employeeID: newLeave.id,
       firstName: newLeave.firstName,
@@ -102,6 +130,8 @@ const Leave = () => {
         to: "",
         status: "Pending",
       });
+      setType(6);
+      setIsActionModal(true);
     }
   };
 

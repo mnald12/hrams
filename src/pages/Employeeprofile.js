@@ -1,181 +1,180 @@
-import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
-import "../css/employeeprofile.css";
-import {
-  getOne,
-  getEmployeeAttendance,
-  getEmployeeLeaves,
-  getAll,
-} from "../methods";
-import Loader from "../components/Loader";
+import "../css/loginemployee.css";
+import { useState } from "react";
+import { getOneWithRFID } from "../methods/methods";
 
-const EmployeeProfile = () => {
-  const { id } = useParams();
-  const [selectedTab, setSelectedTab] = useState("profile");
-  const [employeeData, setEmployeeData] = useState(null);
-  const [attendanceData, setAttendanceData] = useState([]);
-  const [leaveData, setLeaveData] = useState([]);
-  const [events, setEvents] = useState([]);
+const EmployeeViewer = ({ employee }) => {
+  if (!employee) return null;
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const employee = await getOne("employee", id);
-      const attendance = await getEmployeeAttendance(id);
-      const leaves = await getEmployeeLeaves(id); // Fetch leaves for the current employee
-      const upcomingEvents = await getAll("events");
+  // Destructure the properties you want to display
+  const {
+    avatar,
+    firstName,
+    middleName,
+    lastName,
+    email,
+    phone,
+    address,
+    age,
+    employed,
+    position,
+    rfid,
+    late = [],
+    absent = [],
+    leave = [],
+    points = [],
+  } = employee;
 
-      setEmployeeData(employee || {});
-      setAttendanceData(attendance || []);
-      setLeaveData(leaves || []); // Store fetched leave data
-      setEvents(upcomingEvents.map((event) => event.value));
-    };
-
-    fetchData();
-  }, [id]);
-
-  if (!employeeData) {
-    return <Loader />;
-  }
+  // Helper function to convert 24-hour time to 12-hour format
+  const convertTo12Hour = (hour, minute) => {
+    const ampm = hour >= 12 ? "PM" : "AM";
+    const hour12 = hour % 12 || 12; // convert '0' to '12'
+    const minuteStr = minute.toString().padStart(2, "0");
+    return `${hour12}:${minuteStr} ${ampm}`;
+  };
 
   return (
-    <div className="container">
-      <div className="card">
-        <div className="profile-header">
-          <img
-            className="avatar"
-            src={employeeData.avatar}
-            alt={employeeData.firstName}
-          />
-          <div>
-            <h2>
-              {employeeData.firstName} {employeeData.lastName}
-            </h2>
-            <p>{employeeData.position}</p>
-            <p>Joined: {employeeData.employed}</p>
+    <div className="employee-viewer">
+      <div className="employee-card">
+        <div className="employee-avatar">
+          <img src={avatar} alt={`${firstName} ${lastName}`} />
+        </div>
+        <div className="employee-details">
+          <h2>
+            {firstName} {middleName} {lastName}
+          </h2>
+          <p className="position">{position}</p>
+          <div className="detail-row">
+            <span className="label">Age:</span>
+            <span className="value">{age}</span>
+          </div>
+          <div className="detail-row">
+            <span className="label">Email:</span>
+            <span className="value">{email}</span>
+          </div>
+          <div className="detail-row">
+            <span className="label">Phone:</span>
+            <span className="value">{phone}</span>
+          </div>
+          <div className="detail-row">
+            <span className="label">Address:</span>
+            <span className="value">{address}</span>
+          </div>
+          <div className="detail-row">
+            <span className="label">Employed:</span>
+            <span className="value">{employed}</span>
+          </div>
+          <div className="detail-row">
+            <span className="label">RFID:</span>
+            <span className="value">{rfid}</span>
+          </div>
+
+          {/* Attendance Section */}
+          <div className="employee-attendance">
+            <h3>Attendance</h3>
+            <div className="attendance-summary">
+              <div className="attendance-item">
+                <span className="label">Late:</span>
+                <span className="value">{late.length}</span>
+              </div>
+              <div className="attendance-item">
+                <span className="label">Absent:</span>
+                <span className="value">{absent.length}</span>
+              </div>
+              <div className="attendance-item">
+                <span className="label">Leave:</span>
+                <span className="value">{leave.length}</span>
+              </div>
+            </div>
+            {late.length > 0 && (
+              <div className="attendance-details">
+                <h4>Late Details</h4>
+                <ul>
+                  {late.map((item, index) => (
+                    <li key={index}>
+                      {convertTo12Hour(item.timeInHour, item.timeInMinute)}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+
+          {/* Points Section */}
+          <div className="employee-points">
+            <h3>Points</h3>
+            <ul>
+              {points.map((point, index) => (
+                <li key={index} className="point-item">
+                  <p>
+                    <strong>Period:</strong> {point.from} - {point.to}
+                  </p>
+                  <p>
+                    <strong>SL Balance:</strong> {point.slb || "-"}{" "}
+                    <strong>SL Earned:</strong> {point.sle || "-"}{" "}
+                    <strong>SL Spent:</strong> {point.sls || "-"}
+                  </p>
+                  <p>
+                    <strong>VL Balance:</strong> {point.vlb || "-"}{" "}
+                    <strong>VL Earned:</strong> {point.vle || "-"}{" "}
+                    <strong>VL Spent:</strong> {point.vls || "-"}
+                  </p>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </div>
+    </div>
+  );
+};
 
-      <div className="tabs">
-        <button
-          onClick={() => setSelectedTab("profile")}
-          className={selectedTab === "profile" ? "active" : ""}
-        >
-          Profile
-        </button>
-        <button
-          onClick={() => setSelectedTab("performance")}
-          className={selectedTab === "performance" ? "active" : ""}
-        >
-          Performance
-        </button>
-        <button
-          onClick={() => setSelectedTab("leaves")}
-          className={selectedTab === "leaves" ? "active" : ""}
-        >
-          Leaves
-        </button>
-        <button
-          onClick={() => setSelectedTab("events")}
-          className={selectedTab === "events" ? "active" : ""}
-        >
-          Upcoming Events
-        </button>
-      </div>
+const LoginEmployee = ({ seter, setEmployee }) => {
+  const [cardId, setCardId] = useState("");
 
-      {selectedTab === "profile" && (
-        <div className="tab-content">
-          <p>
-            <strong>Email:</strong> {employeeData.email}
-          </p>
-          <p>
-            <strong>Phone:</strong> {employeeData.phone}
-          </p>
-          <p>
-            <strong>Address:</strong> {employeeData.address}
-          </p>
-        </div>
-      )}
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-      {selectedTab === "performance" && (
-        <div className="tab-content">
-          <h3>Attendance Records</h3>
-          <table>
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Time In AM</th>
-                <th>Time Out AM</th>
-                <th>Time In PM</th>
-                <th>Time Out PM</th>
-                <th>Late</th>
-              </tr>
-            </thead>
-            <tbody>
-              {attendanceData.map((entry, index) => (
-                <tr key={index}>
-                  <td>{entry.date}</td>
-                  <td>
-                    {entry.timeInAM?.hour}:{entry.timeInAM?.minute}
-                  </td>
-                  <td>
-                    {entry.timeOutAM?.hour}:{entry.timeOutAM?.minute}
-                  </td>
-                  <td>
-                    {entry.timeInPM?.hour}:{entry.timeInPM?.minute}
-                  </td>
-                  <td>
-                    {entry.timeOutPM?.hour}:{entry.timeOutPM?.minute}
-                  </td>
-                  <td>{entry.isLate ? "Yes" : "No"}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+    // Use the cardId from state rather than e.target.value
+    getOneWithRFID("employee", cardId, (emp, exists) => {
+      if (exists) {
+        setEmployee(emp);
+        seter(true);
+        console.log(emp);
+      } else {
+        // Optionally, handle the case where the employee does not exist
+        console.error("Employee not found!");
+      }
+    });
+  };
 
-      {selectedTab === "leaves" && (
-        <div className="tab-content">
-          <h3>Leave History</h3>
-          <table>
-            <thead>
-              <tr>
-                <th>Type</th>
-                <th>From</th>
-                <th>To</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {leaveData.map((leave, index) => (
-                <tr key={index}>
-                  <td>{leave.type}</td>
-                  <td>{leave.from}</td>
-                  <td>{leave.to}</td>
-                  <td>{leave.status}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <button className="apply-leave">Apply for Leave</button>
-        </div>
-      )}
+  return (
+    <div className="login-container">
+      <form onSubmit={handleSubmit} className="login-form">
+        <h2>Employee Login</h2>
+        <label htmlFor="rfid">RFID Card ID</label>
+        <input
+          type="text"
+          id="rfid"
+          value={cardId}
+          onChange={(e) => setCardId(e.target.value)}
+          placeholder="Enter RFID Card ID"
+        />
+        <button type="submit">Login</button>
+      </form>
+    </div>
+  );
+};
 
-      {selectedTab === "events" && (
-        <div className="tab-content">
-          <h3>Upcoming Events</h3>
-          {events.length > 0 ? (
-            <ul>
-              {events.map((event, index) => (
-                <li key={index}>{event.name}</li>
-              ))}
-            </ul>
-          ) : (
-            <p>No upcoming events.</p>
-          )}
-        </div>
-      )}
+const EmployeeProfile = () => {
+  const [isLogin, setIsLogin] = useState(false);
+  const [employee, setEmployee] = useState({});
+
+  if (isLogin) {
+    return <EmployeeViewer employee={employee} />;
+  }
+  return (
+    <div className="container-preview">
+      <LoginEmployee seter={setIsLogin} setEmployee={setEmployee} />
     </div>
   );
 };

@@ -1,12 +1,15 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Loader from "../components/Loader";
 import "../css/employee.css";
 import { insertOne } from "../methods/methods";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { storage } from "../firebase/db";
 import { cryptoRandomStringAsync } from "crypto-random-string";
+import { DataContext } from "../App";
 
 const Addemployee = () => {
+  const { setType, setIsActionModal } = useContext(DataContext);
+
   const [isLoading, setIsLoading] = useState(true);
   const [rfid, setRfid] = useState("");
   const [fname, setFname] = useState("");
@@ -35,48 +38,52 @@ const Addemployee = () => {
   ]);
 
   const addEmployee = () => {
-    setIsLoading(true);
-
-    const imageRef = ref(
-      storage,
-      `images/${img.name + cryptoRandomStringAsync({ length: 10 })}`
-    );
-    uploadBytes(imageRef, img).then((snapshot) => {
-      getDownloadURL(snapshot.ref).then(async (url) => {
-        const add = await insertOne("employee", {
-          rfid,
-          firstName: fname,
-          lastName: lname,
-          middleName: mname,
-          age,
-          gender,
-          email,
-          phone,
-          address,
-          position,
-          employed,
-          isOnLeave: false,
-          late: [],
-          absent: [],
-          leave: [],
-          files: [],
-          avatar: url,
-          points: inputsValues,
-          thisYearPoints: {
-            from: "",
-            to: "",
-            slb: 0,
-            vlb: 0,
-            sle: 0,
-            vle: 0,
-            sls: 0,
-            vls: 0,
-          },
-        });
-
-        if (add) {
-          setInputsValues([
-            {
+    if (
+      !rfid ||
+      !fname ||
+      !lname ||
+      !mname ||
+      !age ||
+      !gender ||
+      !email ||
+      !phone ||
+      !address ||
+      !position ||
+      !employed ||
+      !img ||
+      inputsValues.some(
+        (input) => !input.from || !input.to || !input.vlb || !input.slb
+      )
+    ) {
+      setType(12);
+      setIsActionModal(true);
+    } else {
+      const imageRef = ref(
+        storage,
+        `images/${img.name + cryptoRandomStringAsync({ length: 10 })}`
+      );
+      uploadBytes(imageRef, img).then((snapshot) => {
+        getDownloadURL(snapshot.ref).then(async (url) => {
+          const add = await insertOne("employee", {
+            rfid,
+            firstName: fname,
+            lastName: lname,
+            middleName: mname,
+            age,
+            gender,
+            email,
+            phone,
+            address,
+            position,
+            employed,
+            isOnLeave: false,
+            late: [],
+            absent: [],
+            leave: [],
+            files: [],
+            avatar: url,
+            points: inputsValues,
+            thisYearPoints: {
               from: "",
               to: "",
               slb: 0,
@@ -86,23 +93,38 @@ const Addemployee = () => {
               sls: 0,
               vls: 0,
             },
-          ]);
-          setRfid("");
-          setFname("");
-          setLname("");
-          setMname("");
-          setAge("");
-          setGender("");
-          setEmail("");
-          setPhone("");
-          setAddress("");
-          setPosition("");
-          setEmployed("");
-          setImg("");
-          setIsLoading(false);
-        }
+          });
+
+          if (add) {
+            setInputsValues([
+              {
+                from: "",
+                to: "",
+                slb: 0,
+                vlb: 0,
+                sle: 0,
+                vle: 0,
+                sls: 0,
+                vls: 0,
+              },
+            ]);
+            setRfid("");
+            setFname("");
+            setLname("");
+            setMname("");
+            setAge("");
+            setGender("");
+            setEmail("");
+            setPhone("");
+            setAddress("");
+            setPosition("");
+            setEmployed("");
+            setImg("");
+            setIsLoading(false);
+          }
+        });
       });
-    });
+    }
   };
 
   const addRow = () => {

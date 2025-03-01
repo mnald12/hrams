@@ -40,7 +40,11 @@ const Layout = () => {
     return () => unsubscribe();
   }, []);
 
-  if (location.pathname === "/scanner" || location.pathname === "/scanlog") {
+  if (
+    location.pathname === "/scanner" ||
+    location.pathname === "/scanlog" ||
+    location.pathname === "/employee/profile"
+  ) {
     return <Outlet />;
   }
 

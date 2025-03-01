@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
@@ -6,18 +6,24 @@ import { insertOne } from "../methods/methods";
 import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase/db";
 import Loader from "../components/Loader";
+import { DataContext } from "../App";
 
 const Event = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [events, setEvents] = useState([]);
   const [eventTitle, setEventTitle] = useState("");
   const [eventDate, setEventDate] = useState("");
+  const { setType, setIsActionModal } = useContext(DataContext);
 
   const addEvent = () => {
     if (eventTitle && eventDate) {
       insertOne("events", { title: eventTitle, start: eventDate });
       setEventTitle("");
       setEventDate("");
+    } else {
+      setType(12);
+      setIsActionModal(true);
+      return;
     }
   };
 

@@ -30,13 +30,13 @@ const data = [
     Leave: 2,
   },
   {
-    name: "Friday",
+    name: "Thursday",
     Late: 18,
     Absent: 4,
     Leave: 2,
   },
   {
-    name: "Saturday",
+    name: "Friday",
     Late: 22,
     Absent: 5,
     Leave: 3,

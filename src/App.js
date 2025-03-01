@@ -23,6 +23,7 @@ import LoginPage from "./pages/Loginpage";
 import ViewAlllAttendances from "./pages/Viewallattendance";
 import EditEmployee from "./pages/Editemployee";
 import Viewprofile from "./pages/Viewprofile";
+import EmployeeProfile from "./pages/Employeeprofile";
 
 const DataContext = createContext(null);
 
@@ -49,6 +50,7 @@ function App() {
     const fetchs = async () => {
       const olc = await updateEmployeesOnLeave();
       setTodaysLeave(olc);
+      console.log(olc);
     };
 
     fetchs();
@@ -60,7 +62,7 @@ function App() {
       const hours = now.getHours();
       const minutes = now.getMinutes();
 
-      if (hours === 20 && minutes === 49) {
+      if (hours === 18 && minutes === 0) {
         console.log("It's 6 PM! Running function...");
         processAttendance();
         clearInterval(interval);
@@ -173,7 +175,7 @@ function App() {
               path="/allattendance/view/:id"
               element={<ViewAlllAttendances />}
             />
-            <Route path="/employee/profile/:id" element={<EditEmployee />} />
+            <Route path="/employee/profile" element={<EmployeeProfile />} />
             <Route path="/profile/view" element={<Viewprofile />} />
             <Route path="/scanner" element={<Scanner />} />
             <Route path="/login" element={<LoginPage />} />

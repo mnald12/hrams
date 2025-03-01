@@ -8,13 +8,17 @@ import nopic from "../mopic.jpg";
 
 const Viewemployee = () => {
   const [isLoading, setIsLoading] = useState(true);
-  const [employee, setEmployee] = useState({ attendance: [] });
+  const [employee, setEmployee] = useState({ points: [] });
   const params = useParams();
   const [search, setSearch] = useState("");
+  const [search2, setSearch2] = useState("");
   const [attendance, setAttendance] = useState([]);
 
-  const filteredEmployees = attendance.filter((emp) =>
-    emp.date.includes(search)
+  const filteredEmployees = employee.points.filter(
+    (emp) => emp.from.includes(search) || emp.to.includes(search)
+  );
+  const filteredEmployees2 = attendance.filter((emp) =>
+    emp.date.includes(search2)
   );
 
   useEffect(() => {
@@ -124,7 +128,7 @@ const Viewemployee = () => {
               </tr>
             </thead>
             <tbody>
-              {employee.points.map((e, i) => (
+              {filteredEmployees.map((e, i) => (
                 <tr key={i}>
                   <td>{e.from}</td>
                   <td>{e.to}</td>
@@ -152,8 +156,8 @@ const Viewemployee = () => {
               <input
                 className="search-input"
                 placeholder="Search by Date"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                value={search2}
+                onChange={(e) => setSearch2(e.target.value)}
               />
             </div>
           </div>
@@ -188,7 +192,7 @@ const Viewemployee = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredEmployees.map((e, i) => (
+              {filteredEmployees2.map((e, i) => (
                 <tr key={i}>
                   <td>{e.date}</td>
                   <td>
