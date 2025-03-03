@@ -23,6 +23,7 @@ const Addemployee = () => {
   const [position, setPosition] = useState("");
   const [employed, setEmployed] = useState("");
   const [img, setImg] = useState("");
+  const [pdsFile, setPdsFile] = useState("");
 
   const [inputsValues, setInputsValues] = useState([
     {
@@ -37,93 +38,101 @@ const Addemployee = () => {
     },
   ]);
 
-  const addEmployee = () => {
+  const addEmployee = async () => {
+    setIsLoading(true);
     if (
-      !rfid ||
-      !fname ||
-      !lname ||
-      !mname ||
-      !age ||
-      !gender ||
-      !email ||
-      !phone ||
-      !address ||
-      !position ||
-      !employed ||
-      !img ||
-      inputsValues.some(
-        (input) => !input.from || !input.to || !input.vlb || !input.slb
-      )
+      rfid !== "" ||
+      fname !== "" ||
+      lname !== "" ||
+      mname !== "" ||
+      age !== "" ||
+      gender !== "" ||
+      email !== "" ||
+      phone !== "" ||
+      address !== "" ||
+      position !== "" ||
+      employed !== ""
     ) {
-      setType(12);
-      setIsActionModal(true);
-    } else {
       const imageRef = ref(
         storage,
         `images/${img.name + cryptoRandomStringAsync({ length: 10 })}`
       );
-      uploadBytes(imageRef, img).then((snapshot) => {
-        getDownloadURL(snapshot.ref).then(async (url) => {
-          const add = await insertOne("employee", {
-            rfid,
-            firstName: fname,
-            lastName: lname,
-            middleName: mname,
-            age,
-            gender,
-            email,
-            phone,
-            address,
-            position,
-            employed,
-            isOnLeave: false,
-            late: [],
-            absent: [],
-            leave: [],
-            files: [],
-            avatar: url,
-            points: inputsValues,
-            thisYearPoints: {
-              from: "",
-              to: "",
-              slb: 0,
-              vlb: 0,
-              sle: 0,
-              vle: 0,
-              sls: 0,
-              vls: 0,
-            },
-          });
+      const imageSnapshot = await uploadBytes(imageRef, img);
+      const avatarUrl = await getDownloadURL(imageSnapshot.ref);
 
-          if (add) {
-            setInputsValues([
-              {
-                from: "",
-                to: "",
-                slb: 0,
-                vlb: 0,
-                sle: 0,
-                vle: 0,
-                sls: 0,
-                vls: 0,
-              },
-            ]);
-            setRfid("");
-            setFname("");
-            setLname("");
-            setMname("");
-            setAge("");
-            setGender("");
-            setEmail("");
-            setPhone("");
-            setAddress("");
-            setPosition("");
-            setEmployed("");
-            setImg("");
-            setIsLoading(false);
-          }
-        });
+      const pdsRef = ref(
+        storage,
+        `pds/${pdsFile.name + cryptoRandomStringAsync({ length: 10 })}`
+      );
+      const pdsSnapshot = await uploadBytes(pdsRef, pdsFile);
+      const pdsUrl = await getDownloadURL(pdsSnapshot.ref);
+
+      const add = await insertOne("employee", {
+        rfid,
+        firstName: fname,
+        lastName: lname,
+        middleName: mname,
+        age,
+        gender,
+        email,
+        phone,
+        address,
+        position,
+        employed,
+        isOnLeave: false,
+        late: [],
+        absent: [],
+        leave: [],
+        pds: pdsUrl,
+        avatar: avatarUrl,
+        points: inputsValues,
+        thisYearPoints: {
+          from: "",
+          to: "",
+          slb: 0,
+          vlb: 0,
+          sle: 0,
+          vle: 0,
+          sls: 0,
+          vls: 0,
+        },
       });
+
+      if (add) {
+        setInputsValues([
+          {
+            from: "",
+            to: "",
+            slb: 0,
+            vlb: 0,
+            sle: 0,
+            vle: 0,
+            sls: 0,
+            vls: 0,
+          },
+        ]);
+        setRfid("");
+        setFname("");
+        setLname("");
+        setMname("");
+        setAge("");
+        setGender("");
+        setEmail("");
+        setPhone("");
+        setAddress("");
+        setPosition("");
+        setEmployed("");
+        setImg("");
+        setIsLoading(false);
+
+        setType(0);
+        setIsActionModal(true);
+      }
+    } else {
+      setIsLoading(false);
+      setType(12);
+      setIsActionModal(true);
+      return;
     }
   };
 
@@ -175,6 +184,9 @@ const Addemployee = () => {
               document.getElementById("img").style.display = "block";
             }}
           />
+          <h4>PDS:</h4>
+          <input type="file" onChange={(e) => setPdsFile(e.target.files[0])} />
+          <p>Upload your PDS here :</p>
         </div>
 
         <div className="form-right">

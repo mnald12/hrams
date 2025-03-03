@@ -44,9 +44,11 @@ const EditEmployee = () => {
         setEmployed(employee.employed);
         setImg(employee.avatar);
       }
-      setIsLoading(false);
     };
     fetchEmployee();
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
   }, [id]);
 
   const updateEmployee = async () => {

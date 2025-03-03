@@ -370,7 +370,7 @@ const updateEmployeesOnLeave = async () => {
     let onLeaveCount = 0;
 
     for (const emp of employees) {
-      onLeaveCount = +employeesOnLeave.length;
+      onLeaveCount += employeesOnLeave.length;
       const shouldBeOnLeave = employeesOnLeave.includes(emp.id);
       if (emp.isOnLeave !== shouldBeOnLeave) {
         await updateDoc(doc(db, "employee", emp.id), {

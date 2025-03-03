@@ -16,9 +16,18 @@ const Allattendances = () => {
 
   const { setNavActive } = useContext(DataContext);
 
-  const filteredEmployees = attendance.filter(
-    (emp) => emp.date.includes(search) // No need for new Date()
+  const filteredEmployees = attendance.filter((emp) =>
+    emp.date.toLowerCase().includes(search.toLowerCase())
   );
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
 
   useEffect(() => {
     const collectionRef = collection(db, "allattendance");
@@ -30,7 +39,15 @@ const Allattendances = () => {
           id: doc.id,
           ...doc.data(),
         }));
-        setAttendance(items);
+
+        items.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        const newAtt = items.map((i) => ({
+          ...i,
+          date: formatDate(i.date),
+        }));
+
+        setAttendance(newAtt);
       },
       (error) => {
         console.error("Error fetching real-time updates: ", error);
@@ -66,6 +83,7 @@ const Allattendances = () => {
               <tr>
                 <th>No.</th>
                 <th>Date</th>
+                <th>In Attendance</th>
                 <th>Late</th>
                 <th>On Leave</th>
                 <th>Absent</th>
@@ -78,6 +96,7 @@ const Allattendances = () => {
                   <tr key={i}>
                     <td>{i + 1}.</td>
                     <td>{e.date}</td>
+                    <td>{e.attendance.length}</td>
                     <td>{e.totalLates}</td>
                     <td>{e.totalLeaves}</td>
                     <td>{e.totalAbsents}</td>

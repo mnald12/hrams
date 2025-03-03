@@ -3,9 +3,19 @@ import { useState } from "react";
 import { getOneWithRFID } from "../methods/methods";
 
 const EmployeeViewer = ({ employee }) => {
+  const [btnActive, setBtnActive] = useState("profile");
+  const [newLeave, setNewLeave] = useState({
+    employeeID: "",
+    lastName: "",
+    firstName: "",
+    type: "",
+    from: "",
+    to: "",
+    status: "Pending",
+  });
+
   if (!employee) return null;
 
-  // Destructure the properties you want to display
   const {
     avatar,
     firstName,
@@ -39,89 +49,168 @@ const EmployeeViewer = ({ employee }) => {
           <img src={avatar} alt={`${firstName} ${lastName}`} />
         </div>
         <div className="employee-details">
-          <h2>
-            {firstName} {middleName} {lastName}
-          </h2>
-          <p className="position">{position}</p>
-          <div className="detail-row">
-            <span className="label">Age:</span>
-            <span className="value">{age}</span>
+          <div className="navbars">
+            <button
+              className={btnActive === "profile" ? "active" : ""}
+              onClick={() => {
+                setBtnActive("profile");
+              }}
+            >
+              Profile
+            </button>
+            <button
+              className={btnActive === "attendance" ? "active" : ""}
+              onClick={() => {
+                setBtnActive("attendance");
+              }}
+            >
+              Attendance
+            </button>
+            <button
+              className={btnActive === "points" ? "active" : ""}
+              onClick={() => {
+                setBtnActive("points");
+              }}
+            >
+              Points
+            </button>
+            <button
+              className={btnActive === "request" ? "active" : ""}
+              onClick={() => {
+                setBtnActive("request");
+              }}
+            >
+              Request Leave
+            </button>
           </div>
-          <div className="detail-row">
-            <span className="label">Email:</span>
-            <span className="value">{email}</span>
-          </div>
-          <div className="detail-row">
-            <span className="label">Phone:</span>
-            <span className="value">{phone}</span>
-          </div>
-          <div className="detail-row">
-            <span className="label">Address:</span>
-            <span className="value">{address}</span>
-          </div>
-          <div className="detail-row">
-            <span className="label">Employed:</span>
-            <span className="value">{employed}</span>
-          </div>
-          <div className="detail-row">
-            <span className="label">RFID:</span>
-            <span className="value">{rfid}</span>
-          </div>
-
-          {/* Attendance Section */}
-          <div className="employee-attendance">
-            <h3>Attendance</h3>
-            <div className="attendance-summary">
-              <div className="attendance-item">
-                <span className="label">Late:</span>
-                <span className="value">{late.length}</span>
+          {btnActive === "profile" ? (
+            <>
+              <h2>
+                {firstName} {middleName} {lastName}
+              </h2>
+              <p className="position">{position}</p>
+              <div className="detail-row">
+                <span className="label">Age:</span>
+                <span className="value">{age}</span>
               </div>
-              <div className="attendance-item">
-                <span className="label">Absent:</span>
-                <span className="value">{absent.length}</span>
+              <div className="detail-row">
+                <span className="label">Email:</span>
+                <span className="value">{email}</span>
               </div>
-              <div className="attendance-item">
-                <span className="label">Leave:</span>
-                <span className="value">{leave.length}</span>
+              <div className="detail-row">
+                <span className="label">Phone:</span>
+                <span className="value">{phone}</span>
               </div>
+              <div className="detail-row">
+                <span className="label">Address:</span>
+                <span className="value">{address}</span>
+              </div>
+              <div className="detail-row">
+                <span className="label">Employed:</span>
+                <span className="value">{employed}</span>
+              </div>
+              <div className="detail-row">
+                <span className="label">RFID:</span>
+                <span className="value">{rfid}</span>
+              </div>
+            </>
+          ) : btnActive === "attendance" ? (
+            <div className="employee-attendance">
+              <h3>Attendance</h3>
+              <div className="attendance-summary">
+                <div className="attendance-item">
+                  <span className="label">Late:</span>
+                  <span className="value">{late.length}</span>
+                </div>
+                <div className="attendance-item">
+                  <span className="label">Absent:</span>
+                  <span className="value">{absent.length}</span>
+                </div>
+                <div className="attendance-item">
+                  <span className="label">Leave:</span>
+                  <span className="value">{leave.length}</span>
+                </div>
+              </div>
+              {late.length > 0 && (
+                <div className="attendance-details">
+                  <h4>Late Details</h4>
+                  <ul>
+                    {late.map((item, index) => (
+                      <li key={index}>
+                        {convertTo12Hour(item.timeInHour, item.timeInMinute)}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
-            {late.length > 0 && (
-              <div className="attendance-details">
-                <h4>Late Details</h4>
-                <ul>
-                  {late.map((item, index) => (
-                    <li key={index}>
-                      {convertTo12Hour(item.timeInHour, item.timeInMinute)}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </div>
-
-          {/* Points Section */}
-          <div className="employee-points">
-            <h3>Points</h3>
-            <ul>
-              {points.map((point, index) => (
-                <li key={index} className="point-item">
-                  <p>
-                    <strong>Period:</strong> {point.from} - {point.to}
-                  </p>
-                  <p>
-                    <strong>SL Balance:</strong> {point.slb || "-"}{" "}
-                    <strong>SL Earned:</strong> {point.sle || "-"}{" "}
-                    <strong>SL Spent:</strong> {point.sls || "-"}
-                  </p>
-                  <p>
-                    <strong>VL Balance:</strong> {point.vlb || "-"}{" "}
-                    <strong>VL Earned:</strong> {point.vle || "-"}{" "}
-                    <strong>VL Spent:</strong> {point.vls || "-"}
-                  </p>
-                </li>
-              ))}
-            </ul>
-          </div>
+          ) : btnActive === "points" ? (
+            <div className="employee-points">
+              <h3>Points</h3>
+              <ul>
+                {points.map((point, index) => (
+                  <li key={index} className="point-item">
+                    <p>
+                      <strong>Period:</strong> {point.from} - {point.to}
+                    </p>
+                    <p>
+                      <strong>SL Balance:</strong> {point.slb || "-"}{" "}
+                      <strong>SL Earned:</strong> {point.sle || "-"}{" "}
+                      <strong>SL Spent:</strong> {point.sls || "-"}
+                    </p>
+                    <p>
+                      <strong>VL Balance:</strong> {point.vlb || "-"}{" "}
+                      <strong>VL Earned:</strong> {point.vle || "-"}{" "}
+                      <strong>VL Spent:</strong> {point.vls || "-"}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : (
+            <div
+              className="leave-form"
+              style={{ width: "100%", padding: "30px" }}
+            >
+              <h2>Request Leave</h2>
+              <select
+                value={newLeave.type}
+                onChange={(e) =>
+                  setNewLeave({ ...newLeave, type: e.target.value })
+                }
+                className="leave-input"
+              >
+                <option value="0" selected>
+                  Select Leave Type
+                </option>
+                <option value="Vacation Leave" selected>
+                  Vacation Leave
+                </option>
+                <option value="Sick Leave">Sick Leave</option>
+              </select>
+              <h4>From :</h4>
+              <input
+                type="date"
+                value={newLeave.from}
+                onChange={(e) =>
+                  setNewLeave({ ...newLeave, from: e.target.value })
+                }
+                className="leave-input"
+              />
+              <h4>To :</h4>
+              <input
+                type="date"
+                value={newLeave.to}
+                onChange={(e) =>
+                  setNewLeave({ ...newLeave, to: e.target.value })
+                }
+                className="leave-input"
+              />
+              <button style={{ marginTop: "12px" }} className="leave-button">
+                Send Request
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>

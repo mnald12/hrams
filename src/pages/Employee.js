@@ -45,7 +45,6 @@ const Employee = () => {
         setMostLate(ml);
         const mlv = await getMostLeaveEmployee();
         setMostLeave(mlv);
-        console.log(mlv);
       },
       (error) => {
         console.error("Error fetching real-time updates: ", error);
