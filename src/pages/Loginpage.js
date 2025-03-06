@@ -1,12 +1,15 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import "../css/loginpage.css";
-import { login } from "../methods/methods"; // Ensure login is secure on the backend
+import { login } from "../methods/methods";
 import pdlogo from "../ptdzlogo.png";
+import { DataContext } from "../App";
 
 const LoginPage = () => {
   const [uname, setUname] = useState("");
   const [pwd, setPwd] = useState("");
   const [error, setError] = useState("");
+
+  const { setIsLogin } = useContext(DataContext);
 
   const submit = async (e) => {
     e.preventDefault();
@@ -14,19 +17,27 @@ const LoginPage = () => {
 
     if (!uname || !pwd) {
       setError("Username and Password are required.");
+      setTimeout(() => {
+        setError(null);
+      }, 2000);
       return;
     }
 
     try {
       const response = await login(uname, pwd);
-      if (response.success) {
-        console.log("Login successful!");
-        // Redirect user or perform other actions
+      if (response) {
+        setIsLogin(true);
       } else {
-        setError(response.message || "Invalid credentials");
+        setError("Invalid credentials");
+        setTimeout(() => {
+          setError(null);
+        }, 2000);
       }
     } catch (err) {
       setError("An error occurred. Please try again.");
+      setTimeout(() => {
+        setError(null);
+      }, 2000);
     }
   };
 
@@ -37,8 +48,12 @@ const LoginPage = () => {
       </div>
       <form className="form" onSubmit={submit}>
         <h2>Login</h2>
-        {error && <p className="error-message">{error}</p>}
         <div className="input">
+          {error && (
+            <p style={{ color: "red" }} className="error-message">
+              {error}
+            </p>
+          )}
           <div className="inputBox">
             <label>Username:</label>
             <input

@@ -4,7 +4,7 @@ import "../css/employee.css";
 import { insertOne } from "../methods/methods";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { storage } from "../firebase/db";
-import { cryptoRandomStringAsync } from "crypto-random-string";
+import cryptoRandomString from "crypto-random-string";
 import { DataContext } from "../App";
 
 const Addemployee = () => {
@@ -55,14 +55,14 @@ const Addemployee = () => {
     ) {
       const imageRef = ref(
         storage,
-        `images/${img.name + cryptoRandomStringAsync({ length: 10 })}`
+        `images/${img.name + cryptoRandomString({ length: 10 })}`
       );
       const imageSnapshot = await uploadBytes(imageRef, img);
       const avatarUrl = await getDownloadURL(imageSnapshot.ref);
 
       const pdsRef = ref(
         storage,
-        `pds/${pdsFile.name + cryptoRandomStringAsync({ length: 10 })}`
+        `pds/${pdsFile.name + cryptoRandomString({ length: 10 })}`
       );
       const pdsSnapshot = await uploadBytes(pdsRef, pdsFile);
       const pdsUrl = await getDownloadURL(pdsSnapshot.ref);

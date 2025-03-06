@@ -15,24 +15,25 @@ const Event = () => {
   const [eventDate, setEventDate] = useState("");
   const { setType, setIsActionModal } = useContext(DataContext);
 
-  const addEvent = () => {
+  const addEvent = async () => {
     if (eventTitle && eventDate) {
-      insertOne("events", { title: eventTitle, start: eventDate });
-      setEventTitle("");
-      setEventDate("");
+      const isAdd = insertOne("events", {
+        title: eventTitle,
+        start: eventDate,
+      });
+      if (isAdd) {
+        setEventTitle("");
+        setEventDate("");
+        setType(4);
+        setIsActionModal(true);
+      } else {
+        setType(5);
+        setIsActionModal(true);
+      }
     } else {
       setType(12);
       setIsActionModal(true);
       return;
-    }
-  };
-
-  const handleEventClick = (clickInfo) => {
-    console.log(clickInfo);
-    if (window.confirm("Delete this event?")) {
-      setEvents(
-        events.filter((event) => event.start !== clickInfo.event.startStr)
-      );
     }
   };
 
@@ -71,7 +72,7 @@ const Event = () => {
             initialView="dayGridMonth"
             events={events}
             selectable={true}
-            eventClick={handleEventClick}
+            style={{ cursor: "pointer" }}
           />
         </div>
         <div

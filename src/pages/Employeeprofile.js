@@ -2,7 +2,7 @@ import "../css/loginemployee.css";
 import { useState } from "react";
 import { getOneWithRFID } from "../methods/methods";
 
-const EmployeeViewer = ({ employee }) => {
+const EmployeeViewer = ({ employee, setLogout }) => {
   const [btnActive, setBtnActive] = useState("profile");
   const [newLeave, setNewLeave] = useState({
     employeeID: "",
@@ -46,7 +46,11 @@ const EmployeeViewer = ({ employee }) => {
     <div className="employee-viewer">
       <div className="employee-card">
         <div className="employee-avatar">
-          <img src={avatar} alt={`${firstName} ${lastName}`} />
+          <img
+            src={avatar}
+            alt={`${firstName} ${lastName}`}
+            style={{ marginTop: "12px" }}
+          />
         </div>
         <div className="employee-details">
           <div className="navbars">
@@ -82,6 +86,15 @@ const EmployeeViewer = ({ employee }) => {
             >
               Request Leave
             </button>
+            <button
+              className={btnActive === "event" ? "active" : ""}
+              onClick={() => {
+                setBtnActive("event");
+              }}
+            >
+              Events
+            </button>
+            <button onClick={() => setLogout(false)}>Logout</button>
           </div>
           {btnActive === "profile" ? (
             <>
@@ -170,9 +183,38 @@ const EmployeeViewer = ({ employee }) => {
           ) : (
             <div
               className="leave-form"
-              style={{ width: "100%", padding: "30px" }}
+              style={{
+                width: "100%",
+                padding: "20px",
+                marginTop: "20px !important",
+              }}
             >
               <h2>Request Leave</h2>
+              <div className="lfc">
+                <div className="inpsg">
+                  <h4>From :</h4>
+                  <input
+                    type="date"
+                    value={newLeave.from}
+                    onChange={(e) =>
+                      setNewLeave({ ...newLeave, from: e.target.value })
+                    }
+                    className="leave-input"
+                  />
+                </div>
+                <div className="inpsg">
+                  <h4>To :</h4>
+                  <input
+                    type="date"
+                    value={newLeave.to}
+                    onChange={(e) =>
+                      setNewLeave({ ...newLeave, to: e.target.value })
+                    }
+                    className="leave-input"
+                  />
+                </div>
+              </div>
+              <h4>Leave Type :</h4>
               <select
                 value={newLeave.type}
                 onChange={(e) =>
@@ -188,24 +230,9 @@ const EmployeeViewer = ({ employee }) => {
                 </option>
                 <option value="Sick Leave">Sick Leave</option>
               </select>
-              <h4>From :</h4>
-              <input
-                type="date"
-                value={newLeave.from}
-                onChange={(e) =>
-                  setNewLeave({ ...newLeave, from: e.target.value })
-                }
-                className="leave-input"
-              />
-              <h4>To :</h4>
-              <input
-                type="date"
-                value={newLeave.to}
-                onChange={(e) =>
-                  setNewLeave({ ...newLeave, to: e.target.value })
-                }
-                className="leave-input"
-              />
+
+              <h4>PDS :</h4>
+              <input type="file" className="leave-input" />
               <button style={{ marginTop: "12px" }} className="leave-button">
                 Send Request
               </button>
@@ -222,15 +249,12 @@ const LoginEmployee = ({ seter, setEmployee }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Use the cardId from state rather than e.target.value
     getOneWithRFID("employee", cardId, (emp, exists) => {
       if (exists) {
         setEmployee(emp);
         seter(true);
         console.log(emp);
       } else {
-        // Optionally, handle the case where the employee does not exist
         console.error("Employee not found!");
       }
     });
@@ -259,7 +283,7 @@ const EmployeeProfile = () => {
   const [employee, setEmployee] = useState({});
 
   if (isLogin) {
-    return <EmployeeViewer employee={employee} />;
+    return <EmployeeViewer employee={employee} setLogout={setIsLogin} />;
   }
   return (
     <div className="container-preview">

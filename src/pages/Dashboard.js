@@ -18,7 +18,6 @@ const Dashboard = () => {
   useEffect(() => {
     const fetch = async () => {
       const te = await getAll("employee");
-      console.log(te);
       setTotalEmployee(te.length);
       const evs = await getAll("events");
       setEvents(evs);

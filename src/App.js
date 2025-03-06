@@ -35,6 +35,7 @@ function App() {
   const [todaysLate, setTodaysLate] = useState(0);
   const [todaysAbsent, setTodaysAbsent] = useState(0);
   const [todaysLeave, setTodaysLeave] = useState(0);
+  const [isLogin, setIsLogin] = useState(0);
 
   useEffect(() => {
     const checkScreenSize = () => {
@@ -154,6 +155,8 @@ function App() {
         setTodaysAbsent,
         todaysLeave,
         setTodaysLeave,
+        isLogin,
+        setIsLogin,
       }}
     >
       <BrowserRouter>

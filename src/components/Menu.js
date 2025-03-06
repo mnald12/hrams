@@ -4,7 +4,6 @@ import { AiOutlineMenu, AiOutlinePoweroff } from "react-icons/ai";
 import { ddClose, ddOpen } from "../methods/navMethods";
 import { GrClose } from "react-icons/gr";
 import { BiUserCircle } from "react-icons/bi";
-import { update } from "../methods/methods";
 import { useContext, useEffect, useState } from "react";
 import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase/db";
@@ -13,7 +12,7 @@ import { DataContext } from "../App";
 
 const Menu = () => {
   const [profile, setProfile] = useState({});
-  const { setNavActive } = useContext(DataContext);
+  const { setNavActive, setIsLogin } = useContext(DataContext);
 
   useEffect(() => {
     const docRef = doc(db, "profile", "admin");
@@ -68,7 +67,7 @@ const Menu = () => {
           </Link>
           <button
             onClick={() => {
-              update("profile", "admin", { isLogin: false });
+              setIsLogin(false);
             }}
           >
             <AiOutlinePoweroff color="red" className="icn" /> Logout

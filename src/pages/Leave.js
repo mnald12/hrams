@@ -3,19 +3,23 @@ import Loader from "../components/Loader";
 import "../css/leave.css"; // Import CSS file
 import { BiTrash } from "react-icons/bi";
 import { collection, onSnapshot } from "firebase/firestore";
-import { db } from "../firebase/db";
+import { db, storage } from "../firebase/db";
 import { FaCheck } from "react-icons/fa";
 import { approveLeave, insertOne, rejectLeave } from "../methods/methods";
 import { DataContext } from "../App";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import cryptoRandomString from "crypto-random-string";
 
 const Leave = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [employee, setEmployee] = useState([]);
   const [leaveRequests, setLeaveRequests] = useState([]);
   const [onLeave, setOnLeave] = useState([]);
+  const [rejects, setRejects] = useState([]);
 
   const { setType, setIsActionModal } = useContext(DataContext);
 
+  const [alfFile, setAlfFile] = useState("");
   const [newLeave, setNewLeave] = useState({
     employeeID: "",
     lastName: "",
@@ -66,8 +70,12 @@ const Leave = () => {
         const approvedRequests = items.filter(
           (item) => item.status === "Approved"
         );
+        const rejectedRequests = items.filter(
+          (item) => item.status === "Rejected"
+        );
         setLeaveRequests(pendingRequests);
         setOnLeave(approvedRequests);
+        setRejects(rejectedRequests);
       },
       (error) => {
         console.error("Error fetching real-time updates: ", error);
@@ -78,6 +86,7 @@ const Leave = () => {
   }, []);
 
   const handleApprove = async (id) => {
+    setIsLoading(true);
     const isApproved = await approveLeave(id);
     if (isApproved) {
       setType(8);
@@ -86,9 +95,11 @@ const Leave = () => {
       setType(9);
       setIsActionModal(true);
     }
+    setIsLoading(false);
   };
 
   const handleReject = async (id) => {
+    setIsLoading(true);
     const isRejected = await rejectLeave(id);
     if (isRejected) {
       setType(10);
@@ -97,43 +108,51 @@ const Leave = () => {
       setType(11);
       setIsActionModal(true);
     }
+    setIsLoading(false);
   };
 
   const handleAddLeave = async () => {
-    if (
-      !newLeave.employeeID ||
-      !newLeave.from ||
-      !newLeave.to ||
-      !newLeave.type
-    ) {
+    setIsLoading(true);
+    if (newLeave.from && newLeave.to && newLeave.type) {
+      const laf = ref(
+        storage,
+        `forms/${alfFile.name + cryptoRandomString({ length: 10 })}`
+      );
+      const lafSnapshot = await uploadBytes(laf, alfFile);
+      const lafUrl = await getDownloadURL(lafSnapshot.ref);
+
+      const isInsert = await insertOne("leave", {
+        employeeID: newLeave.id,
+        firstName: newLeave.firstName,
+        lastName: newLeave.lastName,
+        type: newLeave.type,
+        from: newLeave.from,
+        to: newLeave.to,
+        status: newLeave.status,
+        applicationForm: lafUrl,
+      });
+      if (isInsert) {
+        setNewLeave({
+          id: "",
+          lastName: "",
+          firstName: "",
+          type: "",
+          from: "",
+          to: "",
+          status: "Pending",
+        });
+        setType(6);
+        setIsActionModal(true);
+      }
+    } else {
       setType(12);
       setIsActionModal(true);
+      setIsLoading(false);
       return;
     }
-
-    const isInsert = await insertOne("leave", {
-      employeeID: newLeave.id,
-      firstName: newLeave.firstName,
-      lastName: newLeave.lastName,
-      type: newLeave.type,
-      from: newLeave.from,
-      to: newLeave.to,
-      status: newLeave.status,
-    });
-    if (isInsert) {
-      setNewLeave({
-        id: "",
-        lastName: "",
-        firstName: "",
-        type: "",
-        from: "",
-        to: "",
-        status: "Pending",
-      });
-      setType(6);
-      setIsActionModal(true);
-    }
   };
+
+  const [active, setActive] = useState("request");
 
   if (isLoading) {
     return <Loader />;
@@ -142,85 +161,145 @@ const Leave = () => {
   return (
     <div className="leave-container">
       <div className="leaves">
-        <div className="leave-history">
-          <h2 style={{ marginLeft: "12px" }}>Leave Requests</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>No.</th>
-                <th>Employee</th>
-                <th>Leave Type</th>
-                <th>From</th>
-                <th>To</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {leaveRequests.map((request, no) => (
-                <tr key={request.id}>
-                  <td>{no + 1}.</td>
-                  <td>
-                    {request.firstName} {request.lastName}
-                  </td>
-                  <td>{request.type}</td>
-                  <td>{request.from}</td>
-                  <td>{request.to}</td>
-                  <td>{request.status}</td>
-                  <td style={{ display: "flex", gap: "10px" }}>
-                    {request.status === "Pending" && (
-                      <>
-                        <button
-                          title="approve"
-                          className="approve-button"
-                          onClick={() => handleApprove(request.id)}
-                        >
-                          <FaCheck color="green" />
-                        </button>
-                        <button
-                          title="reject"
-                          className="reject-button"
-                          onClick={() => handleReject(request.id)}
-                        >
-                          <BiTrash color="red" />
-                        </button>
-                      </>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="navbars">
+          <button
+            className={active === "request" ? "active" : ""}
+            onClick={() => {
+              setActive("request");
+            }}
+          >
+            Requests
+          </button>
+          <button
+            className={active === "approve" ? "active" : ""}
+            onClick={() => {
+              setActive("approve");
+            }}
+          >
+            Approved
+          </button>
+          <button
+            className={active === "rejected" ? "active" : ""}
+            onClick={() => {
+              setActive("rejected");
+            }}
+          >
+            Rejected
+          </button>
         </div>
-        <div className="leave-history">
-          <h2 style={{ marginLeft: "12px" }}>Approved Leave</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>No.</th>
-                <th>Employee</th>
-                <th>Leave Type</th>
-                <th>From</th>
-                <th>To</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {onLeave.map((onLeave, no) => (
-                <tr key={no}>
-                  <td>{no + 1}.</td>
-                  <td>
-                    {onLeave.firstName} {onLeave.lastName}
-                  </td>
-                  <td>{onLeave.type}</td>
-                  <td>{onLeave.from}</td>
-                  <td>{onLeave.to}</td>
-                  <td>{onLeave.status}</td>
+
+        {active === "request" ? (
+          <div className="leave-history">
+            <h2 style={{ marginLeft: "12px" }}>Leave Requests</h2>
+            <table>
+              <thead>
+                <tr>
+                  <th>No.</th>
+                  <th>Employee</th>
+                  <th>Leave Type</th>
+                  <th>From</th>
+                  <th>To</th>
+                  <th>Status</th>
+                  <th>Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {leaveRequests.map((request, no) => (
+                  <tr key={request.id}>
+                    <td>{no + 1}.</td>
+                    <td>
+                      {request.firstName} {request.lastName}
+                    </td>
+                    <td>{request.type}</td>
+                    <td>{request.from}</td>
+                    <td>{request.to}</td>
+                    <td>{request.status}</td>
+                    <td style={{ display: "flex", gap: "10px" }}>
+                      {request.status === "Pending" && (
+                        <>
+                          <button
+                            title="approve"
+                            className="approve-button"
+                            onClick={() => handleApprove(request.id)}
+                          >
+                            <FaCheck color="green" />
+                          </button>
+                          <button
+                            title="reject"
+                            className="reject-button"
+                            onClick={() => handleReject(request.id)}
+                          >
+                            <BiTrash color="red" />
+                          </button>
+                        </>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : active === "approve" ? (
+          <div className="leave-history">
+            <h2 style={{ marginLeft: "12px" }}>Approved Leave</h2>
+            <table>
+              <thead>
+                <tr>
+                  <th>No.</th>
+                  <th>Employee</th>
+                  <th>Leave Type</th>
+                  <th>From</th>
+                  <th>To</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {onLeave.map((onLeave, no) => (
+                  <tr key={no}>
+                    <td>{no + 1}.</td>
+                    <td>
+                      {onLeave.firstName} {onLeave.lastName}
+                    </td>
+                    <td>{onLeave.type}</td>
+                    <td>{onLeave.from}</td>
+                    <td>{onLeave.to}</td>
+                    <td>{onLeave.status}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div className="leave-history">
+            <h2 style={{ marginLeft: "12px" }}>Rejected Leave</h2>
+            <table>
+              <thead>
+                <tr>
+                  <th>No.</th>
+                  <th>Employee</th>
+                  <th>Leave Type</th>
+                  <th>From</th>
+                  <th>To</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rejects.map((onLeave, no) => (
+                  <tr key={no}>
+                    <td>{no + 1}.</td>
+                    <td>
+                      {onLeave.firstName} {onLeave.lastName}
+                    </td>
+                    <td>{onLeave.type}</td>
+                    <td>{onLeave.from}</td>
+                    <td>{onLeave.to}</td>
+                    <td>{onLeave.status}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
       <div className="leave-form">
         <h2>Add Leave Request</h2>
@@ -260,6 +339,12 @@ const Leave = () => {
           </option>
           <option value="Sick Leave">Sick Leave</option>
         </select>
+        <h4>Leave Application Form :</h4>
+        <input
+          type="file"
+          className="leave-input"
+          onChange={(e) => setAlfFile(e.target.files[0])}
+        />
         <h4>From :</h4>
         <input
           type="date"
@@ -274,7 +359,11 @@ const Leave = () => {
           onChange={(e) => setNewLeave({ ...newLeave, to: e.target.value })}
           className="leave-input"
         />
-        <button className="leave-button" onClick={handleAddLeave}>
+        <button
+          className="leave-button"
+          style={{ marginTop: "12px" }}
+          onClick={handleAddLeave}
+        >
           Add Leave
         </button>
       </div>

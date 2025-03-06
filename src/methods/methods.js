@@ -60,14 +60,20 @@ const getOne = async (table, id) => {
 };
 
 const login = async (uname, pwd) => {
-  const profile = await getOne("profile", "admin");
-  if (uname === profile.username && pwd === profile.password) {
-    await update("profile", "admin", {
-      isLogin: true,
-    });
+  try {
+    const profile = await getOne("profile", "admin");
+
+    if (!profile) {
+      console.error("Admin profile not found.");
+      return false;
+    }
+
+    return uname === profile.username && pwd === profile.password;
+  } catch (error) {
+    console.error("Error fetching admin profile:", error);
+    return false;
   }
 };
-
 const getOneWithRFID = (table, rfid, callback) => {
   const employeesRef = collection(db, table);
   const q = query(employeesRef, where("rfid", "==", rfid));
@@ -283,6 +289,18 @@ const getMostLateEmployee = (employees) => {
   );
 };
 
+const getEmployeeLeaves = async (employeeID) => {
+  try {
+    const allLeaves = await getAll("leave");
+    return allLeaves
+      .map((doc) => doc.value)
+      .filter((leave) => leave.employeeID === employeeID);
+  } catch (error) {
+    console.error("Error fetching employee leaves:", error);
+    return [];
+  }
+};
+
 const getMostLeaveEmployee = async () => {
   const leaveCollection = collection(db, "leave");
   const leaveSnapshot = await getDocs(leaveCollection);
@@ -331,10 +349,10 @@ const approveLeave = async (leaveId) => {
 const rejectLeave = async (leaveId) => {
   const leaveRef = doc(db, "leave", leaveId);
   try {
-    await deleteDoc(leaveRef);
+    await updateDoc(leaveRef, { status: "Rejected" });
     return true;
   } catch (error) {
-    console.error("Error rejecting leave request:", error);
+    console.error("Error updating leave status:", error);
     return false;
   }
 };
@@ -370,8 +388,8 @@ const updateEmployeesOnLeave = async () => {
     let onLeaveCount = 0;
 
     for (const emp of employees) {
-      onLeaveCount += employeesOnLeave.length;
       const shouldBeOnLeave = employeesOnLeave.includes(emp.id);
+      onLeaveCount += employeesOnLeave.length;
       if (emp.isOnLeave !== shouldBeOnLeave) {
         await updateDoc(doc(db, "employee", emp.id), {
           isOnLeave: shouldBeOnLeave,
@@ -401,6 +419,7 @@ export {
   updateTimeInOut,
   checkEmployeeInAttendance,
   checkSession,
+  getEmployeeLeaves,
   getMostLateEmployee,
   getMostLeaveEmployee,
   approveLeave,
