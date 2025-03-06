@@ -30,6 +30,10 @@ const Employee = () => {
       emp.lastName.toLowerCase().includes(search.toLowerCase())
   );
 
+  const sortedEmployees = [...filteredEmployees].sort((a, b) =>
+    a.lastName.toLowerCase().localeCompare(b.lastName.toLowerCase())
+  );
+
   useEffect(() => {
     const collectionRef = collection(db, "employee");
 
@@ -96,7 +100,7 @@ const Employee = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredEmployees.map((e, i) => (
+                  {sortedEmployees.map((e, i) => (
                     <tr key={e.id}>
                       <td>{i + 1}.</td>
                       <td>
@@ -115,7 +119,7 @@ const Employee = () => {
                           <FaEye color="green" />
                         </Link>
                         <Link
-                          title="view"
+                          title="edit"
                           className="add-btn-icn"
                           to={`/employee/edit/${e.id}`}
                           onClick={() => setNavActive("Edit Employee")}
@@ -148,7 +152,9 @@ const Employee = () => {
                   <p className="color-red">Most Late</p>
                   <h3>{mostLate.name}</h3>
                   <h6 className="h6b">
-                    {mostLate.hour} Hrs {mostLate.minutes} Mins
+                    {mostLate.hour} Hrs{" "}
+                    {mostLate.minutes > 0 ? <>{mostLate.minutes} Mins</> : ""}{" "}
+                    Total Late
                   </h6>
                 </div>
               </div>
@@ -161,7 +167,9 @@ const Employee = () => {
                   <h3>
                     {mostLeave.firstName} {mostLeave.lastName[0]}.
                   </h3>
-                  <h6 className="h6b">{mostLeave.leaveDays} Days</h6>
+                  <h6 className="h6b">
+                    {mostLeave.leaveDays} Days Total Leave
+                  </h6>
                 </div>
               </div>
             </div>

@@ -24,14 +24,18 @@ import ViewAlllAttendances from "./pages/Viewallattendance";
 import EditEmployee from "./pages/Editemployee";
 import Viewprofile from "./pages/Viewprofile";
 import EmployeeProfile from "./pages/Employeeprofile";
+import { collection, onSnapshot } from "firebase/firestore";
+import { db } from "./firebase/db";
 
 const DataContext = createContext(null);
+let tl = 0;
 
 function App() {
   const [navActive, setNavActive] = useState("Dashboard");
   const [isMobile, setIsMobile] = useState(false);
   const [type, setType] = useState(0);
   const [isActionModal, setIsActionModal] = useState(false);
+  const [present, setPresent] = useState(0);
   const [todaysLate, setTodaysLate] = useState(0);
   const [todaysAbsent, setTodaysAbsent] = useState(0);
   const [todaysLeave, setTodaysLeave] = useState(0);
@@ -51,10 +55,50 @@ function App() {
     const fetchs = async () => {
       const olc = await updateEmployeesOnLeave();
       setTodaysLeave(olc);
-      console.log(olc);
     };
 
     fetchs();
+  }, []);
+
+  useEffect(() => {
+    const collectionRef = collection(db, "lates");
+
+    const unsubscribe = onSnapshot(
+      collectionRef,
+      async (querySnapshot) => {
+        const items = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setTodaysLate(items.length);
+        tl = items.length;
+      },
+      (error) => {
+        console.error("Error fetching real-time updates: ", error);
+      }
+    );
+
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    const collectionRef = collection(db, "attendance");
+
+    const unsubscribe = onSnapshot(
+      collectionRef,
+      (querySnapshot) => {
+        const items = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setPresent(items.length);
+      },
+      (error) => {
+        console.error("Error fetching real-time updates: ", error);
+      }
+    );
+
+    return () => unsubscribe();
   }, []);
 
   useEffect(() => {
@@ -128,8 +172,14 @@ function App() {
         totalLeaves,
       });
 
-      if (isInserted) {
+      const isLatesInserted = await insertOne("alllates", {
+        date: new Date().toISOString().split("T")[0],
+        late: tl,
+      });
+
+      if (isInserted && isLatesInserted) {
         await clearTable("attendance");
+        await clearTable("lates");
       }
     } catch (error) {
       console.error("Error processing attendance:", error);
@@ -156,8 +206,8 @@ function App() {
         setType,
         isActionModal,
         setIsActionModal,
+        present,
         todaysLate,
-        setTodaysLate,
         todaysAbsent,
         setTodaysAbsent,
         todaysLeave,

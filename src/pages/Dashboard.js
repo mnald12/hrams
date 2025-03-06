@@ -2,9 +2,9 @@ import { useContext, useEffect, useState } from "react";
 import "../css/dashboard.css";
 import Loader from "../components/Loader";
 import { MdOutlinePersonOff } from "react-icons/md";
+import { BsPersonCheckFill } from "react-icons/bs";
 import { TiGroupOutline } from "react-icons/ti";
 import { IoPersonRemoveOutline } from "react-icons/io5";
-import { BsPersonX } from "react-icons/bs";
 import Lines from "../components/Lines";
 import Line2 from "../components/Line2";
 import { getAll } from "../methods/methods";
@@ -13,7 +13,7 @@ import EventDashboard from "../components/Events";
 const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [totalEmployee, setTotalEmployee] = useState(0);
-  const { todaysLate, todaysAbsent, todaysLeave } = useContext(DataContext);
+  const { todaysLate, todaysLeave } = useContext(DataContext);
   const [events, setEvents] = useState([]);
   useEffect(() => {
     const fetch = async () => {
@@ -39,11 +39,11 @@ const Dashboard = () => {
         <div className="cards">
           <div className="card-4">
             <div className="card-left">
-              <MdOutlinePersonOff className="card-icn" color="red" />
+              <BsPersonCheckFill className="card-icn" color="greeb" />
             </div>
             <div className="card-right">
-              <p>Today's Absent</p>
-              <h3>{todaysAbsent}</h3>
+              <p>Present Today</p>
+              <h3>{"0"}</h3>
             </div>
           </div>
           <div className="card-4">
@@ -57,7 +57,7 @@ const Dashboard = () => {
           </div>
           <div className="card-4">
             <div className="card-left">
-              <BsPersonX className="card-icn" color="darkred" />
+              <MdOutlinePersonOff className="card-icn" color="darkred" />
             </div>
             <div className="card-right">
               <p>On Leave</p>

@@ -9,6 +9,7 @@ import {
   query,
   where,
   arrayUnion,
+  writeBatch,
 } from "@firebase/firestore";
 import { db } from "../firebase/db";
 
@@ -357,9 +358,55 @@ const rejectLeave = async (leaveId) => {
   }
 };
 
+// const updateEmployeesOnLeave = async () => {
+//   const today = new Date();
+//   today.setHours(8, 0, 0, 0);
+
+//   try {
+//     const leaveSnapshot = await getDocs(collection(db, "leave"));
+//     const leaveData = leaveSnapshot.docs.map((doc) => ({
+//       id: doc.id,
+//       ...doc.data(),
+//     }));
+
+//     const employeesOnLeave = leaveData
+//       .filter((leave) => {
+//         if (leave.status !== "Approved") return false;
+
+//         const fromDate = new Date(leave.from + "T00:00:00");
+//         const toDate = new Date(leave.to + "T23:59:59");
+
+//         return fromDate <= today && toDate >= today;
+//       })
+//       .map((leave) => leave.employeeID);
+
+//     const employeeSnapshot = await getDocs(collection(db, "employee"));
+//     const employees = employeeSnapshot.docs.map((doc) => ({
+//       id: doc.id,
+//       ...doc.data(),
+//     }));
+
+//     let onLeaveCount = 0;
+
+//     for (const emp of employees) {
+//       const shouldBeOnLeave = employeesOnLeave.includes(emp.id);
+//       onLeaveCount += employeesOnLeave.length;
+//       if (emp.isOnLeave !== shouldBeOnLeave) {
+//         await updateDoc(doc(db, "employee", emp.id), {
+//           isOnLeave: shouldBeOnLeave,
+//         });
+//       }
+//     }
+
+//     return onLeaveCount;
+//   } catch (error) {
+//     console.error("Error updating leave status:", error);
+//   }
+// };
+
 const updateEmployeesOnLeave = async () => {
   const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  today.setHours(8, 0, 0, 0);
 
   try {
     const leaveSnapshot = await getDocs(collection(db, "leave"));
@@ -368,16 +415,19 @@ const updateEmployeesOnLeave = async () => {
       ...doc.data(),
     }));
 
-    const employeesOnLeave = leaveData
-      .filter((leave) => {
-        if (leave.status !== "Approved") return false;
+    // Get employees who should be on leave today
+    const employeesOnLeave = new Set(
+      leaveData
+        .filter((leave) => {
+          if (leave.status !== "Approved") return false;
 
-        const fromDate = new Date(leave.from + "T00:00:00");
-        const toDate = new Date(leave.to + "T23:59:59");
+          const fromDate = new Date(`${leave.from}T00:00:00`);
+          const toDate = new Date(`${leave.to}T23:59:59`);
 
-        return fromDate <= today && toDate >= today;
-      })
-      .map((leave) => leave.employeeID);
+          return fromDate <= today && toDate >= today;
+        })
+        .map((leave) => leave.employeeID)
+    );
 
     const employeeSnapshot = await getDocs(collection(db, "employee"));
     const employees = employeeSnapshot.docs.map((doc) => ({
@@ -385,21 +435,26 @@ const updateEmployeesOnLeave = async () => {
       ...doc.data(),
     }));
 
+    const batch = writeBatch(db);
     let onLeaveCount = 0;
 
     for (const emp of employees) {
-      const shouldBeOnLeave = employeesOnLeave.includes(emp.id);
-      onLeaveCount += employeesOnLeave.length;
+      const shouldBeOnLeave = employeesOnLeave.has(emp.id);
+
       if (emp.isOnLeave !== shouldBeOnLeave) {
-        await updateDoc(doc(db, "employee", emp.id), {
+        batch.update(doc(db, "employee", emp.id), {
           isOnLeave: shouldBeOnLeave,
         });
       }
+
+      if (shouldBeOnLeave) onLeaveCount++;
     }
 
+    await batch.commit();
     return onLeaveCount;
   } catch (error) {
     console.error("Error updating leave status:", error);
+    return 0;
   }
 };
 

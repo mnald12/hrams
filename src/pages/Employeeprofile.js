@@ -1,17 +1,17 @@
 import "../css/loginemployee.css";
 import { useState } from "react";
-import { getOneWithRFID } from "../methods/methods";
+import { getOneWithRFID, insertOne } from "../methods/methods";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { storage } from "../firebase/db";
+import cryptoRandomString from "crypto-random-string";
 
 const EmployeeViewer = ({ employee, setLogout }) => {
   const [btnActive, setBtnActive] = useState("profile");
+  const [alfFile, setAlfFile] = useState("");
   const [newLeave, setNewLeave] = useState({
-    employeeID: "",
-    lastName: "",
-    firstName: "",
     type: "",
     from: "",
     to: "",
-    status: "Pending",
   });
 
   if (!employee) return null;
@@ -34,12 +34,40 @@ const EmployeeViewer = ({ employee, setLogout }) => {
     points = [],
   } = employee;
 
-  // Helper function to convert 24-hour time to 12-hour format
   const convertTo12Hour = (hour, minute) => {
     const ampm = hour >= 12 ? "PM" : "AM";
-    const hour12 = hour % 12 || 12; // convert '0' to '12'
+    const hour12 = hour % 12 || 12;
     const minuteStr = minute.toString().padStart(2, "0");
     return `${hour12}:${minuteStr} ${ampm}`;
+  };
+
+  const submitApp = async () => {
+    if (newLeave.from && newLeave.to && newLeave.type) {
+      const laf = ref(
+        storage,
+        `forms/${alfFile.name + cryptoRandomString({ length: 10 })}`
+      );
+      const lafSnapshot = await uploadBytes(laf, alfFile);
+      const lafUrl = await getDownloadURL(lafSnapshot.ref);
+
+      const isInsert = await insertOne("leave", {
+        employeeID: employee.id,
+        firstName: firstName,
+        lastName: lastName,
+        type: newLeave.type,
+        from: newLeave.from,
+        to: newLeave.to,
+        status: "Pending",
+        applicationForm: lafUrl,
+      });
+      if (isInsert) {
+        setNewLeave({
+          type: "",
+          from: "",
+          to: "",
+        });
+      }
+    }
   };
 
   return (
@@ -232,8 +260,16 @@ const EmployeeViewer = ({ employee, setLogout }) => {
               </select>
 
               <h4>PDS :</h4>
-              <input type="file" className="leave-input" />
-              <button style={{ marginTop: "12px" }} className="leave-button">
+              <input
+                type="file"
+                onChange={(e) => setAlfFile(e.target.files[0])}
+                className="leave-input"
+              />
+              <button
+                style={{ marginTop: "12px" }}
+                className="leave-button"
+                onClick={() => submitApp()}
+              >
                 Send Request
               </button>
             </div>
@@ -246,24 +282,44 @@ const EmployeeViewer = ({ employee, setLogout }) => {
 
 const LoginEmployee = ({ seter, setEmployee }) => {
   const [cardId, setCardId] = useState("");
+  const [nf, setNf] = useState(false);
+  const [errMsg, setErrMsg] = useState("RFID Not Found!");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    getOneWithRFID("employee", cardId, (emp, exists) => {
-      if (exists) {
-        setEmployee(emp);
-        seter(true);
-        console.log(emp);
-      } else {
-        console.error("Employee not found!");
-      }
-    });
+
+    if (cardId) {
+      getOneWithRFID("employee", cardId, (emp, exists) => {
+        if (exists) {
+          setEmployee(emp);
+          seter(true);
+        } else {
+          setErrMsg("RFID Not Found!");
+          setNf(true);
+          setTimeout(() => {
+            setNf(false);
+          }, 2000);
+        }
+      });
+    } else {
+      setErrMsg("Please enter your RFID.");
+      setNf(true);
+      setTimeout(() => {
+        setNf(false);
+      }, 2000);
+    }
   };
 
   return (
     <div className="login-container">
       <form onSubmit={handleSubmit} className="login-form">
         <h2>Employee Login</h2>
+        {nf ? (
+          <p style={{ color: "red", textAlign: "center" }}>{errMsg}</p>
+        ) : (
+          ""
+        )}
+
         <label htmlFor="rfid">RFID Card ID</label>
         <input
           type="text"

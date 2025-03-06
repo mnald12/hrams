@@ -15,6 +15,7 @@ const EmployeeViewer = ({ employee, attendance, leaves }) => {
     phone,
     address,
     age,
+    gender,
     employed,
     position,
     rfid,
@@ -27,7 +28,7 @@ const EmployeeViewer = ({ employee, attendance, leaves }) => {
       style={{ padding: "0", marginTop: "16px" }}
     >
       <div className="employee-cards" style={{ height: "480px" }}>
-        <div className="employee-avatars">
+        <div className="employee-avatars" style={{ textAlign: "center" }}>
           <img
             src={avatar}
             alt={`${firstName} ${lastName}`}
@@ -78,6 +79,10 @@ const EmployeeViewer = ({ employee, attendance, leaves }) => {
               <div className="detail-row">
                 <span className="label">Age:</span>
                 <span className="value">{age}</span>
+              </div>
+              <div className="detail-row">
+                <span className="label">Gender:</span>
+                <span className="value">{gender}</span>
               </div>
               <div className="detail-row">
                 <span className="label">Email:</span>

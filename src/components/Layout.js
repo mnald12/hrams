@@ -27,7 +27,10 @@ const Layout = () => {
 
   return (
     <>
-      <div className="container">
+      <div
+        className="container"
+        style={{ maxWidth: "1300px", margin: "0 auto" }}
+      >
         <Sidebar />
         <div className="page">
           <Header className="header-z" />
