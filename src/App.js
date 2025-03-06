@@ -137,7 +137,14 @@ function App() {
   };
 
   if (isMobile) {
-    return <></>;
+    return (
+      <div className="warning-container">
+        <p className="warning-text">
+          This system is best viewed on a larger device. Please switch to a
+          bigger screen for the best experience.
+        </p>
+      </div>
+    );
   }
 
   return (
