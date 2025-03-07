@@ -1,4 +1,3 @@
-// import { DataContext } from "../App";
 import Scannermodal from "../components/Scannermodal";
 import "../css/scanner.css";
 import {
@@ -12,21 +11,27 @@ import {
 import pdlogo from "../pdlogo.png";
 import { useState, useEffect, useRef } from "react";
 
-// const timeRanges = {
-//   timeInAM: { start: 5, end: 11 },
-//   timeOutAM: { start: 11, end: 12 },
-//   timeInPM: { start: 12, end: 15 },
-//   timeOutPM: { start: 16, end: 19 },
-// };
-
 const Scanner = () => {
   const [lastScan, setLastScan] = useState(null);
   const [currentTime, setCurrentTime] = useState(new Date());
   const inputRef = useRef(null);
   const [isShowModal, setIsShowModal] = useState(false);
   const [modalType, setModalType] = useState(0);
-  // const { setTodaysLate } = useContext(DataContext);
   const [btnActive, setBtnActive] = useState("TIAM");
+
+  useEffect(() => {
+    const hour = new Date().getHours();
+
+    if (hour >= 8 && hour < 11) {
+      setBtnActive("TIAM");
+    } else if (hour >= 11 && hour < 13) {
+      setBtnActive("TOAM");
+    } else if (hour >= 13 && hour < 4) {
+      setBtnActive("TIPM");
+    } else {
+      setBtnActive("TOPM");
+    }
+  }, []);
 
   const formatDate = (date) => {
     return new Intl.DateTimeFormat("en-US", {
@@ -267,205 +272,6 @@ const Scanner = () => {
       setModalType(4);
       setIsShowModal(true);
     }
-
-    // if (hour >= timeRanges.timeInAM.start && hour < timeRanges.timeInAM.end) {
-    //   const isScanned = await checkSession(employee.id, "TIME_IN_AM");
-
-    //   if (isScanned) {
-    //     setModalType(2);
-    //     setIsShowModal(true);
-    //     return;
-    //   }
-
-    //   const isInAttendance = await checkEmployeeInAttendance(employee.id);
-
-    //   if (!isInAttendance) {
-    //     insertOne("attendance", {
-    //       rfid: scannedCode,
-    //       employeeID: employee.id,
-    //       avatar: employee.avatar,
-    //       lastName: employee.lastName,
-    //       firstName: employee.firstName,
-    //       date: scanDate.toISOString().split("T")[0],
-    //       timeInAM: {
-    //         hour: hour,
-    //         minute: minute,
-    //       },
-    //       timeInPM: {
-    //         hour: 0,
-    //         minute: 0,
-    //       },
-    //       timeOutAM: {
-    //         hour: 0,
-    //         minute: 0,
-    //       },
-    //       timeOutPM: {
-    //         hour: 0,
-    //         minute: 0,
-    //       },
-    //       sessions: {
-    //         timeInAmDone: true,
-    //         timeInPmDone: false,
-    //         timeOutAmDone: false,
-    //         timeOutPmDone: false,
-    //       },
-    //     });
-    //   }
-
-    //   if (hour >= 8 && hour <= 10) {
-    //     addToLate("employee", employee.id, {
-    //       date: scanDate,
-    //       lateMode: "AM",
-    //       timeInHour: hour,
-    //       timeInMinute: minute,
-    //       lateTime: {
-    //         hour: hour >= 1 ? hour - 8 : 0,
-    //         minute: minute,
-    //       },
-    //     });
-    //     setTodaysLate((prevCount) => prevCount + 1);
-    //   }
-
-    //   setModalType(4);
-    //   setIsShowModal(true);
-    // } else if (
-    //   hour >= timeRanges.timeOutAM.start &&
-    //   hour < timeRanges.timeOutAM.end
-    // ) {
-    //   const isScanned = await checkSession(employee.id, "TIME_OUT_AM");
-
-    //   if (isScanned) {
-    //     setModalType(2);
-    //     setIsShowModal(true);
-    //     return;
-    //   }
-
-    //   const isInAttendance = await checkEmployeeInAttendance(employee.id);
-
-    //   if (!isInAttendance) {
-    //     setModalType(5);
-    //     setIsShowModal(true);
-    //     return;
-    //   }
-
-    //   updateTimeInOut(employee.id, {
-    //     timeOutAM: {
-    //       hour: hour,
-    //       minute: minute,
-    //     },
-    //     sessions: {
-    //       timeOutAmDone: true,
-    //     },
-    //   });
-
-    //   setModalType(4);
-    //   setIsShowModal(true);
-    // } else if (
-    //   hour >= timeRanges.timeInPM.start &&
-    //   hour <= timeRanges.timeInPM.end
-    // ) {
-    //   const isScanned = await checkSession(employee.id, "TIME_IN_PM");
-
-    //   if (isScanned) {
-    //     setModalType(2);
-    //     setIsShowModal(true);
-    //     return;
-    //   }
-
-    //   const isInAttendance = await checkEmployeeInAttendance(employee.id);
-
-    //   if (!isInAttendance) {
-    //     insertOne("attendance", {
-    //       rfid: scannedCode,
-    //       employeeID: employee.id,
-    //       avatar: employee.avatar,
-    //       lastName: employee.lastName,
-    //       firstName: employee.firstName,
-    //       date: scanDate.toISOString().split("T")[0],
-    //       timeInAM: {
-    //         hour: 0,
-    //         minute: 0,
-    //       },
-    //       timeInPM: {
-    //         hour: hour,
-    //         minute: minute,
-    //       },
-    //       timeOutAM: {
-    //         hour: 0,
-    //         minute: 0,
-    //       },
-    //       timeOutPM: {
-    //         hour: 0,
-    //         minute: 0,
-    //       },
-    //       sessions: {
-    //         timeInAmDone: false,
-    //         timeInPmDone: true,
-    //         timeOutAmDone: false,
-    //         timeOutPmDone: false,
-    //       },
-    //     });
-    //   }
-
-    //   updateTimeInOut(employee.id, {
-    //     timeInPM: {
-    //       hour: hour,
-    //       minute: minute,
-    //     },
-    //     sessions: {
-    //       timeInPmDone: true,
-    //     },
-    //   });
-
-    //   if (hour >= 13 && hour <= 15) {
-    //     addToLate("employee", employee.id, {
-    //       date: scanDate,
-    //       lateMode: "PM",
-    //       timeInHour: hour,
-    //       timeInMinute: minute,
-    //       lateTime: {
-    //         hour: hour > 13 ? hour - 13 : 0,
-    //         minute: minute,
-    //       },
-    //     });
-    //     setTodaysLate((prevCount) => prevCount + 1);
-    //   }
-
-    //   setModalType(4);
-    //   setIsShowModal(true);
-    // } else if (
-    //   hour >= timeRanges.timeOutPM.start &&
-    //   hour < timeRanges.timeOutPM.end
-    // ) {
-    //   const isScanned = await checkSession(employee.id, "TIME_OUT_PM");
-
-    //   if (isScanned) {
-    //     setModalType(2);
-    //     setIsShowModal(true);
-    //     return;
-    //   }
-
-    //   const isInAttendance = await checkEmployeeInAttendance(employee.id);
-
-    //   if (!isInAttendance) {
-    //     setModalType(5);
-    //     setIsShowModal(true);
-    //     return;
-    //   }
-
-    //   updateTimeInOut(employee.id, {
-    //     timeOutPM: {
-    //       hour: hour,
-    //       minute: minute,
-    //     },
-    //     sessions: {
-    //       timeOutPmDone: true,
-    //     },
-    //   });
-
-    //   setModalType(4);
-    //   setIsShowModal(true);
-    // }
   };
 
   const focusInput = () => {

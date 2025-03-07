@@ -11,29 +11,16 @@ import {
   arrayUnion,
   writeBatch,
 } from "@firebase/firestore";
+
 import { db } from "../firebase/db";
 
-const isNewUser = async (id) => {
-  try {
-    const usersRef = collection(db, "users");
-    const q = query(usersRef, where("userId", "==", id));
-    const data = [];
-    const querySnapshot = await getDocs(q);
-    querySnapshot.forEach((doc) => {
-      data.push({
-        id: doc.id,
-        value: doc.data(),
-      });
-    });
-    if (data.length === 0) {
-      return true;
-    } else {
-      return false;
-    }
-  } catch (e) {
-    return e;
-  }
-};
+import {
+  format,
+  startOfWeek,
+  addDays,
+  parseISO,
+  eachDayOfInterval,
+} from "date-fns";
 
 const insertOne = async (table, data) => {
   try {
@@ -75,6 +62,7 @@ const login = async (uname, pwd) => {
     return false;
   }
 };
+
 const getOneWithRFID = (table, rfid, callback) => {
   const employeesRef = collection(db, table);
   const q = query(employeesRef, where("rfid", "==", rfid));
@@ -358,52 +346,6 @@ const rejectLeave = async (leaveId) => {
   }
 };
 
-// const updateEmployeesOnLeave = async () => {
-//   const today = new Date();
-//   today.setHours(8, 0, 0, 0);
-
-//   try {
-//     const leaveSnapshot = await getDocs(collection(db, "leave"));
-//     const leaveData = leaveSnapshot.docs.map((doc) => ({
-//       id: doc.id,
-//       ...doc.data(),
-//     }));
-
-//     const employeesOnLeave = leaveData
-//       .filter((leave) => {
-//         if (leave.status !== "Approved") return false;
-
-//         const fromDate = new Date(leave.from + "T00:00:00");
-//         const toDate = new Date(leave.to + "T23:59:59");
-
-//         return fromDate <= today && toDate >= today;
-//       })
-//       .map((leave) => leave.employeeID);
-
-//     const employeeSnapshot = await getDocs(collection(db, "employee"));
-//     const employees = employeeSnapshot.docs.map((doc) => ({
-//       id: doc.id,
-//       ...doc.data(),
-//     }));
-
-//     let onLeaveCount = 0;
-
-//     for (const emp of employees) {
-//       const shouldBeOnLeave = employeesOnLeave.includes(emp.id);
-//       onLeaveCount += employeesOnLeave.length;
-//       if (emp.isOnLeave !== shouldBeOnLeave) {
-//         await updateDoc(doc(db, "employee", emp.id), {
-//           isOnLeave: shouldBeOnLeave,
-//         });
-//       }
-//     }
-
-//     return onLeaveCount;
-//   } catch (error) {
-//     console.error("Error updating leave status:", error);
-//   }
-// };
-
 const updateEmployeesOnLeave = async () => {
   const today = new Date();
   today.setHours(8, 0, 0, 0);
@@ -458,8 +400,190 @@ const updateEmployeesOnLeave = async () => {
   }
 };
 
+async function getLatesData() {
+  const latesRef = collection(db, "alllates");
+
+  // Get current date
+  const today = new Date();
+
+  // Define start and end of week (Monday–Friday)
+  const startWeek = format(
+    startOfWeek(today, { weekStartsOn: 1 }),
+    "yyyy-MM-dd"
+  );
+  const endWeek = format(
+    addDays(startOfWeek(today, { weekStartsOn: 1 }), 4),
+    "yyyy-MM-dd"
+  );
+
+  // Define start and end of the year (January - December)
+  const startYear = format(new Date(today.getFullYear(), 0, 1), "yyyy-MM-dd"); // Jan 1st
+  const endYear = format(new Date(today.getFullYear(), 11, 31), "yyyy-MM-dd"); // Dec 31st
+
+  // Firestore queries (string comparisons)
+  const weeklyQuery = query(
+    latesRef,
+    where("date", ">=", startWeek),
+    where("date", "<=", endWeek)
+  );
+  const monthlyQuery = query(
+    latesRef,
+    where("date", ">=", startYear),
+    where("date", "<=", endYear)
+  );
+
+  // Fetch data
+  const weeklySnapshot = await getDocs(weeklyQuery);
+  const monthlySnapshot = await getDocs(monthlyQuery);
+
+  // Initialize weekly data structure
+  let weeklyData = {
+    Monday: 0,
+    Tuesday: 0,
+    Wednesday: 0,
+    Thursday: 0,
+    Friday: 0,
+  };
+
+  // Initialize full-year monthly structure with all months set to 0
+  let monthlyData = {
+    January: 0,
+    February: 0,
+    March: 0,
+    April: 0,
+    May: 0,
+    June: 0,
+    July: 0,
+    August: 0,
+    September: 0,
+    October: 0,
+    November: 0,
+    December: 0,
+  };
+
+  // Process weekly data (Monday–Friday)
+  weeklySnapshot.forEach((doc) => {
+    const data = doc.data();
+    const dayName = format(parseISO(data.date), "EEEE"); // Convert "2025-03-07" to "Friday"
+
+    if (weeklyData[dayName] !== undefined) {
+      weeklyData[dayName] += data.late || 0;
+    }
+  });
+
+  // Process monthly data (January–December)
+  monthlySnapshot.forEach((doc) => {
+    const data = doc.data();
+    const monthName = format(parseISO(data.date), "MMMM"); // Get month name
+
+    monthlyData[monthName] += data.late || 0;
+  });
+
+  // Convert to array format
+  const weeklyArray = Object.keys(weeklyData).map((day) => ({
+    name: day,
+    late: weeklyData[day],
+  }));
+  const monthlyArray = Object.keys(monthlyData).map((month) => ({
+    name: month,
+    late: monthlyData[month],
+  }));
+
+  return { weeklyArray, monthlyArray };
+}
+
+async function getLeaveData() {
+  const leaveRef = collection(db, "leave");
+
+  // Get current date
+  const today = new Date();
+
+  // Define start and end of week (Monday–Friday)
+  const startWeek = format(
+    startOfWeek(today, { weekStartsOn: 1 }),
+    "yyyy-MM-dd"
+  );
+  const endWeek = format(
+    addDays(startOfWeek(today, { weekStartsOn: 1 }), 4),
+    "yyyy-MM-dd"
+  );
+  // Firestore queries (string comparisons)
+  const leaveQuery = query(leaveRef, where("status", "==", "Approved"));
+
+  // Fetch data
+  const leaveSnapshot = await getDocs(leaveQuery);
+
+  // Initialize weekly data structure
+  let weeklyData = {
+    Monday: 0,
+    Tuesday: 0,
+    Wednesday: 0,
+    Thursday: 0,
+    Friday: 0,
+  };
+
+  // Initialize full-year monthly structure with all months set to 0
+  let monthlyData = {
+    January: 0,
+    February: 0,
+    March: 0,
+    April: 0,
+    May: 0,
+    June: 0,
+    July: 0,
+    August: 0,
+    September: 0,
+    October: 0,
+    November: 0,
+    December: 0,
+  };
+
+  // Process leave data
+  leaveSnapshot.forEach((doc) => {
+    const data = doc.data();
+    const leaveDays = eachDayOfInterval({
+      start: parseISO(data.from),
+      end: parseISO(data.to),
+    });
+
+    leaveDays.forEach((day) => {
+      const dayString = format(day, "yyyy-MM-dd");
+      const dayName = format(day, "EEEE"); // Get day name (Monday, Tuesday, etc.)
+      const monthName = format(day, "MMMM"); // Get month name (March, April, etc.)
+
+      // Add to weekly data (only if it's Mon–Fri)
+      if (
+        weeklyData[dayName] !== undefined &&
+        dayString >= startWeek &&
+        dayString <= endWeek
+      ) {
+        weeklyData[dayName] += 1;
+      }
+
+      // Add to monthly data
+      if (monthlyData[monthName] !== undefined) {
+        monthlyData[monthName] += 1;
+      }
+    });
+  });
+
+  // Convert to array format
+  const weeklyArray = Object.keys(weeklyData).map((day) => ({
+    name: day,
+    leave: weeklyData[day],
+  }));
+  const monthlyArray = Object.keys(monthlyData).map((month) => ({
+    name: month,
+    leave: monthlyData[month],
+  }));
+
+  console.log("Weekly Leave Data (Mon-Fri):", weeklyArray);
+  console.log("Monthly Leave Data (Jan-Dec):", monthlyArray);
+
+  return { weeklyArray, monthlyArray };
+}
+
 export {
-  isNewUser,
   insertOne,
   getOne,
   getAll,
@@ -480,4 +604,6 @@ export {
   approveLeave,
   rejectLeave,
   updateEmployeesOnLeave,
+  getLatesData,
+  getLeaveData,
 };

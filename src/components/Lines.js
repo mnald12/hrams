@@ -9,34 +9,34 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import { getLatesData, getLeaveData } from "../methods/methods";
 
-const data = [
-  {
-    name: "Monday",
-    Late: 20,
-    Leave: 3,
-  },
-  {
-    name: "Tuesday",
-    Late: 11,
-    Leave: 3,
-  },
-  {
-    name: "Wednesday",
-    Late: 8,
-    Leave: 2,
-  },
-  {
-    name: "Thursday",
-    Late: 18,
-    Leave: 2,
-  },
-  {
-    name: "Friday",
-    Late: 22,
-    Leave: 3,
-  },
-];
+let data = [];
+
+Promise.all([getLeaveData(), getLatesData()]).then(
+  ([leaveResult, lateResult]) => {
+    let leaveData = leaveResult.weeklyArray;
+    let lateData = lateResult.weeklyArray;
+
+    let mergedData = {};
+
+    lateData.forEach((item) => {
+      mergedData[item.name] = { name: item.name, late: item.late, leave: 0 };
+    });
+
+    leaveData.forEach((item) => {
+      if (mergedData[item.name]) {
+        mergedData[item.name].leave = item.leave;
+      } else {
+        mergedData[item.name] = { name: item.name, late: 0, leave: item.leave };
+      }
+    });
+
+    data = Object.values(mergedData);
+
+    console.log(data);
+  }
+);
 
 export default class Example extends PureComponent {
   render() {
@@ -58,8 +58,8 @@ export default class Example extends PureComponent {
           <YAxis />
           <Tooltip />
           <Legend />
-          <Line type="monotone" dataKey="Late" stroke="orange" />
-          <Line type="monotone" dataKey="Leave" stroke="red" />
+          <Line type="monotone" dataKey="late" stroke="orange" />
+          <Line type="monotone" dataKey="leave" stroke="red" />
         </LineChart>
       </ResponsiveContainer>
     );

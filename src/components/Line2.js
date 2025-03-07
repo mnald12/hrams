@@ -9,69 +9,52 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import { getLatesData, getLeaveData } from "../methods/methods";
 
-const data = [
-  {
-    name: "Jan",
-    Late: 0,
-    Leave: 0,
-  },
-  {
-    name: "Feb",
-    Late: 0,
-    Leave: 3,
-  },
-  {
-    name: "Mar",
-    Late: 0,
-    Leave: 1,
-  },
-  {
-    name: "Apr",
-    Late: 0,
-    Leave: 0,
-  },
-  {
-    name: "May",
-    Late: 0,
-    Leave: 0,
-  },
-  {
-    name: "Jun",
-    Late: 0,
-    Leave: 0,
-  },
-  {
-    name: "Jul",
-    Late: 0,
-    Leave: 0,
-  },
-  {
-    name: "Aug",
-    Late: 0,
-    Leave: 0,
-  },
-  {
-    name: "Sep",
-    Late: 0,
-    Leave: 0,
-  },
-  {
-    name: "Oct",
-    Late: 0,
-    Leave: 0,
-  },
-  {
-    name: "Nov",
-    Late: 0,
-    Leave: 0,
-  },
-  {
-    name: "Dec",
-    Late: 0,
-    Leave: 0,
-  },
-];
+let data = [];
+
+Promise.all([getLeaveData(), getLatesData()]).then(
+  ([leaveResult, lateResult]) => {
+    let leaveData = leaveResult.monthlyArray;
+    let lateData = lateResult.monthlyArray;
+
+    const months = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+
+    let mergedData = {};
+    months.forEach((month) => {
+      mergedData[month] = { name: month, late: 0, leave: 0 };
+    });
+
+    lateData.forEach((item) => {
+      if (mergedData[item.name]) {
+        mergedData[item.name].late = item.late;
+      }
+    });
+
+    leaveData.forEach((item) => {
+      if (mergedData[item.name]) {
+        mergedData[item.name].leave = item.leave;
+      }
+    });
+
+    data = Object.values(mergedData);
+
+    console.log(data);
+  }
+);
 
 export default class Line2 extends PureComponent {
   render() {
@@ -93,8 +76,8 @@ export default class Line2 extends PureComponent {
           <YAxis />
           <Tooltip />
           <Legend />
-          <Line type="monotone" dataKey="Late" stroke="orange" />
-          <Line type="monotone" dataKey="Leave" stroke="red" />
+          <Line type="monotone" dataKey="late" stroke="orange" />
+          <Line type="monotone" dataKey="leave" stroke="red" />
         </LineChart>
       </ResponsiveContainer>
     );

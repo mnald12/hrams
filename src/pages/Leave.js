@@ -213,7 +213,7 @@ const Leave = () => {
                     <td>{request.type}</td>
                     <td>{request.from}</td>
                     <td>{request.to}</td>
-                    <td>{request.status}</td>
+                    <td style={{ color: "orange" }}>{request.status}</td>
                     <td style={{ display: "flex", gap: "10px" }}>
                       <button
                         title="approve"
@@ -260,7 +260,7 @@ const Leave = () => {
                     <td>{onLeave.type}</td>
                     <td>{onLeave.from}</td>
                     <td>{onLeave.to}</td>
-                    <td>{onLeave.status}</td>
+                    <td style={{ color: "green" }}>{onLeave.status}</td>
                     <td
                       style={{
                         display: "flex",
@@ -306,7 +306,7 @@ const Leave = () => {
                     <td>{onLeave.type}</td>
                     <td>{onLeave.from}</td>
                     <td>{onLeave.to}</td>
-                    <td>{onLeave.status}</td>
+                    <td style={{ color: "red" }}>{onLeave.status}</td>
                     <td
                       style={{
                         display: "flex",
