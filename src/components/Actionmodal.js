@@ -106,6 +106,26 @@ const ActionModal = ({ type, handleClose }) => {
       title: "Event Deletion Failed",
       message: "There was an error deleting the event. Please try again.",
     },
+    {
+      icon: <FaUserEdit className="icon blue" />, // Updating Profile Success 17
+      title: "Profile Updated",
+      message: "Admin profile details have been updated successfully.",
+    },
+    {
+      icon: <FaTimesCircle className="icon red" />, // Updating Profile Fail 18
+      title: "Profile Update Failed",
+      message: "There was an error updating profile details. Please try again.",
+    },
+    {
+      icon: <FaClock className="icon purple" />, // Attendance Process Success 19
+      title: "Attendance Processed",
+      message: "Attendance records have been successfully processed.",
+    },
+    {
+      icon: <FaTimesCircle className="icon red" />, // Attendance Process Fail 20
+      title: "Attendance Processing Failed",
+      message: "There was an error processing attendance.",
+    },
   ];
 
   useEffect(() => {

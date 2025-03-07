@@ -26,6 +26,7 @@ import Viewprofile from "./pages/Viewprofile";
 import EmployeeProfile from "./pages/Employeeprofile";
 import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "./firebase/db";
+import EditAdmin from "./pages/Editadmin";
 
 const DataContext = createContext(null);
 let tl = 0;
@@ -180,6 +181,11 @@ function App() {
       if (isInserted && isLatesInserted) {
         await clearTable("attendance");
         await clearTable("lates");
+        setType(19);
+        setIsActionModal(true);
+      } else {
+        setType(20);
+        setIsActionModal(true);
       }
     } catch (error) {
       console.error("Error processing attendance:", error);
@@ -237,6 +243,7 @@ function App() {
             />
             <Route path="/employee/profile" element={<EmployeeProfile />} />
             <Route path="/profile/view" element={<Viewprofile />} />
+            <Route path="/profile/edit" element={<EditAdmin />} />
             <Route path="/scanner" element={<Scanner />} />
             <Route path="/login" element={<LoginPage />} />
           </Route>

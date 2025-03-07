@@ -85,7 +85,8 @@ const EditEmployee = () => {
       setIsActionModal(true);
       setType(2);
     } else {
-      alert("Failed to update employee");
+      setIsActionModal(true);
+      setType(3);
     }
 
     setIsLoading(false);

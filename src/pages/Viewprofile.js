@@ -1,12 +1,16 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Loader from "../components/Loader";
 import "../css/employee.css";
 import { getOne } from "../methods/methods";
 import nopic from "../mopic.jpg";
+import { DataContext } from "../App";
+import { useNavigate } from "react-router-dom";
 
 const Viewprofile = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [employee, setEmployee] = useState({ attendance: [] });
+  const { setNavActive } = useContext(DataContext);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchEmployee = async () => {
@@ -48,6 +52,10 @@ const Viewprofile = () => {
               <input type="text" value={employee.firstName} disabled />
             </div>
             <div className="inp-grp">
+              <h4>Position:</h4>
+              <input type="text" value={employee.position} disabled />
+            </div>
+            <div className="inp-grp">
               <h4>Email:</h4>
               <input type="text" value={employee.email} disabled />
             </div>
@@ -55,7 +63,7 @@ const Viewprofile = () => {
               <h4>Phone No:</h4>
               <input type="text" value={employee.phone} disabled />
             </div>
-            <div className="inp-grp address">
+            <div className="inp-grp">
               <h4>Address:</h4>
               <input type="text" value={employee.address} disabled />
             </div>
@@ -74,7 +82,13 @@ const Viewprofile = () => {
         </div>
       </div>
       <div className="add-row-btn">
-        <button style={{ marginLeft: "20px !important", background: "orange" }}>
+        <button
+          onClick={() => {
+            setNavActive("Edit Profile");
+            navigate("/profile/edit");
+          }}
+          style={{ marginLeft: "20px !important", background: "orange" }}
+        >
           Edit profile
         </button>
       </div>

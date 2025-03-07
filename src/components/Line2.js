@@ -14,81 +14,66 @@ const data = [
   {
     name: "Jan",
     Late: 0,
-    Absent: 0,
     Leave: 0,
   },
   {
     name: "Feb",
     Late: 0,
-    Absent: 0,
     Leave: 3,
   },
   {
     name: "Mar",
     Late: 0,
-    Absent: 0,
     Leave: 1,
   },
   {
     name: "Apr",
     Late: 0,
-    Absent: 0,
     Leave: 0,
   },
   {
     name: "May",
     Late: 0,
-    Absent: 0,
     Leave: 0,
   },
   {
     name: "Jun",
     Late: 0,
-    Absent: 0,
     Leave: 0,
   },
   {
     name: "Jul",
     Late: 0,
-    Absent: 0,
     Leave: 0,
   },
   {
     name: "Aug",
     Late: 0,
-    Absent: 0,
     Leave: 0,
   },
   {
     name: "Sep",
     Late: 0,
-    Absent: 0,
     Leave: 0,
   },
   {
     name: "Oct",
     Late: 0,
-    Absent: 0,
     Leave: 0,
   },
   {
     name: "Nov",
     Late: 0,
-    Absent: 0,
     Leave: 0,
   },
   {
     name: "Dec",
     Late: 0,
-    Absent: 0,
     Leave: 0,
   },
 ];
 
 export default class Line2 extends PureComponent {
-  static demoUrl =
-    "https://codesandbox.io/p/sandbox/line-chart-width-xaxis-padding-8v7952";
-
   render() {
     return (
       <ResponsiveContainer width="100%" height="100%">
@@ -109,13 +94,7 @@ export default class Line2 extends PureComponent {
           <Tooltip />
           <Legend />
           <Line type="monotone" dataKey="Late" stroke="orange" />
-          <Line
-            type="monotone"
-            dataKey="Absent"
-            stroke="red"
-            activeDot={{ r: 5 }}
-          />
-          <Line type="monotone" dataKey="Leave" stroke="darkviolet" />
+          <Line type="monotone" dataKey="Leave" stroke="red" />
         </LineChart>
       </ResponsiveContainer>
     );

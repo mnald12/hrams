@@ -127,6 +127,10 @@ const Addemployee = () => {
 
         setType(0);
         setIsActionModal(true);
+      } else {
+        setType(1);
+        setIsActionModal(true);
+        return;
       }
     } else {
       setIsLoading(false);

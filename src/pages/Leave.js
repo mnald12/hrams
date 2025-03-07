@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import Loader from "../components/Loader";
-import "../css/leave.css"; // Import CSS file
+import "../css/leave.css";
 import { BiTrash } from "react-icons/bi";
 import { collection, onSnapshot } from "firebase/firestore";
 import { db, storage } from "../firebase/db";
@@ -215,24 +215,20 @@ const Leave = () => {
                     <td>{request.to}</td>
                     <td>{request.status}</td>
                     <td style={{ display: "flex", gap: "10px" }}>
-                      {request.status === "Pending" && (
-                        <>
-                          <button
-                            title="approve"
-                            className="approve-button"
-                            onClick={() => handleApprove(request.id)}
-                          >
-                            <FaCheck color="green" />
-                          </button>
-                          <button
-                            title="reject"
-                            className="reject-button"
-                            onClick={() => handleReject(request.id)}
-                          >
-                            <BiTrash color="red" />
-                          </button>
-                        </>
-                      )}
+                      <button
+                        title="approve"
+                        className="approve-button"
+                        onClick={() => handleApprove(request.id)}
+                      >
+                        <FaCheck color="green" />
+                      </button>
+                      <button
+                        title="reject"
+                        className="reject-button"
+                        onClick={() => handleReject(request.id)}
+                      >
+                        <BiTrash color="red" />
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -251,6 +247,7 @@ const Leave = () => {
                   <th>From</th>
                   <th>To</th>
                   <th>Status</th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -264,6 +261,21 @@ const Leave = () => {
                     <td>{onLeave.from}</td>
                     <td>{onLeave.to}</td>
                     <td>{onLeave.status}</td>
+                    <td
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <button
+                        title="reject"
+                        className="reject-button"
+                        onClick={() => handleReject(onLeave.id)}
+                      >
+                        <BiTrash color="red" />
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -281,6 +293,7 @@ const Leave = () => {
                   <th>From</th>
                   <th>To</th>
                   <th>Status</th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -294,6 +307,21 @@ const Leave = () => {
                     <td>{onLeave.from}</td>
                     <td>{onLeave.to}</td>
                     <td>{onLeave.status}</td>
+                    <td
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <button
+                        title="approve"
+                        className="approve-button"
+                        onClick={() => handleApprove(onLeave.id)}
+                      >
+                        <FaCheck color="green" />
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>

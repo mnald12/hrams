@@ -13,7 +13,7 @@ import EventDashboard from "../components/Events";
 const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [totalEmployee, setTotalEmployee] = useState(0);
-  const { todaysLate, todaysLeave } = useContext(DataContext);
+  const { present, todaysLate, todaysLeave } = useContext(DataContext);
   const [events, setEvents] = useState([]);
   useEffect(() => {
     const fetch = async () => {
@@ -43,7 +43,7 @@ const Dashboard = () => {
             </div>
             <div className="card-right">
               <p>Present Today</p>
-              <h3>{"0"}</h3>
+              <h3>{present}</h3>
             </div>
           </div>
           <div className="card-4">

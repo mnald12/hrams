@@ -7,12 +7,13 @@ import { BiUserCircle } from "react-icons/bi";
 import { useContext, useEffect, useState } from "react";
 import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase/db";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { DataContext } from "../App";
 
 const Menu = () => {
   const [profile, setProfile] = useState({});
   const { setNavActive, setIsLogin } = useContext(DataContext);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const docRef = doc(db, "profile", "admin");
@@ -54,17 +55,15 @@ const Menu = () => {
       <div className="header-content" id="header-content">
         <h3>Menu</h3>
         <div>
-          <Link
-            title="view"
-            className="menu-btn"
-            to={`/profile/view`}
+          <button
             onClick={() => {
-              setNavActive("View Employee");
+              setNavActive("View Profile");
+              navigate("/profile/view");
               ddClose();
             }}
           >
             <BiUserCircle className="icn" /> Profile
-          </Link>
+          </button>
           <button
             onClick={() => {
               setIsLogin(false);
