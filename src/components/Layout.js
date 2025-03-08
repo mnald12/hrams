@@ -29,7 +29,7 @@ const Layout = () => {
     <>
       <div
         className="container"
-        style={{ maxWidth: "1300px", margin: "0 auto" }}
+        style={{ maxWidth: "1500px", margin: "0 auto" }}
       >
         <Sidebar />
         <div className="page">

@@ -11,72 +11,82 @@ import { DataContext } from "../App";
 const EditAdmin = () => {
   const { setType, setIsActionModal } = useContext(DataContext);
   const [isLoading, setIsLoading] = useState(true);
-  const [employee, setEmployee] = useState({});
-  const [address, setAddress] = useState(employee.address || "");
-  const [avatar, setAvatar] = useState(employee.avatar || "");
-  const [email, setEmail] = useState(employee.email || "");
-  const [firstName, setFirstName] = useState(employee.firstName || "");
-  const [lastName, setLastName] = useState(employee.lastName || "");
-  const [phone, setPhone] = useState(employee.phone || "");
-  const [position, setPosition] = useState(employee.position || "");
-  const [username, setUsername] = useState(employee.username || "");
-  const [password, setPassword] = useState(employee.password || "");
-  const [img, setImg] = useState("");
+  const [img, setImg] = useState(null);
+
+  const [address, setAddress] = useState("");
+  const [avatar, setAvatar] = useState("");
+  const [email, setEmail] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [position, setPosition] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
 
   useEffect(() => {
     const fetchEmployee = async () => {
       try {
         const data = await getOne("profile", "admin");
-        setEmployee(data);
+        if (data) {
+          setAddress(data.address || "");
+          setAvatar(data.avatar || "");
+          setEmail(data.email || "");
+          setFirstName(data.firstName || "");
+          setLastName(data.lastName || "");
+          setPhone(data.phone || "");
+          setPosition(data.position || "");
+          setUsername(data.username || "");
+          setPassword(data.password || "");
+        }
       } catch (error) {
         console.error("Error fetching employee:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchEmployee();
-
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
   }, []);
 
   const updateAdmin = async () => {
     setIsLoading(true);
+    let avatarUrl = avatar;
 
-    if (avatar instanceof File) {
+    if (img) {
       const imageRef = ref(
         storage,
-        `images/${img.name + (await cryptoRandomString({ length: 10 }))}`
+        `images/${img.name + cryptoRandomString({ length: 10 })}`
       );
       const snapshot = await uploadBytes(imageRef, img);
-      const avatarUrl = await getDownloadURL(snapshot.ref);
-      setAvatar(avatarUrl);
+      avatarUrl = await getDownloadURL(snapshot.ref);
     }
 
     const updatedEmployee = {
-      address: address,
-      avatar: avatar,
-      email: email,
-      firstName: firstName,
-      lastName: lastName,
-      password: password,
-      phone: phone,
-      position: position,
-      username: username,
+      address,
+      avatar: avatarUrl,
+      email,
+      firstName,
+      lastName,
+      phone,
+      position,
+      username,
+      password,
     };
 
-    const updated = await update("profile", "admin", updatedEmployee);
-    console.log(updated);
-
-    if (updated) {
-      setIsActionModal(true);
-      setType(17);
-    } else {
-      setIsActionModal(true);
-      setType(18);
+    try {
+      const updated = await update("profile", "admin", updatedEmployee);
+      if (updated) {
+        setIsActionModal(true);
+        setType(17);
+      } else {
+        setIsActionModal(true);
+        setType(18);
+      }
+    } catch (error) {
+      console.error("Error updating admin:", error);
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   if (isLoading) return <Loader />;
@@ -86,18 +96,18 @@ const EditAdmin = () => {
       <div className="form-container">
         <div className="form-left">
           <div className="preview">
-            <img id="img" src={employee.avatar || nopic} alt="avatar" />
+            <img id="img-preview" src={avatar || nopic} alt="avatar" />
           </div>
 
           <h4>Employee Image:</h4>
           <input
             type="file"
-            id="imgs"
             onChange={(e) => {
-              document.getElementById("img").src =
-                URL.createObjectURL(e.target.files[0]) + "#toolbar=0";
-              setImg(e.target.files[0]);
-              document.getElementById("img").style.display = "block";
+              const file = e.target.files[0];
+              if (file) {
+                setImg(file);
+                setAvatar(URL.createObjectURL(file));
+              }
             }}
           />
         </div>
@@ -109,7 +119,7 @@ const EditAdmin = () => {
               <h4>Last Name:</h4>
               <input
                 type="text"
-                value={lastName || employee.lastName}
+                value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
               />
             </div>
@@ -117,7 +127,7 @@ const EditAdmin = () => {
               <h4>First Name:</h4>
               <input
                 type="text"
-                value={firstName || employee.firstName}
+                value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
               />
             </div>
@@ -125,15 +135,15 @@ const EditAdmin = () => {
               <h4>Position:</h4>
               <input
                 type="text"
-                value={position || employee.position}
+                value={position}
                 onChange={(e) => setPosition(e.target.value)}
               />
             </div>
             <div className="inp-grp">
               <h4>Email:</h4>
               <input
-                type="text"
-                value={email || employee.email}
+                type="email"
+                value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
@@ -141,7 +151,7 @@ const EditAdmin = () => {
               <h4>Phone No:</h4>
               <input
                 type="text"
-                value={phone || employee.phone}
+                value={phone}
                 onChange={(e) => setPhone(e.target.value)}
               />
             </div>
@@ -149,7 +159,7 @@ const EditAdmin = () => {
               <h4>Address:</h4>
               <input
                 type="text"
-                value={address || employee.address}
+                value={address}
                 onChange={(e) => setAddress(e.target.value)}
               />
             </div>
@@ -160,7 +170,7 @@ const EditAdmin = () => {
               <h4>Username:</h4>
               <input
                 type="text"
-                value={username || employee.username}
+                value={username}
                 onChange={(e) => setUsername(e.target.value)}
               />
             </div>
@@ -168,7 +178,7 @@ const EditAdmin = () => {
               <h4>Password:</h4>
               <input
                 type="password"
-                value={password || employee.password}
+                value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
@@ -176,10 +186,7 @@ const EditAdmin = () => {
         </div>
       </div>
       <div className="add-row-btn">
-        <button
-          onClick={() => updateAdmin()}
-          style={{ marginLeft: "20px !important", background: "orange" }}
-        >
+        <button onClick={updateAdmin} style={{ background: "orange" }}>
           Update profile
         </button>
       </div>

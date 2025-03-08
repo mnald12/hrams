@@ -27,6 +27,7 @@ import EmployeeProfile from "./pages/Employeeprofile";
 import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "./firebase/db";
 import EditAdmin from "./pages/Editadmin";
+import ExcelViewer from "./pages/Excelviewer";
 
 const DataContext = createContext(null);
 let tl = 0;
@@ -41,6 +42,7 @@ function App() {
   const [todaysAbsent, setTodaysAbsent] = useState(0);
   const [todaysLeave, setTodaysLeave] = useState(0);
   const [isLogin, setIsLogin] = useState(0);
+  const [excelFile, setExcelFile] = useState("");
 
   useEffect(() => {
     const checkScreenSize = () => {
@@ -220,6 +222,8 @@ function App() {
         setTodaysLeave,
         isLogin,
         setIsLogin,
+        excelFile,
+        setExcelFile,
       }}
     >
       <BrowserRouter>
@@ -242,6 +246,10 @@ function App() {
               element={<ViewAlllAttendances />}
             />
             <Route path="/employee/profile" element={<EmployeeProfile />} />
+            <Route
+              path="/employee/view/applicationform"
+              element={<ExcelViewer />}
+            />
             <Route path="/profile/view" element={<Viewprofile />} />
             <Route path="/profile/edit" element={<EditAdmin />} />
             <Route path="/scanner" element={<Scanner />} />

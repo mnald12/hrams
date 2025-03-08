@@ -4,11 +4,12 @@ import "../css/leave.css";
 import { BiTrash } from "react-icons/bi";
 import { collection, onSnapshot } from "firebase/firestore";
 import { db, storage } from "../firebase/db";
-import { FaCheck } from "react-icons/fa";
+import { FaCheck, FaEye } from "react-icons/fa";
 import { approveLeave, insertOne, rejectLeave } from "../methods/methods";
 import { DataContext } from "../App";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import cryptoRandomString from "crypto-random-string";
+import { useNavigate } from "react-router-dom";
 
 const Leave = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -17,7 +18,10 @@ const Leave = () => {
   const [onLeave, setOnLeave] = useState([]);
   const [rejects, setRejects] = useState([]);
 
-  const { setType, setIsActionModal } = useContext(DataContext);
+  const navigate = useNavigate();
+
+  const { setNavActive, setType, setIsActionModal, setExcelFile } =
+    useContext(DataContext);
 
   const [alfFile, setAlfFile] = useState("");
   const [newLeave, setNewLeave] = useState({
@@ -143,6 +147,7 @@ const Leave = () => {
         });
         setType(6);
         setIsActionModal(true);
+        setIsLoading(false);
       }
     } else {
       setType(12);
@@ -215,6 +220,18 @@ const Leave = () => {
                     <td>{request.to}</td>
                     <td style={{ color: "orange" }}>{request.status}</td>
                     <td style={{ display: "flex", gap: "10px" }}>
+                      {/* <button
+                        title="view"
+                        className="approve-button"
+                        onClick={() => {
+                          setExcelFile(request.applicationForm);
+                          console.log(request.applicationForm);
+                          setNavActive("View Application Form");
+                          navigate("/employee/view/applicationform");
+                        }}
+                      >
+                        <FaEye color="forestgreen" />
+                      </button> */}
                       <button
                         title="approve"
                         className="approve-button"

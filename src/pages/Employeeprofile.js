@@ -406,7 +406,7 @@ const EmployeeViewer = ({ employee, setLogout, id }) => {
                 <option value="Sick Leave">Sick Leave</option>
               </select>
 
-              <h4>PDS :</h4>
+              <h4>Leave Application Form :</h4>
               <input
                 type="file"
                 onChange={(e) => setAlfFile(e.target.files[0])}
