@@ -6,6 +6,7 @@ import {
   FaCalendarTimes,
   FaCheckCircle,
   FaClock,
+  FaBan,
 } from "react-icons/fa";
 import { useEffect } from "react";
 
@@ -45,6 +46,12 @@ const Scannermodal = ({ type, handleClose }) => {
       title: "Missed Time-In",
       message:
         "You did not scan during the time-in session but scanned during time-out. Please inform HR for corrections.",
+    },
+    {
+      icon: <FaBan className="icon gray" />,
+      title: "Invalid Scan Time",
+      message:
+        "You are attempting to scan outside of the allowed time period. Please check the schedule and try again.",
     },
   ];
 

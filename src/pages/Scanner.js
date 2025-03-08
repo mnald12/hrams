@@ -58,6 +58,12 @@ const Scanner = () => {
     }
 
     if (btnActive === "TIAM") {
+      if (hour >= 12) {
+        setModalType(6);
+        setIsShowModal(true);
+        return;
+      }
+
       const isScanned = await checkSession(employee.id, "TIME_IN_AM");
 
       if (isScanned) {
@@ -131,6 +137,12 @@ const Scanner = () => {
       setModalType(4);
       setIsShowModal(true);
     } else if (btnActive === "TOAM") {
+      if (hour >= 14 || (hour >= 6 && hour <= 9)) {
+        setModalType(6);
+        setIsShowModal(true);
+        return;
+      }
+
       const isScanned = await checkSession(employee.id, "TIME_OUT_AM");
 
       if (isScanned) {
@@ -160,6 +172,12 @@ const Scanner = () => {
       setModalType(4);
       setIsShowModal(true);
     } else if (btnActive === "TIPM") {
+      if (hour >= 16 || (hour >= 6 && hour <= 11)) {
+        setModalType(6);
+        setIsShowModal(true);
+        return;
+      }
+
       const isScanned = await checkSession(employee.id, "TIME_IN_PM");
 
       if (isScanned) {
@@ -243,6 +261,12 @@ const Scanner = () => {
       setModalType(4);
       setIsShowModal(true);
     } else if (btnActive === "TOPM") {
+      if (hour >= 6 && hour <= 15) {
+        setModalType(6);
+        setIsShowModal(true);
+        return;
+      }
+
       const isScanned = await checkSession(employee.id, "TIME_OUT_PM");
 
       if (isScanned) {
