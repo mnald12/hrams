@@ -13,7 +13,6 @@ const EventCard = ({ event }) => {
 };
 
 const EventDashboard = ({ events }) => {
-  console.log(events);
   return (
     <div className="event-dashboard">
       {events.map((event, index) => (

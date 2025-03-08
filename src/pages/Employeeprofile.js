@@ -1,11 +1,20 @@
 import "../css/loginemployee.css";
-import { useState } from "react";
-import { getOneWithRFID, insertOne } from "../methods/methods";
+import { useEffect, useState } from "react";
+import {
+  getEmployeeAttendance,
+  getEmployeeLeaves,
+  getOneWithRFID,
+  insertOne,
+} from "../methods/methods";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { storage } from "../firebase/db";
+import { db, storage } from "../firebase/db";
 import cryptoRandomString from "crypto-random-string";
+import { collection, onSnapshot } from "firebase/firestore";
+import FullCalendar from "@fullcalendar/react";
+import dayGridPlugin from "@fullcalendar/daygrid";
+import interactionPlugin from "@fullcalendar/interaction";
 
-const EmployeeViewer = ({ employee, setLogout }) => {
+const EmployeeViewer = ({ employee, setLogout, id }) => {
   const [btnActive, setBtnActive] = useState("profile");
   const [alfFile, setAlfFile] = useState("");
   const [newLeave, setNewLeave] = useState({
@@ -14,7 +23,56 @@ const EmployeeViewer = ({ employee, setLogout }) => {
     to: "",
   });
 
-  if (!employee) return null;
+  const [attendance, setAttendance] = useState([]);
+  const [leaves, setLeaves] = useState([]);
+  const [events, setEvents] = useState(null);
+
+  useEffect(() => {
+    const getAtt = async () => {
+      try {
+        const att = await getEmployeeAttendance(employee.id);
+        setAttendance(att);
+        console.log(id);
+      } catch (error) {
+        console.error("Error fetching employee attendance:", error);
+      }
+    };
+
+    const getLeaves = async () => {
+      try {
+        const att = await getEmployeeLeaves(employee.id);
+        setLeaves(att);
+        console.log(att);
+      } catch (error) {
+        console.error("Error fetching employee attendance:", error);
+      }
+    };
+
+    getAtt();
+    getLeaves();
+  }, [employee.id, id]);
+
+  useEffect(() => {
+    const collectionRef = collection(db, "events");
+
+    const unsubscribe = onSnapshot(
+      collectionRef,
+      (querySnapshot) => {
+        const items = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setEvents(items);
+      },
+      (error) => {
+        console.error("Error fetching real-time updates: ", error);
+      }
+    );
+
+    return () => unsubscribe();
+  }, []);
+
+  if (!employee) return;
 
   const {
     avatar,
@@ -28,18 +86,10 @@ const EmployeeViewer = ({ employee, setLogout }) => {
     employed,
     position,
     rfid,
-    late = [],
-    absent = [],
-    leave = [],
+    gender,
     points = [],
+    late = [],
   } = employee;
-
-  const convertTo12Hour = (hour, minute) => {
-    const ampm = hour >= 12 ? "PM" : "AM";
-    const hour12 = hour % 12 || 12;
-    const minuteStr = minute.toString().padStart(2, "0");
-    return `${hour12}:${minuteStr} ${ampm}`;
-  };
 
   const submitApp = async () => {
     if (newLeave.from && newLeave.to && newLeave.type) {
@@ -135,6 +185,10 @@ const EmployeeViewer = ({ employee, setLogout }) => {
                 <span className="value">{age}</span>
               </div>
               <div className="detail-row">
+                <span className="label">Gender:</span>
+                <span className="value">{gender}</span>
+              </div>
+              <div className="detail-row">
                 <span className="label">Email:</span>
                 <span className="value">{email}</span>
               </div>
@@ -156,59 +210,152 @@ const EmployeeViewer = ({ employee, setLogout }) => {
               </div>
             </>
           ) : btnActive === "attendance" ? (
-            <div className="employee-attendance">
-              <h3>Attendance</h3>
+            <div className="employee-attendance" style={{ maxHeight: "400px" }}>
               <div className="attendance-summary">
                 <div className="attendance-item">
                   <span className="label">Late:</span>
                   <span className="value">{late.length}</span>
                 </div>
                 <div className="attendance-item">
-                  <span className="label">Absent:</span>
-                  <span className="value">{absent.length}</span>
-                </div>
-                <div className="attendance-item">
                   <span className="label">Leave:</span>
-                  <span className="value">{leave.length}</span>
+                  <span className="value">{leaves.length}</span>
                 </div>
               </div>
-              {late.length > 0 && (
-                <div className="attendance-details">
-                  <h4>Late Details</h4>
-                  <ul>
-                    {late.map((item, index) => (
-                      <li key={index}>
-                        {convertTo12Hour(item.timeInHour, item.timeInMinute)}
-                      </li>
+              <div
+                className="leave-form"
+                style={{
+                  width: "100%",
+                  padding: "20px",
+                  marginTop: "20px !important",
+                }}
+              >
+                <h2>Attendance</h2>
+                <table>
+                  <thead style={{ paddingTop: "0 !important" }}>
+                    <tr>
+                      <th width="15%">Date</th>
+                      <th width="15%">Time in</th>
+                      <th width="15%">Time out</th>
+                      <th width="15%">Time in</th>
+                      <th width="15%">Time out</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {attendance.map((e, i) => (
+                      <tr key={i}>
+                        <td>{e.date}</td>
+                        <td>
+                          {e.timeInAM.hour ? (
+                            <>
+                              {e.timeInAM.hour <= 9
+                                ? `0${e.timeInAM.hour}`
+                                : e.timeInAM.hour}{" "}
+                              :{" "}
+                              {e.timeInAM.minute <= 9
+                                ? `0${e.timeInAM.minute}`
+                                : e.timeInAM.minute}{" "}
+                              AM
+                            </>
+                          ) : (
+                            ""
+                          )}
+                        </td>
+                        <td>
+                          {e.timeOutAM.hour ? (
+                            <>
+                              {e.timeOutAM.hour <= 9
+                                ? `0${e.timeOutAM.hour}`
+                                : e.timeOutAM.hour}{" "}
+                              :{" "}
+                              {e.timeOutAM.minute <= 9
+                                ? `0${e.timeOutAM.minute}`
+                                : e.timeOutAM.minute}{" "}
+                              AM
+                            </>
+                          ) : (
+                            ""
+                          )}
+                        </td>
+                        <td>
+                          {e.timeInPM.hour ? (
+                            <>
+                              {e.timeInPM.hour <= 9
+                                ? `0${e.timeInPM.hour}`
+                                : e.timeInPM.hour}{" "}
+                              :{" "}
+                              {e.timeInPM.minute <= 9
+                                ? `0${e.timeInPM.minute}`
+                                : e.timeInPM.minute}{" "}
+                              PM
+                            </>
+                          ) : (
+                            ""
+                          )}
+                        </td>
+                        <td>
+                          {e.timeOutPM.hour ? (
+                            <>
+                              {e.timeOutPM.hour <= 9
+                                ? `0${e.timeOutPM.hour}`
+                                : e.timeOutPM.hour}{" "}
+                              :{" "}
+                              {e.timeOutPM.minute <= 9
+                                ? `0${e.timeOutPM.minute}`
+                                : e.timeOutPM.minute}{" "}
+                              PM
+                            </>
+                          ) : (
+                            ""
+                          )}
+                        </td>
+                      </tr>
                     ))}
-                  </ul>
-                </div>
-              )}
+                  </tbody>
+                </table>
+              </div>
             </div>
           ) : btnActive === "points" ? (
             <div className="employee-points">
-              <h3>Points</h3>
-              <ul>
-                {points.map((point, index) => (
-                  <li key={index} className="point-item">
-                    <p>
-                      <strong>Period:</strong> {point.from} - {point.to}
-                    </p>
-                    <p>
-                      <strong>SL Balance:</strong> {point.slb || "-"}{" "}
-                      <strong>SL Earned:</strong> {point.sle || "-"}{" "}
-                      <strong>SL Spent:</strong> {point.sls || "-"}
-                    </p>
-                    <p>
-                      <strong>VL Balance:</strong> {point.vlb || "-"}{" "}
-                      <strong>VL Earned:</strong> {point.vle || "-"}{" "}
-                      <strong>VL Spent:</strong> {point.vls || "-"}
-                    </p>
-                  </li>
-                ))}
-              </ul>
+              <div
+                className="leave-form"
+                style={{
+                  width: "100%",
+                  padding: "20px",
+                  marginTop: "20px !important",
+                }}
+              >
+                <h2>Points</h2>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>From</th>
+                      <th>To</th>
+                      <th>SL Bal</th>
+                      <th>SL Earned</th>
+                      <th>SL Spent</th>
+                      <th>VL Bal</th>
+                      <th>VL Earned</th>
+                      <th>VL Spent</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {points.map((point, index) => (
+                      <tr key={index}>
+                        <td>{point.from}</td>
+                        <td>{point.to}</td>
+                        <td>{point.slb}</td>
+                        <td>{point.sle}</td>
+                        <td>{point.sls}</td>
+                        <td>{point.vlb}</td>
+                        <td>{point.vle}</td>
+                        <td>{point.vls}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
-          ) : (
+          ) : btnActive === "request" ? (
             <div
               className="leave-form"
               style={{
@@ -273,6 +420,22 @@ const EmployeeViewer = ({ employee, setLogout }) => {
                 Send Request
               </button>
             </div>
+          ) : (
+            <div
+              style={{
+                padding: "12px",
+                paddingBottom: "20px",
+                height: "300px",
+              }}
+            >
+              <FullCalendar
+                plugins={[dayGridPlugin, interactionPlugin]}
+                initialView="dayGridMonth"
+                events={events}
+                selectable={true}
+                style={{ cursor: "pointer" }}
+              />
+            </div>
           )}
         </div>
       </div>
@@ -280,7 +443,7 @@ const EmployeeViewer = ({ employee, setLogout }) => {
   );
 };
 
-const LoginEmployee = ({ seter, setEmployee }) => {
+const LoginEmployee = ({ seter, setEmployee, setCardIds }) => {
   const [cardId, setCardId] = useState("");
   const [nf, setNf] = useState(false);
   const [errMsg, setErrMsg] = useState("RFID Not Found!");
@@ -292,6 +455,7 @@ const LoginEmployee = ({ seter, setEmployee }) => {
       getOneWithRFID("employee", cardId, (emp, exists) => {
         if (exists) {
           setEmployee(emp);
+          setCardIds(cardId);
           seter(true);
         } else {
           setErrMsg("RFID Not Found!");
@@ -337,13 +501,20 @@ const LoginEmployee = ({ seter, setEmployee }) => {
 const EmployeeProfile = () => {
   const [isLogin, setIsLogin] = useState(false);
   const [employee, setEmployee] = useState({});
+  const [id, setId] = useState("");
 
   if (isLogin) {
-    return <EmployeeViewer employee={employee} setLogout={setIsLogin} />;
+    return (
+      <EmployeeViewer employee={employee} setLogout={setIsLogin} id={id} />
+    );
   }
   return (
     <div className="container-preview">
-      <LoginEmployee seter={setIsLogin} setEmployee={setEmployee} />
+      <LoginEmployee
+        seter={setIsLogin}
+        setEmployee={setEmployee}
+        setCardIds={setId}
+      />
     </div>
   );
 };
