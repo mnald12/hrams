@@ -22,6 +22,7 @@ const Addemployee = () => {
   const [address, setAddress] = useState("");
   const [position, setPosition] = useState("");
   const [employed, setEmployed] = useState("");
+  const [department, setDepartment] = useState("");
   const [img, setImg] = useState("");
   const [pdsFile, setPdsFile] = useState("");
 
@@ -79,6 +80,7 @@ const Addemployee = () => {
         address,
         position,
         employed,
+        department,
         isOnLeave: false,
         late: [],
         absent: [],
@@ -122,7 +124,9 @@ const Addemployee = () => {
         setAddress("");
         setPosition("");
         setEmployed("");
+        setDepartment("");
         setImg("");
+        setPdsFile("");
         setIsLoading(false);
 
         setType(0);
@@ -227,6 +231,14 @@ const Addemployee = () => {
                 type="date"
                 onChange={(e) => setEmployed(e.target.value)}
               />
+            </div>
+
+            <div className="inp-grp">
+              <h4>Department:</h4>
+              <select onChange={(e) => setDepartment(e.target.value)}>
+                <option value="Male">Dep1</option>
+                <option value="Female">Dep2</option>
+              </select>
             </div>
           </div>
         </div>

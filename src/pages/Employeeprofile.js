@@ -32,7 +32,6 @@ const EmployeeViewer = ({ employee, setLogout, id }) => {
       try {
         const att = await getEmployeeAttendance(employee.id);
         setAttendance(att);
-        console.log(id);
       } catch (error) {
         console.error("Error fetching employee attendance:", error);
       }
@@ -40,9 +39,8 @@ const EmployeeViewer = ({ employee, setLogout, id }) => {
 
     const getLeaves = async () => {
       try {
-        const att = await getEmployeeLeaves(employee.id);
-        setLeaves(att);
-        console.log(att);
+        const leave = await getEmployeeLeaves(employee.id);
+        setLeaves(leave);
       } catch (error) {
         console.error("Error fetching employee attendance:", error);
       }
@@ -129,6 +127,12 @@ const EmployeeViewer = ({ employee, setLogout, id }) => {
             alt={`${firstName} ${lastName}`}
             style={{ marginTop: "12px" }}
           />
+          <div className="pdetails">
+            <h3>
+              {firstName} {middleName} {lastName}
+            </h3>
+            <p>{position}</p>
+          </div>
         </div>
         <div className="employee-details">
           <div className="navbars">
@@ -157,6 +161,14 @@ const EmployeeViewer = ({ employee, setLogout, id }) => {
               Points
             </button>
             <button
+              className={btnActive === "leaves" ? "active" : ""}
+              onClick={() => {
+                setBtnActive("leaves");
+              }}
+            >
+              My Leaves
+            </button>
+            <button
               className={btnActive === "request" ? "active" : ""}
               onClick={() => {
                 setBtnActive("request");
@@ -175,250 +187,305 @@ const EmployeeViewer = ({ employee, setLogout, id }) => {
             <button onClick={() => setLogout(false)}>Logout</button>
           </div>
           {btnActive === "profile" ? (
-            <>
-              <h2>
-                {firstName} {middleName} {lastName}
-              </h2>
-              <p className="position">{position}</p>
-              <div className="detail-row">
-                <span className="label">Age:</span>
-                <span className="value">{age}</span>
+            <div className="profile-container">
+              <div className="pc-left">
+                <h3>Personal Information</h3>
+                <div className="detail-row">
+                  <span className="label">Age:</span>
+                  <span className="value">{age}</span>
+                </div>
+                <div className="detail-row">
+                  <span className="label">Gender:</span>
+                  <span className="value">{gender}</span>
+                </div>
+                <div className="detail-row">
+                  <span className="label">Email:</span>
+                  <span className="value">{email}</span>
+                </div>
+                <div className="detail-row">
+                  <span className="label">Phone:</span>
+                  <span className="value">{phone}</span>
+                </div>
+                <div className="detail-row">
+                  <span className="label">Address:</span>
+                  <span className="value">{address}</span>
+                </div>
+                <div className="detail-row">
+                  <span className="label">Employed:</span>
+                  <span className="value">{employed}</span>
+                </div>
+                <div className="detail-row">
+                  <span className="label">RFID:</span>
+                  <span className="value">{rfid}</span>
+                </div>
               </div>
-              <div className="detail-row">
-                <span className="label">Gender:</span>
-                <span className="value">{gender}</span>
-              </div>
-              <div className="detail-row">
-                <span className="label">Email:</span>
-                <span className="value">{email}</span>
-              </div>
-              <div className="detail-row">
-                <span className="label">Phone:</span>
-                <span className="value">{phone}</span>
-              </div>
-              <div className="detail-row">
-                <span className="label">Address:</span>
-                <span className="value">{address}</span>
-              </div>
-              <div className="detail-row">
-                <span className="label">Employed:</span>
-                <span className="value">{employed}</span>
-              </div>
-              <div className="detail-row">
-                <span className="label">RFID:</span>
-                <span className="value">{rfid}</span>
-              </div>
-            </>
-          ) : btnActive === "attendance" ? (
-            <div className="employee-attendance" style={{ maxHeight: "400px" }}>
-              <div className="attendance-summary">
-                <div className="attendance-item">
-                  <span className="label">Late:</span>
+              <div className="pc-right">
+                <h3>Attendances</h3>
+                <div className="detail-row">
+                  <span className="label">Late: </span>
                   <span className="value">{late.length}</span>
                 </div>
-                <div className="attendance-item">
-                  <span className="label">Leave:</span>
+                <div className="detail-row">
+                  <span className="label">Leaves: </span>
                   <span className="value">{leaves.length}</span>
                 </div>
+                <div className="detail-row">
+                  <span className="label">Absent: </span>
+                  <span className="value">0</span>
+                </div>
+                <h3 style={{ paddingTop: "12px" }}>Current Points</h3>
+                <div class="points-container">
+                  <div class="point-box">
+                    <h4>🏥 Sick Leave</h4>
+                    <p>
+                      Balance:{" "}
+                      <b style={{ fontSize: "14px" }}>{points[0].slb}</b>
+                    </p>
+                    <p>
+                      Earned:{" "}
+                      <b style={{ fontSize: "14px" }}>{points[0].sle}</b>
+                    </p>
+                    <p>
+                      Spent: <b style={{ fontSize: "14px" }}>{points[0].sls}</b>{" "}
+                    </p>
+                  </div>
+                  <div class="point-box">
+                    <h4>🌴 Vacation Leave</h4>
+                    <p>
+                      Balance:{" "}
+                      <b style={{ fontSize: "14px" }}>{points[0].vlb}</b>
+                    </p>
+                    <p>
+                      Earned:{" "}
+                      <b style={{ fontSize: "14px" }}>{points[0].vle}</b>
+                    </p>
+                    <p>
+                      Spent: <b style={{ fontSize: "14px" }}>{points[0].vls}</b>
+                    </p>
+                  </div>
+                </div>
               </div>
-              <div
-                className="leave-form"
-                style={{
-                  width: "100%",
-                  padding: "20px",
-                  marginTop: "20px !important",
-                }}
-              >
-                <h2>Attendance</h2>
-                <table>
-                  <thead style={{ paddingTop: "0 !important" }}>
-                    <tr>
-                      <th width="15%">Date</th>
-                      <th width="15%">Time in</th>
-                      <th width="15%">Time out</th>
-                      <th width="15%">Time in</th>
-                      <th width="15%">Time out</th>
+            </div>
+          ) : btnActive === "attendance" ? (
+            <div className="employee-attendance" style={{ maxHeight: "400px" }}>
+              <table>
+                <thead style={{ paddingTop: "0 !important" }}>
+                  <tr>
+                    <th width="15%">Date</th>
+                    <th width="15%">Time in</th>
+                    <th width="15%">Time out</th>
+                    <th width="15%">Time in</th>
+                    <th width="15%">Time out</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {attendance.map((e, i) => (
+                    <tr key={i}>
+                      <td>{e.date}</td>
+                      <td>
+                        {e.timeInAM.hour ? (
+                          <>
+                            {e.timeInAM.hour <= 9
+                              ? `0${e.timeInAM.hour}`
+                              : e.timeInAM.hour}{" "}
+                            :{" "}
+                            {e.timeInAM.minute <= 9
+                              ? `0${e.timeInAM.minute}`
+                              : e.timeInAM.minute}{" "}
+                            AM
+                          </>
+                        ) : (
+                          ""
+                        )}
+                      </td>
+                      <td>
+                        {e.timeOutAM.hour ? (
+                          <>
+                            {e.timeOutAM.hour <= 9
+                              ? `0${e.timeOutAM.hour}`
+                              : e.timeOutAM.hour}{" "}
+                            :{" "}
+                            {e.timeOutAM.minute <= 9
+                              ? `0${e.timeOutAM.minute}`
+                              : e.timeOutAM.minute}{" "}
+                            AM
+                          </>
+                        ) : (
+                          ""
+                        )}
+                      </td>
+                      <td>
+                        {e.timeInPM.hour ? (
+                          <>
+                            {e.timeInPM.hour <= 9
+                              ? `0${e.timeInPM.hour}`
+                              : e.timeInPM.hour}{" "}
+                            :{" "}
+                            {e.timeInPM.minute <= 9
+                              ? `0${e.timeInPM.minute}`
+                              : e.timeInPM.minute}{" "}
+                            PM
+                          </>
+                        ) : (
+                          ""
+                        )}
+                      </td>
+                      <td>
+                        {e.timeOutPM.hour ? (
+                          <>
+                            {e.timeOutPM.hour <= 9
+                              ? `0${e.timeOutPM.hour}`
+                              : e.timeOutPM.hour}{" "}
+                            :{" "}
+                            {e.timeOutPM.minute <= 9
+                              ? `0${e.timeOutPM.minute}`
+                              : e.timeOutPM.minute}{" "}
+                            PM
+                          </>
+                        ) : (
+                          ""
+                        )}
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {attendance.map((e, i) => (
-                      <tr key={i}>
-                        <td>{e.date}</td>
-                        <td>
-                          {e.timeInAM.hour ? (
-                            <>
-                              {e.timeInAM.hour <= 9
-                                ? `0${e.timeInAM.hour}`
-                                : e.timeInAM.hour}{" "}
-                              :{" "}
-                              {e.timeInAM.minute <= 9
-                                ? `0${e.timeInAM.minute}`
-                                : e.timeInAM.minute}{" "}
-                              AM
-                            </>
-                          ) : (
-                            ""
-                          )}
-                        </td>
-                        <td>
-                          {e.timeOutAM.hour ? (
-                            <>
-                              {e.timeOutAM.hour <= 9
-                                ? `0${e.timeOutAM.hour}`
-                                : e.timeOutAM.hour}{" "}
-                              :{" "}
-                              {e.timeOutAM.minute <= 9
-                                ? `0${e.timeOutAM.minute}`
-                                : e.timeOutAM.minute}{" "}
-                              AM
-                            </>
-                          ) : (
-                            ""
-                          )}
-                        </td>
-                        <td>
-                          {e.timeInPM.hour ? (
-                            <>
-                              {e.timeInPM.hour <= 9
-                                ? `0${e.timeInPM.hour}`
-                                : e.timeInPM.hour}{" "}
-                              :{" "}
-                              {e.timeInPM.minute <= 9
-                                ? `0${e.timeInPM.minute}`
-                                : e.timeInPM.minute}{" "}
-                              PM
-                            </>
-                          ) : (
-                            ""
-                          )}
-                        </td>
-                        <td>
-                          {e.timeOutPM.hour ? (
-                            <>
-                              {e.timeOutPM.hour <= 9
-                                ? `0${e.timeOutPM.hour}`
-                                : e.timeOutPM.hour}{" "}
-                              :{" "}
-                              {e.timeOutPM.minute <= 9
-                                ? `0${e.timeOutPM.minute}`
-                                : e.timeOutPM.minute}{" "}
-                              PM
-                            </>
-                          ) : (
-                            ""
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                  ))}
+                </tbody>
+              </table>
             </div>
           ) : btnActive === "points" ? (
             <div className="employee-points">
+              <table>
+                <thead>
+                  <tr>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>SL Bal</th>
+                    <th>SL Earned</th>
+                    <th>SL Spent</th>
+                    <th>VL Bal</th>
+                    <th>VL Earned</th>
+                    <th>VL Spent</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {points.map((point, index) => (
+                    <tr key={index}>
+                      <td>{point.from}</td>
+                      <td>{point.to}</td>
+                      <td>{point.slb}</td>
+                      <td>{point.sle}</td>
+                      <td>{point.sls}</td>
+                      <td>{point.vlb}</td>
+                      <td>{point.vle}</td>
+                      <td>{point.vls}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : btnActive === "leaves" ? (
+            <>
+              <table>
+                <thead>
+                  <tr>
+                    <th>No.</th>
+                    <th>Leave Type</th>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {leaves.map((leave, no) => (
+                    <tr key={no}>
+                      <td>{no + 1}.</td>
+                      <td>{leave.type}</td>
+                      <td>{leave.from}</td>
+                      <td>{leave.to}</td>
+                      <td
+                        style={{
+                          color: `${
+                            leave.status === "Approved"
+                              ? "green"
+                              : leave.status === "Rejected"
+                              ? "red"
+                              : "orange"
+                          }`,
+                        }}
+                      >
+                        {leave.status}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </>
+          ) : btnActive === "request" ? (
+            <div style={{ padding: "10px" }}>
               <div
                 className="leave-form"
                 style={{
                   width: "100%",
                   padding: "20px",
                   marginTop: "20px !important",
+                  marginBottom: "unset",
                 }}
               >
-                <h2>Points</h2>
-                <table>
-                  <thead>
-                    <tr>
-                      <th>From</th>
-                      <th>To</th>
-                      <th>SL Bal</th>
-                      <th>SL Earned</th>
-                      <th>SL Spent</th>
-                      <th>VL Bal</th>
-                      <th>VL Earned</th>
-                      <th>VL Spent</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {points.map((point, index) => (
-                      <tr key={index}>
-                        <td>{point.from}</td>
-                        <td>{point.to}</td>
-                        <td>{point.slb}</td>
-                        <td>{point.sle}</td>
-                        <td>{point.sls}</td>
-                        <td>{point.vlb}</td>
-                        <td>{point.vle}</td>
-                        <td>{point.vls}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          ) : btnActive === "request" ? (
-            <div
-              className="leave-form"
-              style={{
-                width: "100%",
-                padding: "20px",
-                marginTop: "20px !important",
-              }}
-            >
-              <h2>Request Leave</h2>
-              <div className="lfc">
-                <div className="inpsg">
-                  <h4>From :</h4>
-                  <input
-                    type="date"
-                    value={newLeave.from}
-                    onChange={(e) =>
-                      setNewLeave({ ...newLeave, from: e.target.value })
-                    }
-                    className="leave-input"
-                  />
+                <h2>Request Leave</h2>
+                <div className="lfc">
+                  <div className="inpsg">
+                    <h4>From :</h4>
+                    <input
+                      type="date"
+                      value={newLeave.from}
+                      onChange={(e) =>
+                        setNewLeave({ ...newLeave, from: e.target.value })
+                      }
+                      className="leave-input"
+                    />
+                  </div>
+                  <div className="inpsg">
+                    <h4>To :</h4>
+                    <input
+                      type="date"
+                      value={newLeave.to}
+                      onChange={(e) =>
+                        setNewLeave({ ...newLeave, to: e.target.value })
+                      }
+                      className="leave-input"
+                    />
+                  </div>
                 </div>
-                <div className="inpsg">
-                  <h4>To :</h4>
-                  <input
-                    type="date"
-                    value={newLeave.to}
-                    onChange={(e) =>
-                      setNewLeave({ ...newLeave, to: e.target.value })
-                    }
-                    className="leave-input"
-                  />
-                </div>
-              </div>
-              <h4>Leave Type :</h4>
-              <select
-                value={newLeave.type}
-                onChange={(e) =>
-                  setNewLeave({ ...newLeave, type: e.target.value })
-                }
-                className="leave-input"
-              >
-                <option value="0" selected>
-                  Select Leave Type
-                </option>
-                <option value="Vacation Leave" selected>
-                  Vacation Leave
-                </option>
-                <option value="Sick Leave">Sick Leave</option>
-              </select>
+                <h4>Leave Type :</h4>
+                <select
+                  value={newLeave.type}
+                  onChange={(e) =>
+                    setNewLeave({ ...newLeave, type: e.target.value })
+                  }
+                  className="leave-input"
+                >
+                  <option value="0" selected>
+                    Select Leave Type
+                  </option>
+                  <option value="Vacation Leave" selected>
+                    Vacation Leave
+                  </option>
+                  <option value="Sick Leave">Sick Leave</option>
+                </select>
 
-              <h4>Leave Application Form :</h4>
-              <input
-                type="file"
-                onChange={(e) => setAlfFile(e.target.files[0])}
-                className="leave-input"
-              />
-              <button
-                style={{ marginTop: "12px" }}
-                className="leave-button"
-                onClick={() => submitApp()}
-              >
-                Send Request
-              </button>
+                <h4>Leave Application Form :</h4>
+                <input
+                  type="file"
+                  onChange={(e) => setAlfFile(e.target.files[0])}
+                  className="leave-input"
+                />
+                <button
+                  style={{ marginTop: "12px" }}
+                  className="leave-button"
+                  onClick={() => submitApp()}
+                >
+                  Send Request
+                </button>
+              </div>
             </div>
           ) : (
             <div
@@ -490,7 +557,7 @@ const LoginEmployee = ({ seter, setEmployee, setCardIds }) => {
           id="rfid"
           value={cardId}
           onChange={(e) => setCardId(e.target.value)}
-          placeholder="Enter RFID Card ID"
+          placeholder="Enter RFID Card ID to login"
         />
         <button type="submit">Login</button>
       </form>

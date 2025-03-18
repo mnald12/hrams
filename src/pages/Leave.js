@@ -164,7 +164,7 @@ const Leave = () => {
   }
 
   return (
-    <div className="leave-container">
+    <div className="leave-container" style={{ background: "white" }}>
       <div className="leaves">
         <div className="navbars">
           <button

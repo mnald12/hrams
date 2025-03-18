@@ -48,8 +48,10 @@ const Scanner = () => {
   };
 
   const checkAttendance = async (scannedCode, scanDate, employee) => {
-    const hour = scanDate.getHours();
+    let hour = scanDate.getHours();
     const minute = scanDate.getMinutes();
+
+    hour = 8;
 
     if (employee.isOnLeave) {
       setModalType(3);
@@ -326,14 +328,15 @@ const Scanner = () => {
       date: scanDate,
     });
 
-    setLastScan({
-      id: scannedCode,
-      time: formatDate(scanDate).toLocaleString(),
-    });
-
     getOneWithRFID("employee", scannedCode, (data, isExist) => {
       if (isExist) {
         checkAttendance(scannedCode, scanDate, data);
+        setLastScan({
+          id: scannedCode,
+          time: formatDate(scanDate).toLocaleString(),
+          avatar: data.avatar,
+          name: `${data.firstName} ${data.lastName} `,
+        });
       } else {
         setModalType(0);
         setIsShowModal(true);
@@ -363,14 +366,16 @@ const Scanner = () => {
         </div>
         {lastScan && (
           <div className="last-scan-box">
-            <p>Last Scan:</p>
-            <p className="scan-id">ID: {lastScan.id}</p>
+            <p>Last attendance :</p>
+            <p className="scan-id">
+              <img src={lastScan.avatar} alt="pic" /> {lastScan.name}
+            </p>
             <p className="scan-time">
               Scanned at: {lastScan.time.toLocaleString()}
             </p>
           </div>
         )}
-        <div className="scanner-buttons">
+        {/* <div className="scanner-buttons">
           <button
             className={btnActive === "TIAM" ? "active" : ""}
             onClick={() => {
@@ -403,7 +408,7 @@ const Scanner = () => {
           >
             Time Out Afternoon
           </button>
-        </div>
+        </div> */}
       </div>
       {isShowModal ? (
         <>

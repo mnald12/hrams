@@ -23,7 +23,7 @@
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: row;
-  max-width: 1000px;
+  max-width: 1200px;
   width: 100%;
   overflow: hidden;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -38,6 +38,7 @@
   width: 100%;
   overflow: hidden;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  height: 100%;
   min-height: 470px;
 }
 
@@ -50,6 +51,7 @@
   justify-content: center;
   padding: 20px;
   padding-top: 40px;
+  position: relative;
 }
 
 .employee-avatar img {
@@ -58,6 +60,32 @@
   object-fit: cover;
   border-radius: 50%;
   border: 5px solid var(--secondary-color);
+}
+
+.pdetails {
+  width: 100%;
+  position: absolute;
+  left: 0;
+  top: 240px;
+  text-align: center;
+}
+
+.pdetails h3 {
+  font-family: "Poppins", sans-serif;
+  font-size: 26px;
+  font-weight: bold;
+  color: #ffffff; /* White for contrast */
+  text-align: center;
+  margin: 10px 0;
+}
+
+.pdetails p {
+  font-family: "Poppins", sans-serif;
+  font-size: 18px;
+  font-weight: normal;
+  color: #000000; /* Black for readability */
+  text-align: center;
+  margin: 5px 0;
 }
 
 /* Avatar section styling */
@@ -81,9 +109,10 @@
 /* Details section styling with independent scrolling */
 .employee-details {
   flex: 2;
-  padding: 2rem;
+  border: 2rem solid white;
   max-height: 100vh;
   overflow-y: auto;
+  position: relative;
 }
 
 .employee-details h2 {
@@ -103,11 +132,13 @@
 /* Detail rows styling */
 .detail-row {
   display: flex;
+  width: 100%;
   margin-bottom: 0.8rem;
+  gap: 16px;
 }
 
 .detail-row .label {
-  flex-basis: 150px;
+  flex-basis: 100px;
   font-weight: bold;
   color: #555;
 }
@@ -180,6 +211,20 @@
   list-style: none;
   padding: 0;
   margin: 0;
+}
+
+.profile-container {
+  display: flex;
+  gap: 10px;
+}
+
+.profile-container .pc-left {
+  width: 60%;
+}
+
+.profile-container h3 {
+  padding-bottom: 16px;
+  font-size: 23px;
 }
 
 .point-item {
@@ -366,9 +411,14 @@
   align-content: center;
   justify-content: flex-start;
   gap: 12px;
+  padding: 10px 5px;
   padding-bottom: 20px;
   box-shadow: rgba(33, 35, 38, 0.1) 0px 10px 10px -10px;
   margin-bottom: 12px;
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index: 9999;
 }
 
 .navbars button {
@@ -422,4 +472,36 @@
 .navbars .active {
   box-shadow: rgb(204, 219, 232) 3px 3px 6px 0px inset,
     rgba(255, 255, 255, 0.5) -3px -3px 6px 1px inset !important;
+  font-weight: bolder;
+}
+.current-points {
+  margin-top: 20px;
+}
+
+.date-range {
+  font-size: 16px;
+  color: #444;
+  margin-bottom: 15px;
+}
+
+.points-container {
+  display: flex;
+  gap: 20px;
+}
+
+.point-box {
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 8px;
+  width: 180px;
+}
+
+.point-box h4 {
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.point-box p {
+  margin: 5px 0;
+  color: #555;
 }

@@ -41,7 +41,7 @@ p {
 
 .hidden-input {
   position: absolute;
-  opacity: 0;
+  opacity: 1;
   pointer-events: none;
 }
 
@@ -68,6 +68,15 @@ p {
   font-size: 1.3rem;
   font-weight: bold;
   color: #1e40af;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.scan-id img {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
 }
 
 .scan-time {
