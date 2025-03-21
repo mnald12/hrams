@@ -301,6 +301,7 @@ const EmployeeViewer = ({ employee, attendance, leaves }) => {
             <table>
               <thead>
                 <tr>
+                  <th>Type</th>
                   <th>From</th>
                   <th>To</th>
                   <th>Status</th>
@@ -309,6 +310,7 @@ const EmployeeViewer = ({ employee, attendance, leaves }) => {
               <tbody>
                 {leaves.map((l, i) => (
                   <tr key={i}>
+                    <td>{l.type}</td>
                     <td>{l.from}</td>
                     <td>{l.to}</td>
                     <td

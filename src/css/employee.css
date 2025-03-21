@@ -266,6 +266,19 @@ table tbody td .add-btn-icn:hover {
   flex-wrap: wrap;
 }
 
+.pts {
+  position: relative;
+  border-top: 20px solid transparent;
+}
+
+.pts h5 {
+  position: absolute;
+  left: 23px;
+  top: -7px;
+  font-size: 16px;
+  color: #0056b3;
+}
+
 .inp-grp {
   width: 31%;
   height: auto;

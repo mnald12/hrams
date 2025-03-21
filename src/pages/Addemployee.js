@@ -247,7 +247,8 @@ const Addemployee = () => {
       <div className="form-container-bottom">
         <h2>Points Information</h2>
         {inputsValues.map((input, index) => (
-          <div key={index} className="inps">
+          <div key={index} className="inps pts">
+            <h5>{index === 0 ? "Current Points" : "Past Points"}</h5>
             <div className="inp-grp-4">
               <h4>From:</h4>
               <input
@@ -331,7 +332,7 @@ const Addemployee = () => {
 
         <div className="add-row-btn">
           <button className="arbtn" onClick={addRow}>
-            Add Row
+            Add Past Points Row
           </button>
           <button onClick={addEmployee}>Save</button>
         </div>

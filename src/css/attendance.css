@@ -46,3 +46,9 @@
   padding: 12px;
   margin-top: 12px;
 }
+
+@media print {
+  .printable {
+    padding: 20px;
+  }
+}
