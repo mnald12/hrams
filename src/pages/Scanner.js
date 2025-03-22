@@ -51,7 +51,15 @@ const Scanner = () => {
     let hour = scanDate.getHours();
     const minute = scanDate.getMinutes();
 
-    hour = 8;
+    if (hour >= 8 && hour < 11) {
+      setBtnActive("TIAM");
+    } else if (hour >= 11 && hour < 13) {
+      setBtnActive("TOAM");
+    } else if (hour >= 13 && hour < 4) {
+      setBtnActive("TIPM");
+    } else {
+      setBtnActive("TOPM");
+    }
 
     if (employee.isOnLeave) {
       setModalType(3);
