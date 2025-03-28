@@ -40,7 +40,10 @@ const Sidebar = () => {
                   : "side-btn"
               }
               to="/dashboard"
-              onClick={() => setNavActive("Dashboard")}
+              onClick={() => {
+                setNavActive("Dashboard");
+                sessionStorage.setItem("navActive", "Dashboard");
+              }}
             >
               <BiSolidDashboard className="icn" /> <span>Dashboard</span>
             </Link>
@@ -51,7 +54,10 @@ const Sidebar = () => {
                   : "side-btn"
               }
               to="/employee"
-              onClick={() => setNavActive("Employee")}
+              onClick={() => {
+                setNavActive("Employee");
+                sessionStorage.setItem("navActive", "Employee");
+              }}
             >
               <IoIosPeople className="icn" /> <span>Employee</span>
             </Link>
@@ -62,7 +68,10 @@ const Sidebar = () => {
                   : "side-btn"
               }
               to="/attendance"
-              onClick={() => setNavActive("Today's Attendance")}
+              onClick={() => {
+                setNavActive("Today's Attendance");
+                sessionStorage.setItem("navActive", "Today's Attendance");
+              }}
             >
               <TbFileCertificate className="icn" />{" "}
               <span>Today's Attendance</span>
@@ -74,7 +83,10 @@ const Sidebar = () => {
                   : "side-btn"
               }
               to="/allattendance"
-              onClick={() => setNavActive("All Attendance")}
+              onClick={() => {
+                setNavActive("All Attendance");
+                sessionStorage.setItem("navActive", "All Attendance");
+              }}
             >
               <TbFileCertificate className="icn" /> <span>All Attendance</span>
             </Link>
@@ -83,7 +95,10 @@ const Sidebar = () => {
                 location.pathname === "/leave" ? "side-btn active" : "side-btn"
               }
               to="/leave"
-              onClick={() => setNavActive("Leave Management")}
+              onClick={() => {
+                setNavActive("Leave Management");
+                sessionStorage.setItem("navActive", "Leave Management");
+              }}
             >
               <MdListAlt className="icn" /> <span>Leave Management</span>
             </Link>
@@ -92,7 +107,10 @@ const Sidebar = () => {
                 location.pathname === "/events" ? "side-btn active" : "side-btn"
               }
               to="/events"
-              onClick={() => setNavActive("Events")}
+              onClick={() => {
+                setNavActive("Events");
+                sessionStorage.setItem("navActive", "Events");
+              }}
             >
               <MdEventNote className="icn" /> <span>Events</span>
             </Link>

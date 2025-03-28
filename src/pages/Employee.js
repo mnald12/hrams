@@ -5,6 +5,7 @@ import { FaEye } from "react-icons/fa";
 import { FaEdit } from "react-icons/fa";
 import { TiGroupOutline } from "react-icons/ti";
 import { IoPersonRemoveOutline } from "react-icons/io5";
+import { MdOutlinePersonOff } from "react-icons/md";
 import { BsPersonX } from "react-icons/bs";
 import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase/db";
@@ -149,7 +150,7 @@ const Employee = () => {
                   <IoPersonRemoveOutline className="card-icns" color="orange" />
                 </div>
                 <div className="card-right">
-                  <p className="color-red">Most Late</p>
+                  <p style={{ color: "orange" }}>Most Late</p>
                   <h3>{mostLate.name}</h3>
                   <h6 className="h6b">
                     {mostLate.hour} Hrs{" "}
@@ -160,10 +161,24 @@ const Employee = () => {
               </div>
               <div className="card-4">
                 <div className="card-left">
-                  <BsPersonX className="card-icns" color="darkred" />
+                  <BsPersonX className="card-icns" color="red" />
                 </div>
                 <div className="card-right">
-                  <p className="color-red">Most Leave</p>
+                  <p className="color-red">Most Absent</p>
+                  <h3>
+                    {mostLeave.firstName} {mostLeave.lastName[0]}.
+                  </h3>
+                  <h6 className="h6b">
+                    {mostLeave.leaveDays} Days Total Absent
+                  </h6>
+                </div>
+              </div>
+              <div className="card-4">
+                <div className="card-left">
+                  <MdOutlinePersonOff className="card-icns" color="darkred" />
+                </div>
+                <div className="card-right">
+                  <p style={{ color: "darkred" }}>Most Leave</p>
                   <h3>
                     {mostLeave.firstName} {mostLeave.lastName[0]}.
                   </h3>

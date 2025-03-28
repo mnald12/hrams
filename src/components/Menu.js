@@ -67,6 +67,7 @@ const Menu = () => {
           <button
             onClick={() => {
               setIsLogin(false);
+              sessionStorage.setItem("isLogin", JSON.stringify(false));
             }}
           >
             <AiOutlinePoweroff color="red" className="icn" /> Logout

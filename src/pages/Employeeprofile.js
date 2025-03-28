@@ -85,8 +85,9 @@ const EmployeeViewer = ({ employee, setLogout, id }) => {
     position,
     rfid,
     gender,
-    points = [],
-    late = [],
+    points,
+    late,
+    absent,
   } = employee;
 
   const submitApp = async () => {
@@ -226,12 +227,12 @@ const EmployeeViewer = ({ employee, setLogout, id }) => {
                   <span className="value">{late.length}</span>
                 </div>
                 <div className="detail-row">
-                  <span className="label">Leaves: </span>
-                  <span className="value">{leaves.length}</span>
+                  <span className="label">Absent: </span>
+                  <span className="value">{absent.length}</span>
                 </div>
                 <div className="detail-row">
-                  <span className="label">Absent: </span>
-                  <span className="value">0</span>
+                  <span className="label">Leaves: </span>
+                  <span className="value">{leaves.length}</span>
                 </div>
                 <h3 style={{ paddingTop: "12px" }}>Current Points</h3>
                 <div class="points-container">

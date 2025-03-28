@@ -218,6 +218,19 @@ const addToLate = async (table, id, value) => {
   }
 };
 
+const addToAbsent = async (table, id, value) => {
+  try {
+    const docRef = doc(db, table, id);
+    await updateDoc(docRef, {
+      absent: arrayUnion(value),
+    });
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating 'absent' array:", error);
+    return { success: false, error };
+  }
+};
+
 const deleteOne = async (table, id) => {
   try {
     await deleteDoc(doc(db, table, id));
@@ -583,6 +596,10 @@ async function getLeaveData() {
   return { weeklyArray, monthlyArray };
 }
 
+const checkCollection = async (collection) => {
+  return (await getDocs(collection(db, collection))).empty;
+};
+
 export {
   insertOne,
   getOne,
@@ -592,6 +609,7 @@ export {
   getAttendance,
   update,
   addToLate,
+  addToAbsent,
   deleteOne,
   clearTable,
   getOneWithRFID,
@@ -606,4 +624,5 @@ export {
   updateEmployeesOnLeave,
   getLatesData,
   getLeaveData,
+  checkCollection,
 };

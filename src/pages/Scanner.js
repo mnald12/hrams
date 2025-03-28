@@ -67,6 +67,36 @@ const Scanner = () => {
       return;
     }
 
+    if (btnActive === "ETO") {
+      if (hour >= 8 && hour <= 10) {
+        updateTimeInOut(employee.id, {
+          timeOutAM: {
+            hour: hour,
+            minute: minute,
+          },
+          sessions: {
+            timeOutAmDone: true,
+          },
+        });
+
+        setModalType(21);
+        setIsShowModal(true);
+      } else if (hour >= 13 && hour <= 15) {
+        updateTimeInOut(employee.id, {
+          timeOutPM: {
+            hour: hour,
+            minute: minute,
+          },
+          sessions: {
+            timeOutPmDone: true,
+          },
+        });
+
+        setModalType(21);
+        setIsShowModal(true);
+      }
+    }
+
     if (btnActive === "TIAM") {
       if (hour >= 12) {
         setModalType(6);
@@ -383,6 +413,41 @@ const Scanner = () => {
             </p>
           </div>
         )}
+        <div className="scanner-buttons">
+          <button
+            className={
+              btnActive === "TIAM" ||
+              btnActive === "TIPM" ||
+              btnActive === "TOAM" ||
+              btnActive === "TOPM"
+                ? "active"
+                : ""
+            }
+            onClick={() => {
+              let hour = new Date().getHours();
+
+              if (hour >= 8 && hour < 11) {
+                setBtnActive("TIAM");
+              } else if (hour >= 11 && hour < 13) {
+                setBtnActive("TOAM");
+              } else if (hour >= 13 && hour < 4) {
+                setBtnActive("TIPM");
+              } else {
+                setBtnActive("TOPM");
+              }
+            }}
+          >
+            Normal Scan
+          </button>
+          <button
+            className={btnActive === "ETO" ? "active" : ""}
+            onClick={() => {
+              setBtnActive("ETO");
+            }}
+          >
+            Emergency Time Out
+          </button>
+        </div>
         {/* <div className="scanner-buttons">
           <button
             className={btnActive === "TIAM" ? "active" : ""}

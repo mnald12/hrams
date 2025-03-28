@@ -27,6 +27,7 @@ const LoginPage = () => {
       const response = await login(uname, pwd);
       if (response) {
         setIsLogin(true);
+        sessionStorage.setItem("isLogin", JSON.stringify(true));
       } else {
         setError("Invalid credentials");
         setTimeout(() => {

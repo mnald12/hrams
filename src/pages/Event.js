@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import { insertOne } from "../methods/methods";
+import { deleteOne, insertOne } from "../methods/methods";
 import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase/db";
 import Loader from "../components/Loader";
@@ -103,6 +103,18 @@ const Event = () => {
           >
             Add Event
           </button>
+
+          <h3 style={{ marginTop: "16px" }}>Delete Event</h3>
+
+          {events.map((e) => (
+            <button
+              title="Click to delete event"
+              style={{ width: "100%", marginTop: "10px", padding: "8px" }}
+              onClick={() => deleteOne("events", e.id)}
+            >
+              {e.title}
+            </button>
+          ))}
         </div>
       </div>
     </div>

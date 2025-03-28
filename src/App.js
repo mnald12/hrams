@@ -14,6 +14,8 @@ import Viewemployee from "./pages/Viewemployee";
 import Event from "./pages/Event";
 import Allattendances from "./pages/Allattendance";
 import {
+  addToAbsent,
+  checkCollection,
   clearTable,
   getAll,
   insertOne,
@@ -33,7 +35,9 @@ const DataContext = createContext(null);
 let tl = 0;
 
 function App() {
-  const [navActive, setNavActive] = useState("Dashboard");
+  const [navActive, setNavActive] = useState(
+    sessionStorage.getItem("navActive") ?? "Dashboard"
+  );
   const [isMobile, setIsMobile] = useState(false);
   const [type, setType] = useState(0);
   const [isActionModal, setIsActionModal] = useState(false);
@@ -41,7 +45,9 @@ function App() {
   const [todaysLate, setTodaysLate] = useState(0);
   const [todaysAbsent, setTodaysAbsent] = useState(0);
   const [todaysLeave, setTodaysLeave] = useState(0);
-  const [isLogin, setIsLogin] = useState(0);
+  const [isLogin, setIsLogin] = useState(
+    JSON.parse(sessionStorage.getItem("isLogin")) ?? false
+  );
   const [excelFile, setExcelFile] = useState("");
 
   useEffect(() => {
@@ -105,13 +111,97 @@ function App() {
   }, []);
 
   useEffect(() => {
+    const collectionRef = collection(db, "absent");
+
+    const unsubscribe = onSnapshot(
+      collectionRef,
+      async (querySnapshot) => {
+        const items = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setTodaysAbsent(items.length);
+      },
+      (error) => {
+        console.error("Error fetching real-time updates: ", error);
+      }
+    );
+
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = new Date();
+      const hours = now.getHours();
+      const minutes = now.getMinutes();
+
+      if (hours === 10 && minutes === 0) {
+        processAbsent();
+        clearInterval(interval);
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const processAbsent = async () => {
+    const isEmpty = await checkCollection("attendance");
+
+    const atts = await getAll("attendance");
+    const emps = await getAll("employee");
+
+    let ta = 0;
+
+    if (isEmpty) {
+      const today = new Date().getDay();
+      const isWeekend = today === 0 || today === 6;
+
+      if (isWeekend) return;
+
+      for (let emp of emps) {
+        await addToAbsent("employee", emp.id, {
+          date: new Date(),
+        });
+        ta++;
+      }
+
+      await insertOne("allabsent", {
+        date: new Date().toISOString().split("T")[0],
+        absent: ta,
+      });
+
+      setTodaysAbsent(ta);
+
+      return;
+    }
+
+    const attendedEmpIds = new Set(atts.map((att) => att.employeeID));
+
+    for (let emp of emps) {
+      if (!attendedEmpIds.has(emp.id)) {
+        await addToAbsent("employee", emp.id, {
+          date: new Date(),
+        });
+        ta++;
+      }
+    }
+
+    await insertOne("allabsent", {
+      date: new Date().toISOString().split("T")[0],
+      absent: ta,
+    });
+
+    setTodaysAbsent(ta);
+  };
+
+  useEffect(() => {
     const interval = setInterval(() => {
       const now = new Date();
       const hours = now.getHours();
       const minutes = now.getMinutes();
 
       if (hours === 18 && minutes === 0) {
-        console.log("It's 6 PM! Running function...");
         processAttendance();
         clearInterval(interval);
       }

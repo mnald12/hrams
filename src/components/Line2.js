@@ -51,8 +51,6 @@ Promise.all([getLeaveData(), getLatesData()]).then(
     });
 
     data = Object.values(mergedData);
-
-    console.log(data);
   }
 );
 

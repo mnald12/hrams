@@ -2,25 +2,32 @@ import { useContext, useEffect, useState } from "react";
 import "../css/dashboard.css";
 import Loader from "../components/Loader";
 import { MdOutlinePersonOff } from "react-icons/md";
-import { BsPersonCheckFill } from "react-icons/bs";
-import { TiGroupOutline } from "react-icons/ti";
+import { BsPersonCheckFill, BsPersonX } from "react-icons/bs";
 import { IoPersonRemoveOutline } from "react-icons/io5";
 import Lines from "../components/Lines";
 import Line2 from "../components/Line2";
 import { getAll } from "../methods/methods";
 import { DataContext } from "../App";
 import EventDashboard from "../components/Events";
+import Barchart from "../components/Barchart";
+import NoUpcomingEvents from "../components/Noupcomingevents";
 const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
-  const [totalEmployee, setTotalEmployee] = useState(0);
-  const { present, todaysLate, todaysLeave } = useContext(DataContext);
+  const { present, todaysLate, todaysLeave, todaysAbsent } =
+    useContext(DataContext);
   const [events, setEvents] = useState([]);
   useEffect(() => {
     const fetch = async () => {
-      const te = await getAll("employee");
-      setTotalEmployee(te.length);
       const evs = await getAll("events");
-      setEvents(evs);
+      const today = new Date().toISOString().split("T")[0];
+      let upcomingEvents = [];
+
+      for (let e of evs) {
+        if (e.value.start >= today) {
+          upcomingEvents.push(e);
+        }
+      }
+      setEvents(upcomingEvents);
     };
 
     fetch();
@@ -57,6 +64,15 @@ const Dashboard = () => {
           </div>
           <div className="card-4">
             <div className="card-left">
+              <BsPersonX className="card-icn" color="red" />
+            </div>
+            <div className="card-right">
+              <p>Today's Absent</p>
+              <h3>{todaysAbsent}</h3>
+            </div>
+          </div>
+          <div className="card-4">
+            <div className="card-left">
               <MdOutlinePersonOff className="card-icn" color="darkred" />
             </div>
             <div className="card-right">
@@ -64,13 +80,13 @@ const Dashboard = () => {
               <h3>{todaysLeave}</h3>
             </div>
           </div>
-          <div className="card-4">
-            <div className="card-left">
-              <TiGroupOutline className="card-icn" color="blue" />
-            </div>
-            <div className="card-right">
-              <p>Total Employee</p>
-              <h3>{totalEmployee}</h3>
+        </div>
+
+        <div className="chart">
+          <div className="charts" style={{ width: "100%" }}>
+            <h3>Department Monthly Status Report</h3>
+            <div className="lines" style={{ height: "220px" }}>
+              <Barchart />
             </div>
           </div>
         </div>
@@ -86,8 +102,12 @@ const Dashboard = () => {
             </div>
           </div>
           <div className="chart-right">
-            <h3>Events</h3>
-            <EventDashboard events={events} />
+            <h3>Upcoming Events</h3>
+            {events.length > 0 ? (
+              <EventDashboard events={events} />
+            ) : (
+              <NoUpcomingEvents />
+            )}
           </div>
         </div>
       </div>

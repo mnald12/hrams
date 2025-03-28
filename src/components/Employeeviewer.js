@@ -21,6 +21,7 @@ const EmployeeViewer = ({ employee, attendance, leaves }) => {
     rfid,
     points = [],
     late,
+    absent,
   } = employee;
 
   return (
@@ -78,12 +79,28 @@ const EmployeeViewer = ({ employee, attendance, leaves }) => {
               Points
             </button>
             <button
-              className={btnActive === "request" ? "active" : ""}
+              className={btnActive === "leave" ? "active" : ""}
               onClick={() => {
-                setBtnActive("request");
+                setBtnActive("leave");
               }}
             >
-              Leave Requests
+              Leaves
+            </button>
+            <button
+              className={btnActive === "late" ? "active" : ""}
+              onClick={() => {
+                setBtnActive("late");
+              }}
+            >
+              Lates
+            </button>
+            <button
+              className={btnActive === "absent" ? "active" : ""}
+              onClick={() => {
+                setBtnActive("absent");
+              }}
+            >
+              Absents
             </button>
           </div>
           {btnActive === "profile" ? (
@@ -138,6 +155,10 @@ const EmployeeViewer = ({ employee, attendance, leaves }) => {
                 <div className="detail-row">
                   <span className="label">Late: </span>
                   <span className="value">{late.length}</span>
+                </div>
+                <div className="detail-row">
+                  <span className="label">Absent: </span>
+                  <span className="value">{absent.length}</span>
                 </div>
                 <div className="detail-row">
                   <span className="label">Leaves: </span>
@@ -297,7 +318,7 @@ const EmployeeViewer = ({ employee, attendance, leaves }) => {
                 ))}
               </tbody>
             </table>
-          ) : (
+          ) : btnActive === "leave" ? (
             <table>
               <thead>
                 <tr>
@@ -330,6 +351,44 @@ const EmployeeViewer = ({ employee, attendance, leaves }) => {
                 ))}
               </tbody>
             </table>
+          ) : btnActive === "late" ? (
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Time In</th>
+                  <th>Late</th>
+                </tr>
+              </thead>
+              <tbody>
+                {late.map((l, i) => (
+                  <tr key={i}>
+                    <td>{l.date.toDate().toISOString().split("T")[0]}</td>
+                    <td>
+                      {String(l.timeInHour % 12 || 12).padStart(2, "0")} :{" "}
+                      {String(l.timeInMinute).padStart(2, "0")} {l.lateMode}
+                    </td>
+
+                    <td>
+                      {l.lateTime.hour === 0
+                        ? `${String(l.lateTime.minute).padStart(
+                            2,
+                            "0"
+                          )} Minutes`
+                        : `${String(l.lateTime.hour).padStart(
+                            2,
+                            "0"
+                          )} Hours & ${String(l.lateTime.minute).padStart(
+                            2,
+                            "0"
+                          )} Minutes`}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <></>
           )}
         </div>
       </div>
