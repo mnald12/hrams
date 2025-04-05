@@ -126,6 +126,12 @@ const ActionModal = ({ type, handleClose }) => {
       title: "Attendance Processing Failed",
       message: "There was an error processing attendance.",
     },
+    {
+      icon: <FaClock className="icon yellow" />, // Too Early to Timeout 21
+      title: "Too Early to Time Out",
+      message:
+        "Please wait at least 15 minutes after timing in before you can time out.",
+    },
   ];
 
   useEffect(() => {

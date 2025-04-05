@@ -192,9 +192,8 @@ const Addemployee = () => {
               document.getElementById("img").style.display = "block";
             }}
           />
-          <h4>PDS:</h4>
+          <h4 style={{ marginTop: "12px" }}>PDS:</h4>
           <input type="file" onChange={(e) => setPdsFile(e.target.files[0])} />
-          <p>Upload your PDS here :</p>
         </div>
 
         <div className="form-right">

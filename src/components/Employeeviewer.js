@@ -363,7 +363,12 @@ const EmployeeViewer = ({ employee, attendance, leaves }) => {
               <tbody>
                 {late.map((l, i) => (
                   <tr key={i}>
-                    <td>{l.date.toDate().toISOString().split("T")[0]}</td>
+                    <td>
+                      {l.date
+                        ? l.date.toDate().toISOString().split("T")[0]
+                        : "Invalid Date"}
+                    </td>
+
                     <td>
                       {String(l.timeInHour % 12 || 12).padStart(2, "0")} :{" "}
                       {String(l.timeInMinute).padStart(2, "0")} {l.lateMode}

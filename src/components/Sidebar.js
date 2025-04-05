@@ -7,6 +7,7 @@ import { TbFileCertificate } from "react-icons/tb";
 import { IoIosPeople } from "react-icons/io";
 import { MdListAlt } from "react-icons/md";
 import { MdEventNote } from "react-icons/md";
+import { FcDepartment } from "react-icons/fc";
 import { fold, unFold } from "../methods/navMethods";
 import { useContext } from "react";
 import { DataContext } from "../App";
@@ -60,6 +61,20 @@ const Sidebar = () => {
               }}
             >
               <IoIosPeople className="icn" /> <span>Employee</span>
+            </Link>
+            <Link
+              className={
+                location.pathname === "/department"
+                  ? "side-btn active"
+                  : "side-btn"
+              }
+              to="/department"
+              onClick={() => {
+                setNavActive("Department");
+                sessionStorage.setItem("navActive", "Department");
+              }}
+            >
+              <FcDepartment className="icn" /> <span>Department</span>
             </Link>
             <Link
               className={

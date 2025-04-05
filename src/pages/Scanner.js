@@ -107,9 +107,30 @@ const Scanner = () => {
       const isScanned = await checkSession(employee.id, "TIME_IN_AM");
 
       if (isScanned) {
-        setModalType(2);
-        setIsShowModal(true);
-        return;
+        if (hour === 8) {
+          if (minute >= 15) {
+            updateTimeInOut(employee.id, {
+              timeOutAM: {
+                hour: hour,
+                minute: minute,
+              },
+              sessions: {
+                timeOutAmDone: true,
+              },
+            });
+
+            setModalType(4);
+            setIsShowModal(true);
+          } else {
+            setModalType(21);
+            setIsShowModal(true);
+            return;
+          }
+        } else {
+          setModalType(2);
+          setIsShowModal(true);
+          return;
+        }
       }
 
       const isInAttendance = await checkEmployeeInAttendance(employee.id);
@@ -224,6 +245,33 @@ const Scanner = () => {
         setModalType(2);
         setIsShowModal(true);
         return;
+      }
+
+      if (isScanned) {
+        if (hour === 13) {
+          if (minute >= 15) {
+            updateTimeInOut(employee.id, {
+              timeOutPM: {
+                hour: hour,
+                minute: minute,
+              },
+              sessions: {
+                timeOutPmDone: true,
+              },
+            });
+
+            setModalType(4);
+            setIsShowModal(true);
+          } else {
+            setModalType(21);
+            setIsShowModal(true);
+            return;
+          }
+        } else {
+          setModalType(2);
+          setIsShowModal(true);
+          return;
+        }
       }
 
       const isInAttendance = await checkEmployeeInAttendance(employee.id);
@@ -413,7 +461,7 @@ const Scanner = () => {
             </p>
           </div>
         )}
-        <div className="scanner-buttons">
+        {/* <div className="scanner-buttons">
           <button
             className={
               btnActive === "TIAM" ||
@@ -447,7 +495,7 @@ const Scanner = () => {
           >
             Emergency Time Out
           </button>
-        </div>
+        </div> */}
         {/* <div className="scanner-buttons">
           <button
             className={btnActive === "TIAM" ? "active" : ""}

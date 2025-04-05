@@ -1,0 +1,89 @@
+.dep-modal-container {
+  width: 100vw;
+  height: 100vh;
+  backdrop-filter: blur(12px);
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dep-modal-container .dep-modal {
+  width: 360px;
+  height: auto;
+  padding: 22px;
+  background-color: white;
+  border-radius: 6px;
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+  position: relative;
+}
+
+.dep-close {
+  position: absolute;
+  right: 20px;
+  top: 20px;
+  background: transparent;
+  outline: none;
+  border: none;
+  font-size: 22px;
+}
+
+.dep-modal-content h3 {
+  font-size: 22px;
+  color: forestgreen;
+  margin-bottom: 20px;
+}
+
+.dep-modal-content input {
+  width: 100%;
+  height: auto;
+  padding: 12px;
+  border: none;
+  outline: none;
+  box-shadow: 0 0 2.5px 0 black;
+  margin-top: 12px;
+  margin-bottom: 7px;
+  border-radius: 4px;
+}
+
+.dep-modal-content .btns {
+  margin-top: 16px;
+  text-align: right;
+}
+
+.dep-modal-content button {
+  background-color: #13aa52;
+  border: 1px solid #13aa52;
+  border-radius: 4px;
+  box-shadow: rgba(0, 0, 0, 0.1) 0 2px 4px 0;
+  box-sizing: border-box;
+  color: #fff;
+  cursor: pointer;
+  font-family: "Akzidenz Grotesk BQ Medium", -apple-system, BlinkMacSystemFont,
+    sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  outline: none;
+  outline: 0;
+  padding: 10px 25px;
+  text-align: center;
+  transform: translateY(0);
+  transition: transform 150ms, box-shadow 150ms;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+.dep-modal-content button:hover {
+  box-shadow: rgba(0, 0, 0, 0.15) 0 3px 9px 0;
+  transform: translateY(-2px);
+}
+
+@media (min-width: 768px) {
+  .dep-modal-content button {
+    padding: 10px 30px;
+  }
+}

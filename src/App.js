@@ -30,6 +30,7 @@ import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "./firebase/db";
 import EditAdmin from "./pages/Editadmin";
 import ExcelViewer from "./pages/Excelviewer";
+import Department from "./pages/Department";
 
 const DataContext = createContext(null);
 let tl = 0;
@@ -49,6 +50,9 @@ function App() {
     JSON.parse(sessionStorage.getItem("isLogin")) ?? false
   );
   const [excelFile, setExcelFile] = useState("");
+  const [isAddDepartment, setIsAddDepartment] = useState(false);
+  const [isEditDepartment, setIsEditDepartment] = useState(false);
+  const [dataToEdit, setDataToEdit] = useState(null);
 
   useEffect(() => {
     const checkScreenSize = () => {
@@ -314,6 +318,12 @@ function App() {
         setIsLogin,
         excelFile,
         setExcelFile,
+        isAddDepartment,
+        setIsAddDepartment,
+        isEditDepartment,
+        setIsEditDepartment,
+        dataToEdit,
+        setDataToEdit,
       }}
     >
       <BrowserRouter>
@@ -322,6 +332,7 @@ function App() {
             <Route index element={<Dashboard />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/employee" element={<Employee />} />
+            <Route path="/department" element={<Department />} />
             <Route path="/attendance" element={<Attendances />} />
             <Route path="/allattendance" element={<Allattendances />} />
             <Route path="/leave" element={<Leave />} />

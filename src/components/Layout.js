@@ -7,11 +7,19 @@ import { useContext } from "react";
 import LoginPage from "../pages/Loginpage";
 import ActionModal from "./Actionmodal";
 import { DataContext } from "../App";
+import AddDepartment from "./AddDepartment";
+import EditDepartment from "./EditDepartment";
 
 const Layout = () => {
   const location = useLocation();
-  const { type, isActionModal, setIsActionModal, isLogin } =
-    useContext(DataContext);
+  const {
+    type,
+    isActionModal,
+    setIsActionModal,
+    isLogin,
+    isAddDepartment,
+    isEditDepartment,
+  } = useContext(DataContext);
 
   if (
     location.pathname === "/scanner" ||
@@ -43,6 +51,8 @@ const Layout = () => {
           ) : (
             <></>
           )}
+          {isAddDepartment ? <AddDepartment /> : <></>}
+          {isEditDepartment ? <EditDepartment /> : <></>}
         </div>
       </div>
       <Profile />

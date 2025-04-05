@@ -58,17 +58,17 @@ export default class Barchart extends PureComponent {
           <Bar
             dataKey="late"
             fill="orange"
-            activeBar={<Rectangle fill="pink" stroke="orange" />}
+            activeBar={<Rectangle fill="orange" stroke="orange" />}
           />
           <Bar
             dataKey="absent"
             fill="red"
-            activeBar={<Rectangle fill="gold" stroke="red" />}
+            activeBar={<Rectangle fill="red" stroke="red" />}
           />
           <Bar
             dataKey="leave"
-            fill="darkviolet"
-            activeBar={<Rectangle fill="gold" stroke="darkviolet" />}
+            fill="darkred"
+            activeBar={<Rectangle fill="darkred" stroke="darkred" />}
           />
         </BarChart>
       </ResponsiveContainer>

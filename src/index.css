@@ -3,14 +3,25 @@
   padding: 0;
   margin: 0;
 }
-
 *::-webkit-scrollbar {
-  width: 5px;
+  width: 10px; /* Controls the width of the scrollbar */
 }
 
-*::-webkit-scrollbar-thumb {
-  background: #3e3e3e;
+/* Target the scrollbar track */
+*::-webkit-scrollbar-track {
+  background: #f1f1f1;
   border-radius: 10px;
+}
+
+/* Target the scrollbar thumb (the draggable part) */
+*::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
+}
+
+/* Optional: On hover */
+*::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }
 
 html,
