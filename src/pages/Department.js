@@ -123,7 +123,9 @@ const Department = () => {
               </div>
               <div className="card-right">
                 <p className="color-blue">Most Employee</p>
-                <h3 style={{ fontSize: "22px" }}>Office of The Major Tanod</h3>
+                <h3 style={{ fontSize: "20px", top: "-14px" }}>
+                  Office of The Major Tanod
+                </h3>
                 <h6 className="h6b">22 Total Employees</h6>
               </div>
             </div>

@@ -3,9 +3,10 @@ import Loader from "../components/Loader";
 import "../css/employee.css";
 import { insertOne } from "../methods/methods";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { storage } from "../firebase/db";
+import { db, storage } from "../firebase/db";
 import cryptoRandomString from "crypto-random-string";
 import { DataContext } from "../App";
+import { collection, onSnapshot } from "firebase/firestore";
 
 const Addemployee = () => {
   const { setType, setIsActionModal } = useContext(DataContext);
@@ -23,8 +24,11 @@ const Addemployee = () => {
   const [position, setPosition] = useState("");
   const [employed, setEmployed] = useState("");
   const [department, setDepartment] = useState("");
+  const [departmentId, setDepartmentId] = useState("");
   const [img, setImg] = useState("");
   const [pdsFile, setPdsFile] = useState("");
+
+  const [departments, setDepartments] = useState([]);
 
   const [inputsValues, setInputsValues] = useState([
     {
@@ -81,6 +85,7 @@ const Addemployee = () => {
         position,
         employed,
         department,
+        departmentId,
         isOnLeave: false,
         late: [],
         absent: [],
@@ -167,9 +172,27 @@ const Addemployee = () => {
   };
 
   useEffect(() => {
+    const collectionRef = collection(db, "department");
+
+    const unsubscribe = onSnapshot(
+      collectionRef,
+      (querySnapshot) => {
+        const items = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setDepartments(items);
+      },
+      (error) => {
+        console.error("Error fetching real-time updates: ", error);
+      }
+    );
+
     setTimeout(() => {
       setIsLoading(false);
     }, 1000);
+
+    return () => unsubscribe();
   }, []);
 
   if (isLoading) return <Loader />;
@@ -234,9 +257,21 @@ const Addemployee = () => {
 
             <div className="inp-grp">
               <h4>Department:</h4>
-              <select onChange={(e) => setDepartment(e.target.value)}>
-                <option value="Male">Dep1</option>
-                <option value="Female">Dep2</option>
+              <select
+                onChange={(e) => {
+                  const selectedId = e.target.value;
+                  const selectedDept = departments.find(
+                    (d) => d.id === selectedId
+                  );
+                  setDepartment(selectedDept?.name || "");
+                  setDepartmentId(selectedId);
+                }}
+              >
+                {departments.map((d) => (
+                  <option key={d.id} value={d.id}>
+                    {d.name}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
