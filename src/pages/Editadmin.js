@@ -99,7 +99,7 @@ const EditAdmin = () => {
             <img id="img-preview" src={avatar || nopic} alt="avatar" />
           </div>
 
-          <h4>Employee Image:</h4>
+          <h4>Admin Image:</h4>
           <input
             type="file"
             onChange={(e) => {

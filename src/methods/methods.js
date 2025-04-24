@@ -12,7 +12,7 @@ import {
   writeBatch,
 } from "@firebase/firestore";
 
-import { db } from "../firebase/db";
+import { db, storage } from "../firebase/db";
 
 import {
   format,
@@ -20,7 +20,9 @@ import {
   addDays,
   parseISO,
   eachDayOfInterval,
+  isSameMonth,
 } from "date-fns";
+import { getDownloadURL, ref } from "firebase/storage";
 
 const insertOne = async (table, data) => {
   try {
@@ -370,7 +372,6 @@ const updateEmployeesOnLeave = async () => {
       ...doc.data(),
     }));
 
-    // Get employees who should be on leave today
     const employeesOnLeave = new Set(
       leaveData
         .filter((leave) => {
@@ -415,11 +416,8 @@ const updateEmployeesOnLeave = async () => {
 
 async function getLatesData() {
   const latesRef = collection(db, "alllates");
-
-  // Get current date
   const today = new Date();
 
-  // Define start and end of week (Monday–Friday)
   const startWeek = format(
     startOfWeek(today, { weekStartsOn: 1 }),
     "yyyy-MM-dd"
@@ -429,11 +427,9 @@ async function getLatesData() {
     "yyyy-MM-dd"
   );
 
-  // Define start and end of the year (January - December)
-  const startYear = format(new Date(today.getFullYear(), 0, 1), "yyyy-MM-dd"); // Jan 1st
-  const endYear = format(new Date(today.getFullYear(), 11, 31), "yyyy-MM-dd"); // Dec 31st
+  const startYear = format(new Date(today.getFullYear(), 0, 1), "yyyy-MM-dd");
+  const endYear = format(new Date(today.getFullYear(), 11, 31), "yyyy-MM-dd");
 
-  // Firestore queries (string comparisons)
   const weeklyQuery = query(
     latesRef,
     where("date", ">=", startWeek),
@@ -445,11 +441,9 @@ async function getLatesData() {
     where("date", "<=", endYear)
   );
 
-  // Fetch data
   const weeklySnapshot = await getDocs(weeklyQuery);
   const monthlySnapshot = await getDocs(monthlyQuery);
 
-  // Initialize weekly data structure
   let weeklyData = {
     Monday: 0,
     Tuesday: 0,
@@ -458,7 +452,6 @@ async function getLatesData() {
     Friday: 0,
   };
 
-  // Initialize full-year monthly structure with all months set to 0
   let monthlyData = {
     January: 0,
     February: 0,
@@ -474,25 +467,22 @@ async function getLatesData() {
     December: 0,
   };
 
-  // Process weekly data (Monday–Friday)
   weeklySnapshot.forEach((doc) => {
     const data = doc.data();
-    const dayName = format(parseISO(data.date), "EEEE"); // Convert "2025-03-07" to "Friday"
+    const dayName = format(parseISO(data.date), "EEEE");
 
     if (weeklyData[dayName] !== undefined) {
       weeklyData[dayName] += data.late || 0;
     }
   });
 
-  // Process monthly data (January–December)
   monthlySnapshot.forEach((doc) => {
     const data = doc.data();
-    const monthName = format(parseISO(data.date), "MMMM"); // Get month name
+    const monthName = format(parseISO(data.date), "MMMM");
 
     monthlyData[monthName] += data.late || 0;
   });
 
-  // Convert to array format
   const weeklyArray = Object.keys(weeklyData).map((day) => ({
     name: day,
     late: weeklyData[day],
@@ -600,6 +590,174 @@ const checkCollection = async (collection) => {
   return (await getDocs(collection(db, collection))).empty;
 };
 
+const download = async (filePath) => {
+  try {
+    const fileRef = ref(storage, filePath);
+    const url = await getDownloadURL(fileRef);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filePath.split("/").pop(); // default filename
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  } catch (error) {
+    console.error("Download failed", error);
+    alert("Failed to download file.");
+  }
+};
+
+async function getLates() {
+  const departmentSnapshot = await getDocs(collection(db, "department"));
+  const today = new Date();
+  const results = [];
+
+  for (const dept of departmentSnapshot.docs) {
+    const departmentId = dept.id;
+    const departmentName = dept.data().name;
+
+    const employeeSnapshot = await getDocs(collection(db, "employee"));
+
+    let lateCount = 0;
+
+    // eslint-disable-next-line no-loop-func
+    employeeSnapshot.docs.forEach((empDoc) => {
+      const emp = empDoc.data();
+      if (emp.departmentId !== departmentId || !Array.isArray(emp.late)) return;
+
+      emp.late.forEach((entry) => {
+        if (entry.date?.toDate && isSameMonth(entry.date.toDate(), today)) {
+          lateCount++;
+        }
+      });
+    });
+
+    results.push({
+      name: departmentName,
+      late: lateCount,
+    });
+  }
+
+  return results;
+}
+
+async function getAbsents() {
+  const departmentSnapshot = await getDocs(collection(db, "department"));
+  const today = new Date();
+  const results = [];
+
+  for (const dept of departmentSnapshot.docs) {
+    const departmentId = dept.id;
+    const departmentName = dept.data().name;
+
+    const employeeSnapshot = await getDocs(collection(db, "employee"));
+
+    let absentCount = 0;
+
+    employeeSnapshot.docs.forEach((empDoc) => {
+      const emp = empDoc.data();
+      if (emp.departmentId !== departmentId || !Array.isArray(emp.absent))
+        return;
+
+      emp.absent.forEach((entry) => {
+        if (entry.date?.toDate && isSameMonth(entry.date.toDate(), today)) {
+          absentCount++;
+        }
+      });
+    });
+
+    results.push({
+      name: departmentName,
+      absent: absentCount,
+    });
+  }
+
+  return results;
+}
+
+async function getLeaves() {
+  const departmentSnapshot = await getDocs(collection(db, "department"));
+  const today = new Date();
+  const results = [];
+
+  for (const dept of departmentSnapshot.docs) {
+    const departmentId = dept.id;
+    const departmentName = dept.data().name;
+
+    const employeeSnapshot = await getDocs(collection(db, "employee"));
+
+    let leaveCount = 0;
+
+    employeeSnapshot.docs.forEach((empDoc) => {
+      const emp = empDoc.data();
+      if (emp.departmentId !== departmentId || !Array.isArray(emp.leave))
+        return;
+
+      emp.leave.forEach((entry) => {
+        if (entry.date?.toDate && isSameMonth(entry.date.toDate(), today)) {
+          leaveCount++;
+        }
+      });
+    });
+
+    results.push({
+      name: departmentName,
+      leave: leaveCount,
+    });
+  }
+
+  return results;
+}
+
+async function getDepartmentStats() {
+  const [lateResults, leaveResults, absentResults] = await Promise.all([
+    getLates(),
+    getLeaves(),
+    getAbsents(),
+  ]);
+
+  const merged = {};
+
+  // Combine Late
+  lateResults.forEach((item) => {
+    merged[item.name] = {
+      name: item.name,
+      late: item.late,
+      leave: 0,
+      absent: 0,
+    };
+  });
+
+  // Combine Leave
+  leaveResults.forEach((item) => {
+    if (merged[item.name]) {
+      merged[item.name].leave = item.leave;
+    } else {
+      merged[item.name] = {
+        name: item.name,
+        late: 0,
+        leave: item.leave,
+        absent: 0,
+      };
+    }
+  });
+
+  // Combine Absent
+  absentResults.forEach((item) => {
+    if (merged[item.name]) {
+      merged[item.name].absent = item.absent;
+    } else {
+      merged[item.name] = {
+        name: item.name,
+        late: 0,
+        leave: 0,
+        absent: item.absent,
+      };
+    }
+  });
+
+  return Object.values(merged);
+}
+
 export {
   insertOne,
   getOne,
@@ -625,4 +783,6 @@ export {
   getLatesData,
   getLeaveData,
   checkCollection,
+  download,
+  getDepartmentStats,
 };

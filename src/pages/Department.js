@@ -5,31 +5,56 @@ import { FaEdit, FaEye } from "react-icons/fa";
 import Loader from "../components/Loader";
 import { TiGroupOutline } from "react-icons/ti";
 import { FcDepartment } from "react-icons/fc";
-import { collection, onSnapshot } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  onSnapshot,
+  query,
+  where,
+} from "firebase/firestore";
 import { db } from "../firebase/db";
 
 const Department = () => {
-  const { setIsAddDepartment } = useContext(DataContext);
   const [search, setSearch] = useState("");
-  const { setIsEditDepartment, setDataToEdit } = useContext(DataContext);
+  const {
+    setIsAddDepartment,
+    setIsEditDepartment,
+    setDataToEdit,
+    setIsViewDepartment,
+    setDataToView,
+  } = useContext(DataContext);
   const [isLoading, setIsLoading] = useState(true);
   const [department, setDepartment] = useState([]);
-
-  // const highestDepartment = department.reduce((max, dept) =>
-  //   dept.employees.length > max.employees.length ? dept : max
-  // );
 
   useEffect(() => {
     const collectionRef = collection(db, "department");
 
     const unsubscribe = onSnapshot(
       collectionRef,
-      (querySnapshot) => {
-        const items = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setDepartment(items);
+      async (querySnapshot) => {
+        const departmentPromises = querySnapshot.docs.map(async (doc) => {
+          const departmentId = doc.id;
+          const departmentData = doc.data();
+
+          const employeesQuery = query(
+            collection(db, "employee"),
+            where("departmentId", "==", departmentId)
+          );
+          const employeeSnapshot = await getDocs(employeesQuery);
+          const employees = employeeSnapshot.docs.map((empDoc) => {
+            const empData = empDoc.data();
+            return `${empData.firstName} ${empData.middleName} ${empData.lastName}`;
+          });
+
+          return {
+            id: departmentId,
+            name: departmentData.name,
+            employees,
+          };
+        });
+
+        const departmentsWithEmployees = await Promise.all(departmentPromises);
+        setDepartment(departmentsWithEmployees);
       },
       (error) => {
         console.error("Error fetching real-time updates: ", error);
@@ -46,6 +71,14 @@ const Department = () => {
   const filteredDepartment = department.filter((emp) =>
     emp.name.toLowerCase().includes(search.toLowerCase())
   );
+
+  const getMostDep = () => {
+    return department.reduce((maxDept, currentDept) => {
+      return currentDept.employees.length > maxDept.employees.length
+        ? currentDept
+        : maxDept;
+    });
+  };
 
   if (isLoading) return <Loader />;
 
@@ -87,7 +120,13 @@ const Department = () => {
                     <td>{d.name}</td>
                     <td>{d.employees.length}</td>
                     <td className="table-actions">
-                      <button>
+                      <button
+                        title="view"
+                        onClick={() => {
+                          setDataToView(d);
+                          setIsViewDepartment(true);
+                        }}
+                      >
                         <FaEye color="green" />
                       </button>
                       <button
@@ -124,9 +163,11 @@ const Department = () => {
               <div className="card-right">
                 <p className="color-blue">Most Employee</p>
                 <h3 style={{ fontSize: "20px", top: "-14px" }}>
-                  Office of The Major Tanod
+                  {getMostDep().name}
                 </h3>
-                <h6 className="h6b">22 Total Employees</h6>
+                <h6 className="h6b">
+                  {getMostDep().employees.length} Total Employees
+                </h6>
               </div>
             </div>
           </div>

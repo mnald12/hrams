@@ -1,5 +1,4 @@
 import "../css/menu.css";
-import usr from "../user.png";
 import { AiOutlineMenu, AiOutlinePoweroff } from "react-icons/ai";
 import { ddClose, ddOpen } from "../methods/navMethods";
 import { GrClose } from "react-icons/gr";
@@ -43,7 +42,7 @@ const Menu = () => {
             <h3>{profile.firstName}</h3>
             <small>{profile.position}</small>
           </div>
-          <img src={usr} alt="profile" />
+          <img src={profile.avatar} alt="profile" />
           <button id="ddOpen" onClick={() => ddOpen()}>
             <AiOutlineMenu className="ddIcn" />
           </button>

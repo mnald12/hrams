@@ -9,6 +9,7 @@ import ActionModal from "./Actionmodal";
 import { DataContext } from "../App";
 import AddDepartment from "./AddDepartment";
 import EditDepartment from "./EditDepartment";
+import ViewDepartment from "./ViewDepartment";
 
 const Layout = () => {
   const location = useLocation();
@@ -19,6 +20,7 @@ const Layout = () => {
     isLogin,
     isAddDepartment,
     isEditDepartment,
+    isViewDepartment,
   } = useContext(DataContext);
 
   if (
@@ -53,6 +55,7 @@ const Layout = () => {
           )}
           {isAddDepartment ? <AddDepartment /> : <></>}
           {isEditDepartment ? <EditDepartment /> : <></>}
+          {isViewDepartment ? <ViewDepartment /> : <></>}
         </div>
       </div>
       <Profile />

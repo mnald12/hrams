@@ -4,9 +4,10 @@ import Loader from "../components/Loader";
 import "../css/employee.css";
 import { getOne, update } from "../methods/methods";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { storage } from "../firebase/db";
+import { db, storage } from "../firebase/db";
 import { cryptoRandomStringAsync } from "crypto-random-string";
 import { DataContext } from "../App";
+import { collection, onSnapshot } from "firebase/firestore";
 
 const EditEmployee = () => {
   const { setType, setIsActionModal } = useContext(DataContext);
@@ -24,7 +25,11 @@ const EditEmployee = () => {
   const [address, setAddress] = useState("");
   const [position, setPosition] = useState("");
   const [employed, setEmployed] = useState("");
+  const [department, setDepartment] = useState("");
+  const [departmentId, setDepartmentId] = useState("");
   const [img, setImg] = useState("");
+
+  const [departments, setDepartments] = useState([]);
 
   useEffect(() => {
     const fetchEmployee = async () => {
@@ -42,6 +47,7 @@ const EditEmployee = () => {
         setAddress(employee.address);
         setPosition(employee.position);
         setEmployed(employee.employed);
+        setDepartment(employee.department);
         setImg(employee.avatar);
       }
     };
@@ -50,6 +56,26 @@ const EditEmployee = () => {
       setIsLoading(false);
     }, 1000);
   }, [id]);
+
+  useEffect(() => {
+    const collectionRef = collection(db, "department");
+
+    const unsubscribe = onSnapshot(
+      collectionRef,
+      (querySnapshot) => {
+        const items = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setDepartments(items);
+      },
+      (error) => {
+        console.error("Error fetching real-time updates: ", error);
+      }
+    );
+
+    return () => unsubscribe();
+  }, []);
 
   const updateEmployee = async () => {
     setIsLoading(true);
@@ -77,6 +103,8 @@ const EditEmployee = () => {
       position,
       employed,
       avatar: avatarUrl,
+      department: department,
+      departmentId: departmentId,
     };
 
     const updated = await update("employee", id, updatedEmployee);
@@ -159,6 +187,30 @@ const EditEmployee = () => {
                 value={employed}
                 onChange={(e) => setEmployed(e.target.value)}
               />
+            </div>
+
+            <div className="inp-grp">
+              <h4>Department:</h4>
+              <select
+                onChange={(e) => {
+                  const selectedId = e.target.value;
+                  const selectedDept = departments.find(
+                    (d) => d.id === selectedId
+                  );
+                  setDepartment(selectedDept?.name || "");
+                  setDepartmentId(selectedId);
+                }}
+              >
+                {departments.map((d) => (
+                  <option
+                    key={d.id}
+                    value={d.id}
+                    selected={d.name === department ? true : false}
+                  >
+                    {d.name}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
         </div>

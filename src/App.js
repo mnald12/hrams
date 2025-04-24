@@ -52,7 +52,9 @@ function App() {
   const [excelFile, setExcelFile] = useState("");
   const [isAddDepartment, setIsAddDepartment] = useState(false);
   const [isEditDepartment, setIsEditDepartment] = useState(false);
+  const [isViewDepartment, setIsViewDepartment] = useState(false);
   const [dataToEdit, setDataToEdit] = useState(null);
+  const [dataToView, setDataToView] = useState(null);
 
   useEffect(() => {
     const checkScreenSize = () => {
@@ -324,6 +326,10 @@ function App() {
         setIsEditDepartment,
         dataToEdit,
         setDataToEdit,
+        isViewDepartment,
+        setIsViewDepartment,
+        dataToView,
+        setDataToView,
       }}
     >
       <BrowserRouter>

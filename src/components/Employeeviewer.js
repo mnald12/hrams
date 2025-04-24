@@ -1,8 +1,14 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "../css/loginemployee.css";
+import ExcelViewer from "./Excelviewer";
+import { download } from "../methods/methods";
 
 const EmployeeViewer = ({ employee, attendance, leaves }) => {
   const [btnActive, setBtnActive] = useState("profile");
+
+  useEffect(() => {
+    console.log(attendance);
+  }, [attendance]);
 
   if (!employee) return null;
 
@@ -17,8 +23,10 @@ const EmployeeViewer = ({ employee, attendance, leaves }) => {
     age,
     gender,
     employed,
+    department,
     position,
     rfid,
+    pds,
     points = [],
     late,
     absent,
@@ -102,6 +110,19 @@ const EmployeeViewer = ({ employee, attendance, leaves }) => {
             >
               Absents
             </button>
+
+            <button
+              id="downbtn"
+              onClick={() => {
+                download(pds);
+                document.getElementById("downbtn").innerText = "Downloading...";
+                setTimeout(() => {
+                  document.getElementById("downbtn").innerText = "Download PDS";
+                }, 1500);
+              }}
+            >
+              Download PDS
+            </button>
           </div>
           {btnActive === "profile" ? (
             <div className="profile-container">
@@ -137,6 +158,10 @@ const EmployeeViewer = ({ employee, attendance, leaves }) => {
                 <div className="detail-row">
                   <span className="label">Employed:</span>
                   <span className="value">{employed}</span>
+                </div>
+                <div className="detail-row">
+                  <span className="label">Department:</span>
+                  <span className="value">{department}</span>
                 </div>
                 <div className="detail-row">
                   <span className="label">RFID:</span>
@@ -393,7 +418,9 @@ const EmployeeViewer = ({ employee, attendance, leaves }) => {
               </tbody>
             </table>
           ) : (
-            <></>
+            <>
+              <ExcelViewer fileUrl={pds} />
+            </>
           )}
         </div>
       </div>

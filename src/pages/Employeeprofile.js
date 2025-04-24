@@ -493,7 +493,7 @@ const EmployeeViewer = ({ employee, setLogout, id }) => {
               style={{
                 padding: "12px",
                 paddingBottom: "20px",
-                height: "300px",
+                height: "400px",
               }}
             >
               <FullCalendar

@@ -65,10 +65,14 @@ const Addemployee = () => {
       const imageSnapshot = await uploadBytes(imageRef, img);
       const avatarUrl = await getDownloadURL(imageSnapshot.ref);
 
-      const pdsRef = ref(
-        storage,
-        `pds/${pdsFile.name + cryptoRandomString({ length: 10 })}`
-      );
+      const fileExtension = pdsFile.name.split(".").pop();
+      const fileNameWithoutExt = pdsFile.name.replace(/\.[^/.]+$/, "");
+      const newFileName = `${fileNameWithoutExt}_${cryptoRandomString({
+        length: 10,
+      })}.${fileExtension}`;
+
+      const pdsRef = ref(storage, `pds/${newFileName}`);
+
       const pdsSnapshot = await uploadBytes(pdsRef, pdsFile);
       const pdsUrl = await getDownloadURL(pdsSnapshot.ref);
 
@@ -242,7 +246,9 @@ const Addemployee = () => {
             <div className="inp-grp">
               <h4>Gender:</h4>
               <select onChange={(e) => setGender(e.target.value)}>
-                <option value="Male">Male</option>
+                <option value="Male" selected>
+                  Male
+                </option>
                 <option value="Female">Female</option>
               </select>
             </div>
