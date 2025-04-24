@@ -1,6 +1,7 @@
 import "../css/loginemployee.css";
 import { useEffect, useState } from "react";
 import {
+  addToLeave,
   getEmployeeAttendance,
   getEmployeeLeaves,
   getOneWithRFID,
@@ -110,6 +111,10 @@ const EmployeeViewer = ({ employee, setLogout, id }) => {
         applicationForm: lafUrl,
       });
       if (isInsert) {
+        await addToLeave("employee", employee.id, {
+          from: newLeave.from,
+          to: newLeave.to,
+        });
         setNewLeave({
           type: "",
           from: "",

@@ -6,6 +6,7 @@ import { collection, onSnapshot } from "firebase/firestore";
 import { db, storage } from "../firebase/db";
 import { FaCheck } from "react-icons/fa";
 import {
+  addToLeave,
   approveLeave,
   download,
   insertOne,
@@ -142,6 +143,10 @@ const Leave = () => {
         applicationForm: lafUrl,
       });
       if (isInsert) {
+        await addToLeave("employee", newLeave.id, {
+          from: newLeave.from,
+          to: newLeave.to,
+        });
         setNewLeave({
           id: "",
           lastName: "",

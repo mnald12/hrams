@@ -1,3 +1,4 @@
+/* eslint-disable no-loop-func */
 import {
   collection,
   doc,
@@ -21,6 +22,9 @@ import {
   parseISO,
   eachDayOfInterval,
   isSameMonth,
+  isWithinInterval,
+  startOfMonth,
+  endOfMonth,
 } from "date-fns";
 import { getDownloadURL, ref } from "firebase/storage";
 
@@ -229,6 +233,19 @@ const addToAbsent = async (table, id, value) => {
     return { success: true };
   } catch (error) {
     console.error("Error updating 'absent' array:", error);
+    return { success: false, error };
+  }
+};
+
+const addToLeave = async (table, id, value) => {
+  try {
+    const docRef = doc(db, table, id);
+    await updateDoc(docRef, {
+      leave: arrayUnion(value),
+    });
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating 'leave' array:", error);
     return { success: false, error };
   }
 };
@@ -677,6 +694,8 @@ async function getAbsents() {
 async function getLeaves() {
   const departmentSnapshot = await getDocs(collection(db, "department"));
   const today = new Date();
+  const monthStart = startOfMonth(today);
+  const monthEnd = endOfMonth(today);
   const results = [];
 
   for (const dept of departmentSnapshot.docs) {
@@ -689,12 +708,21 @@ async function getLeaves() {
 
     employeeSnapshot.docs.forEach((empDoc) => {
       const emp = empDoc.data();
+
       if (emp.departmentId !== departmentId || !Array.isArray(emp.leave))
         return;
 
       emp.leave.forEach((entry) => {
-        if (entry.date?.toDate && isSameMonth(entry.date.toDate(), today)) {
-          leaveCount++;
+        const from = entry.from ? parseISO(entry.from) : null;
+        const to = entry.to ? parseISO(entry.to) : null;
+
+        if (from && to) {
+          const overlap =
+            isWithinInterval(monthStart, { start: from, end: to }) ||
+            isWithinInterval(monthEnd, { start: from, end: to }) ||
+            (from <= monthStart && to >= monthEnd);
+
+          if (overlap) leaveCount++;
         }
       });
     });
@@ -717,7 +745,6 @@ async function getDepartmentStats() {
 
   const merged = {};
 
-  // Combine Late
   lateResults.forEach((item) => {
     merged[item.name] = {
       name: item.name,
@@ -727,7 +754,6 @@ async function getDepartmentStats() {
     };
   });
 
-  // Combine Leave
   leaveResults.forEach((item) => {
     if (merged[item.name]) {
       merged[item.name].leave = item.leave;
@@ -741,7 +767,6 @@ async function getDepartmentStats() {
     }
   });
 
-  // Combine Absent
   absentResults.forEach((item) => {
     if (merged[item.name]) {
       merged[item.name].absent = item.absent;
@@ -768,6 +793,7 @@ export {
   update,
   addToLate,
   addToAbsent,
+  addToLeave,
   deleteOne,
   clearTable,
   getOneWithRFID,

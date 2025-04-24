@@ -136,21 +136,6 @@ function App() {
     return () => unsubscribe();
   }, []);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const now = new Date();
-      const hours = now.getHours();
-      const minutes = now.getMinutes();
-
-      if (hours === 10 && minutes === 0) {
-        processAbsent();
-        clearInterval(interval);
-      }
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, []);
-
   const processAbsent = async () => {
     const isEmpty = await checkCollection("attendance");
 
@@ -209,6 +194,7 @@ function App() {
 
       if (hours === 18 && minutes === 0) {
         processAttendance();
+        processAbsent();
         clearInterval(interval);
       }
     }, 1000);
