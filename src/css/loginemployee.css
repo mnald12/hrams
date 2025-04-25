@@ -506,3 +506,20 @@
   margin: 5px 0;
   color: #555;
 }
+
+.month-header {
+  display: flex;
+  align-items: center;
+  position: relative;
+  padding: 12px;
+}
+
+.month-header button {
+  position: absolute;
+  right: 20px;
+  padding: 8px 14px;
+  border: none;
+  outline: none;
+  border-radius: 5px;
+  color: aliceblue;
+}

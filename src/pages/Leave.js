@@ -94,8 +94,12 @@ const Leave = () => {
 
   const handleApprove = async (id) => {
     setIsLoading(true);
-    const isApproved = await approveLeave(id);
-    if (isApproved) {
+    const res = await approveLeave(id);
+    if (res.isOk) {
+      await addToLeave("employee", res.leaveData.employeeID, {
+        from: res.leaveData.from,
+        to: res.leaveData.to,
+      });
       setType(8);
       setIsActionModal(true);
     } else {
@@ -143,10 +147,6 @@ const Leave = () => {
         applicationForm: lafUrl,
       });
       if (isInsert) {
-        await addToLeave("employee", newLeave.id, {
-          from: newLeave.from,
-          to: newLeave.to,
-        });
         setNewLeave({
           id: "",
           lastName: "",

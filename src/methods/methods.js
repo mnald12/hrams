@@ -358,9 +358,13 @@ const getMostLeaveEmployee = async () => {
 
 const approveLeave = async (leaveId) => {
   const leaveRef = doc(db, "leave", leaveId);
+  const l = await getOne("leave", leaveId);
   try {
     await updateDoc(leaveRef, { status: "Approved" });
-    return true;
+    return {
+      isOk: true,
+      leaveData: l,
+    };
   } catch (error) {
     console.error("Error updating leave status:", error);
     return false;

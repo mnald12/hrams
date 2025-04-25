@@ -1,13 +1,66 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "../css/loginemployee.css";
 import ExcelViewer from "./Excelviewer";
 import { download } from "../methods/methods";
+import { IoMdPrint } from "react-icons/io";
+import { useReactToPrint } from "react-to-print";
 
 const EmployeeViewer = ({ employee, attendance, leaves }) => {
   const [btnActive, setBtnActive] = useState("profile");
+  const [newAtt, setNewAtt] = useState([]);
+  const [r, setR] = useState(0);
+  const ref = useRef([]);
+
+  const reactToPrintFn = useReactToPrint({
+    content: () => ref.current[r],
+  });
+
+  const handlePrint = (k) => {
+    setR(k);
+  };
 
   useEffect(() => {
-    console.log(attendance);
+    reactToPrintFn();
+  }, [r, reactToPrintFn]);
+
+  useEffect(() => {
+    const groupByMonthAndYear = (data) => {
+      const grouped = {};
+
+      data.forEach((entry) => {
+        if (entry.date) {
+          const dateObj = new Date(entry.date);
+          const month = dateObj.toLocaleString("default", { month: "long" });
+          const year = dateObj.getFullYear();
+          const key = `${month} ${year}`;
+
+          if (!grouped[key]) {
+            grouped[key] = [];
+          }
+
+          grouped[key].push(entry);
+        }
+      });
+
+      const result = Object.entries(grouped)
+        .map(([monthYear, attendance]) => ({
+          month: monthYear,
+          attendance,
+        }))
+        .sort((a, b) => {
+          const aDate = new Date(a.attendance[0].date);
+          const bDate = new Date(b.attendance[0].date);
+          return aDate - bDate;
+        });
+
+      return result;
+    };
+
+    if (attendance.length > 0) {
+      const grouped = groupByMonthAndYear(attendance);
+      setNewAtt(grouped);
+      console.log(grouped);
+    }
   }, [attendance]);
 
   if (!employee) return null;
@@ -232,88 +285,88 @@ const EmployeeViewer = ({ employee, attendance, leaves }) => {
               </div>
             </div>
           ) : btnActive === "attendance" ? (
-            <table>
-              <thead style={{ paddingTop: "0 !important" }}>
-                <tr>
-                  <th width="15%">Date</th>
-                  <th width="15%">Time in</th>
-                  <th width="15%">Time out</th>
-                  <th width="15%">Time in</th>
-                  <th width="15%">Time out</th>
-                </tr>
-              </thead>
-              <tbody>
-                {attendance.map((e, i) => (
-                  <tr key={i}>
-                    <td>{e.date}</td>
-                    <td>
-                      {e.timeInAM.hour ? (
-                        <>
-                          {e.timeInAM.hour <= 9
-                            ? `0${e.timeInAM.hour}`
-                            : e.timeInAM.hour}{" "}
-                          :{" "}
-                          {e.timeInAM.minute <= 9
-                            ? `0${e.timeInAM.minute}`
-                            : e.timeInAM.minute}{" "}
-                          AM
-                        </>
-                      ) : (
-                        ""
-                      )}
-                    </td>
-                    <td>
-                      {e.timeOutAM.hour ? (
-                        <>
-                          {e.timeOutAM.hour <= 9
-                            ? `0${e.timeOutAM.hour}`
-                            : e.timeOutAM.hour}{" "}
-                          :{" "}
-                          {e.timeOutAM.minute <= 9
-                            ? `0${e.timeOutAM.minute}`
-                            : e.timeOutAM.minute}{" "}
-                          AM
-                        </>
-                      ) : (
-                        ""
-                      )}
-                    </td>
-                    <td>
-                      {e.timeInPM.hour ? (
-                        <>
-                          {e.timeInPM.hour <= 9
-                            ? `0${e.timeInPM.hour}`
-                            : e.timeInPM.hour}{" "}
-                          :{" "}
-                          {e.timeInPM.minute <= 9
-                            ? `0${e.timeInPM.minute}`
-                            : e.timeInPM.minute}{" "}
-                          PM
-                        </>
-                      ) : (
-                        ""
-                      )}
-                    </td>
-                    <td>
-                      {e.timeOutPM.hour ? (
-                        <>
-                          {e.timeOutPM.hour <= 9
-                            ? `0${e.timeOutPM.hour}`
-                            : e.timeOutPM.hour}{" "}
-                          :{" "}
-                          {e.timeOutPM.minute <= 9
-                            ? `0${e.timeOutPM.minute}`
-                            : e.timeOutPM.minute}{" "}
-                          PM
-                        </>
-                      ) : (
-                        ""
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <>
+              {newAtt.map((a, k) => {
+                return (
+                  <div key={k}>
+                    <div className="month-header">
+                      <h3>{a.month}</h3>
+                      <button
+                        style={{
+                          background: "limegreen",
+                          display: "flex",
+                          gap: "10px",
+                        }}
+                        onClick={() => handlePrint(k)}
+                      >
+                        Print <IoMdPrint />
+                      </button>
+                    </div>
+
+                    <div
+                      ref={(el) => (ref.current[k] = el)}
+                      className="printable"
+                    >
+                      <table>
+                        <thead>
+                          <tr>
+                            <th width="15%">Date</th>
+                            <th width="15%">Time in</th>
+                            <th width="15%">Time out</th>
+                            <th width="15%">Time in</th>
+                            <th width="15%">Time out</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {a.attendance.map((e, i) => (
+                            <tr key={i}>
+                              <td>{e.date}</td>
+                              <td>
+                                {e.timeInAM?.hour != null
+                                  ? `${e.timeInAM.hour
+                                      .toString()
+                                      .padStart(2, "0")} : ${e.timeInAM.minute
+                                      .toString()
+                                      .padStart(2, "0")} AM`
+                                  : ""}
+                              </td>
+                              <td>
+                                {e.timeOutAM?.hour != null
+                                  ? `${e.timeOutAM.hour
+                                      .toString()
+                                      .padStart(2, "0")} : ${e.timeOutAM.minute
+                                      .toString()
+                                      .padStart(2, "0")} AM`
+                                  : ""}
+                              </td>
+                              <td>
+                                {e.timeInPM?.hour != null
+                                  ? `${e.timeInPM.hour
+                                      .toString()
+                                      .padStart(2, "0")} : ${e.timeInPM.minute
+                                      .toString()
+                                      .padStart(2, "0")} PM`
+                                  : ""}
+                              </td>
+                              <td>
+                                {e.timeOutPM?.hour != null
+                                  ? `${e.timeOutPM.hour
+                                      .toString()
+                                      .padStart(2, "0")} : ${e.timeOutPM.minute
+                                      .toString()
+                                      .padStart(2, "0")} PM`
+                                  : ""}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                    <br />
+                  </div>
+                );
+              })}
+            </>
           ) : btnActive === "points" ? (
             <table>
               <thead>
