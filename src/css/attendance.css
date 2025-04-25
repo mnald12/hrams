@@ -51,4 +51,9 @@
   .printable {
     padding: 20px;
   }
+  .printable h3 {
+    color: forestgreen;
+    margin-left: 12px;
+    font-size: 22px;
+  }
 }

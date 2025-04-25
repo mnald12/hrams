@@ -31,6 +31,7 @@ import { db } from "./firebase/db";
 import EditAdmin from "./pages/Editadmin";
 import ExcelViewer from "./pages/Excelviewer";
 import Department from "./pages/Department";
+import Monthlyview from "./pages/Monthlyview";
 
 const DataContext = createContext(null);
 let tl = 0;
@@ -55,6 +56,7 @@ function App() {
   const [isViewDepartment, setIsViewDepartment] = useState(false);
   const [dataToEdit, setDataToEdit] = useState(null);
   const [dataToView, setDataToView] = useState(null);
+  const [monthlyToView, setMonthlyToView] = useState([]);
 
   useEffect(() => {
     const checkScreenSize = () => {
@@ -316,6 +318,8 @@ function App() {
         setIsViewDepartment,
         dataToView,
         setDataToView,
+        monthlyToView,
+        setMonthlyToView,
       }}
     >
       <BrowserRouter>
@@ -339,6 +343,10 @@ function App() {
               element={<ViewAlllAttendances />}
             />
             <Route path="/employee/profile" element={<EmployeeProfile />} />
+            <Route
+              path="/employee/profile/attendance"
+              element={<Monthlyview />}
+            />
             <Route
               path="/employee/view/applicationform"
               element={<ExcelViewer />}
