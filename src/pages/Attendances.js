@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Loader from "../components/Loader";
 import "../css/attendance.css";
 import "react-calendar/dist/Calendar.css";
@@ -6,11 +6,13 @@ import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase/db";
 import { FiSearch } from "react-icons/fi";
 import nopic from "../mopic.jpg";
+import { DataContext } from "../App";
 
 const Attendances = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [attendance, setAttendance] = useState([]);
   const [search, setSearch] = useState("");
+  const { processAttendance, processAbsent } = useContext(DataContext);
 
   const filteredEmployees = attendance.filter(
     (emp) =>
@@ -58,8 +60,16 @@ const Attendances = () => {
                 onChange={(e) => setSearch(e.target.value)}
               />
             </div>
+            <button
+              onClick={() => {
+                processAttendance();
+                processAbsent();
+              }}
+            >
+              Process Attendance
+            </button>
           </div>
-          <table style={{ marginTop: "-30px" }}>
+          <table style={{ marginTop: "-26px" }}>
             <thead>
               <tr
                 style={{

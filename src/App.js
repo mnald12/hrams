@@ -320,6 +320,8 @@ function App() {
         setDataToView,
         monthlyToView,
         setMonthlyToView,
+        processAttendance,
+        processAbsent,
       }}
     >
       <BrowserRouter>
