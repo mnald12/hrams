@@ -55,7 +55,7 @@ const Scanner = () => {
       setBtnActive("TIAM");
     } else if (hour >= 11 && hour < 13) {
       setBtnActive("TOAM");
-    } else if (hour >= 13 && hour < 4) {
+    } else if (hour >= 13 && hour < 15) {
       setBtnActive("TIPM");
     } else {
       setBtnActive("TOPM");
