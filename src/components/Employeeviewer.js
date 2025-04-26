@@ -70,6 +70,7 @@ const EmployeeViewer = ({ employee, attendance, leaves }) => {
     rfid,
     pds,
     points = [],
+    currentPoints,
     late,
     absent,
   } = employee;
@@ -246,28 +247,30 @@ const EmployeeViewer = ({ employee, attendance, leaves }) => {
                     <h4>🏥 Sick Leave</h4>
                     <p>
                       Balance:{" "}
-                      <b style={{ fontSize: "14px" }}>{points[0].slb}</b>
+                      <b style={{ fontSize: "14px" }}>{currentPoints.slb}</b>
                     </p>
                     <p>
                       Earned:{" "}
-                      <b style={{ fontSize: "14px" }}>{points[0].sle}</b>
+                      <b style={{ fontSize: "14px" }}>{currentPoints.sle}</b>
                     </p>
                     <p>
-                      Spent: <b style={{ fontSize: "14px" }}>{points[0].sls}</b>{" "}
+                      Spent:{" "}
+                      <b style={{ fontSize: "14px" }}>{currentPoints.sls}</b>{" "}
                     </p>
                   </div>
                   <div class="point-box">
                     <h4>🌴 Vacation Leave</h4>
                     <p>
                       Balance:{" "}
-                      <b style={{ fontSize: "14px" }}>{points[0].vlb}</b>
+                      <b style={{ fontSize: "14px" }}>{currentPoints.vlb}</b>
                     </p>
                     <p>
                       Earned:{" "}
-                      <b style={{ fontSize: "14px" }}>{points[0].vle}</b>
+                      <b style={{ fontSize: "14px" }}>{currentPoints.vle}</b>
                     </p>
                     <p>
-                      Spent: <b style={{ fontSize: "14px" }}>{points[0].vls}</b>
+                      Spent:{" "}
+                      <b style={{ fontSize: "14px" }}>{currentPoints.vls}</b>
                     </p>
                   </div>
                 </div>
@@ -324,6 +327,16 @@ const EmployeeViewer = ({ employee, attendance, leaves }) => {
                 </tr>
               </thead>
               <tbody>
+                <tr>
+                  <td>{currentPoints.from}</td>
+                  <td>{currentPoints.to}</td>
+                  <td>{currentPoints.slb}</td>
+                  <td>{currentPoints.sle}</td>
+                  <td>{currentPoints.sls}</td>
+                  <td>{currentPoints.vlb}</td>
+                  <td>{currentPoints.vle}</td>
+                  <td>{currentPoints.vls}</td>
+                </tr>
                 {points.map((point, index) => (
                   <tr key={index}>
                     <td>{point.from}</td>

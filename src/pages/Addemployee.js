@@ -96,16 +96,16 @@ const Addemployee = () => {
         leave: [],
         pds: pdsUrl,
         avatar: avatarUrl,
-        points: inputsValues,
-        thisYearPoints: {
-          from: "",
-          to: "",
-          slb: 0,
-          vlb: 0,
-          sle: 0,
-          vle: 0,
-          sls: 0,
-          vls: 0,
+        points: inputsValues.length >= 2 ? inputsValues.slice(1) : [],
+        currentPoints: {
+          from: inputsValues[0].from,
+          to: inputsValues[0].to,
+          slb: inputsValues[0].slb,
+          vlb: inputsValues[0].vlb,
+          sle: inputsValues[0].sle,
+          vle: inputsValues[0].vle,
+          sls: inputsValues[0].sls,
+          vls: inputsValues[0].vls,
         },
       });
 
