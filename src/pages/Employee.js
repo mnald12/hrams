@@ -1,7 +1,7 @@
 import "../css/employee.css";
 import { useState, useEffect, useContext } from "react";
 import Loader from "../components/Loader";
-import { FaEye, FaTrash } from "react-icons/fa";
+import { FaEye } from "react-icons/fa";
 import { FaEdit } from "react-icons/fa";
 import { TiGroupOutline } from "react-icons/ti";
 import { IoPersonRemoveOutline } from "react-icons/io5";
@@ -13,11 +13,7 @@ import { Link } from "react-router-dom";
 import { DataContext } from "../App";
 import { FiSearch } from "react-icons/fi";
 import avapic from "../mopic.jpg";
-import {
-  deleteOne,
-  getMostLateEmployee,
-  getMostLeaveEmployee,
-} from "../methods/methods";
+import { getMostLateEmployee, getMostLeaveEmployee } from "../methods/methods";
 
 const Employee = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -131,12 +127,6 @@ const Employee = () => {
                         >
                           <FaEdit color="orange" />
                         </Link>
-                        <button
-                          title="delete"
-                          onClick={() => deleteOne("employee", e.id)}
-                        >
-                          <FaTrash color="red" />
-                        </button>
                       </td>
                     </tr>
                   ))}
